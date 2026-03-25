@@ -4,6 +4,7 @@ import './bootstrap';
 import { createInertiaApp } from '@inertiajs/react';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { createRoot } from 'react-dom/client';
+import SiteLayout from '@/Layouts/SiteLayout';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Micro & Mega';
 
@@ -13,7 +14,15 @@ createInertiaApp({
         resolvePageComponent(
             `./Pages/${name}.jsx`,
             import.meta.glob('./Pages/**/*.jsx'),
-        ),
+        ).then((module) => {
+            const Page = module.default;
+
+            if (Page && Page.layout === undefined) {
+                Page.layout = (page) => <SiteLayout>{page}</SiteLayout>;
+            }
+
+            return module;
+        }),
     setup({ el, App, props }) {
         const root = createRoot(el);
 

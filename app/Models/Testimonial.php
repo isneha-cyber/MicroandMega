@@ -24,12 +24,12 @@ class Testimonial extends Model
         'rating' => 'integer',
     ];
 
-    protected $appends = ['photo_url'];
+   // In App/Models/Testimonial.php
+protected $appends = ['photo_url'];
 
-    public function getPhotoUrlAttribute(): ?string
-    {
-        return $this->photo
-            ? Storage::disk('public')->url($this->photo)
-            : null;
-    }
+public function getPhotoUrlAttribute(): ?string
+{
+    return $this->photo ? asset('storage/' . $this->photo) : null;
+}
+
 }

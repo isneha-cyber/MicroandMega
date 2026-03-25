@@ -10,11 +10,12 @@ return new class extends Migration
     {
         Schema::create('projects', function (Blueprint $table) {
             $table->id();
-            $table->string('title');
+            $table->string('title'); // Changed from 'name' to 'title' to match controller
             $table->longText('description')->nullable();
             $table->string('image')->nullable();
             $table->string('client_name')->nullable();
             $table->string('category')->nullable();
+            $table->string('status')->default('active'); // Added status field
             $table->string('slug')->unique()->nullable();
             $table->timestamps();
             $table->softDeletes();

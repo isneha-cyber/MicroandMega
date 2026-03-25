@@ -133,4 +133,6 @@ const Products = () => {
     );
 };
 
+Products.layout = (page) => page;
+
 export default Products;
