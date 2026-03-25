@@ -105,6 +105,8 @@ Route::get('/project-details/{slug}', function ($slug) {
       Route::get('/contact',function(){
         return Inertia::render('ContactUs');
     });
+
+    
       Route::get('/product-details',function(){
         return Inertia::render('ProductDetailPage');
     });
