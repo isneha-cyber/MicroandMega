@@ -489,7 +489,7 @@ export default function WhyChooseUs() {
 
       <section 
         ref={sectionRef}
-        className="py-16 sm:py-20 lg:py-24 px-8 sm:px-8 lg:px-12 overflow-hidden"
+        className="py-16 sm:py-20 lg:py-24 px-8 sm:px-8 lg:px-12 overflow-hidden bg-[#f8f8f8]"
       >
         <div className="max-w-7xl mx-auto">
 

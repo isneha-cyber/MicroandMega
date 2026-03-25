@@ -11,136 +11,224 @@ class ProjectController extends Controller
     // ✅ Get all projects with pagination and filtering
     public function index(Request $request)
     {
-        $query = Project::query();
-        
-        // Apply search filter
-        if ($request->has('search') && !empty($request->search)) {
-            $search = $request->search;
-            $query->where(function($q) use ($search) {
-                $q->where('title', 'like', "%{$search}%")
-                  ->orWhere('client_name', 'like', "%{$search}%")
-                  ->orWhere('category', 'like', "%{$search}%");
+        try {
+            $query = Project::query();
+            
+            // Apply search filter
+            if ($request->has('search') && !empty($request->search)) {
+                $search = $request->search;
+                $query->where(function($q) use ($search) {
+                    $q->where('title', 'like', "%{$search}%")
+                      ->orWhere('name', 'like', "%{$search}%")
+                      ->orWhere('client_name', 'like', "%{$search}%")
+                      ->orWhere('category', 'like', "%{$search}%");
+                });
+            }
+            
+            // Apply category filter
+            if ($request->has('category') && !empty($request->category) && $request->category !== 'All') {
+                $query->where('category', $request->category);
+            }
+            
+            // Apply status filter - only show active projects for frontend
+            if ($request->has('status') && !empty($request->status)) {
+                $query->where('status', $request->status);
+            } else {
+                $query->where('status', 'active');
+            }
+            
+            // Get paginated results
+            $perPage = $request->get('per_page', 10);
+            $projects = $query->latest()->paginate($perPage);
+            
+            // Transform the data to include image_url and format for frontend
+            $projects->getCollection()->transform(function ($project) {
+                return $this->formatProjectData($project);
             });
+            
+            return response()->json($projects);
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => 'Failed to fetch projects',
+                'message' => $e->getMessage()
+            ], 500);
         }
-        
-        // Apply status filter
-        if ($request->has('status') && !empty($request->status)) {
-            $query->where('status', $request->status);
+    }
+
+    // ✅ Get single project by slug
+    public function show($slug)
+    {
+        try {
+            $project = Project::where('slug', $slug)->firstOrFail();
+            return response()->json($this->formatProjectData($project));
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => 'Project not found',
+                'message' => $e->getMessage()
+            ], 404);
         }
-        
-        // Get paginated results
-        $perPage = $request->get('per_page', 10);
-        $projects = $query->latest()->paginate($perPage);
-        
-        // Transform the data to include image_url
-        $projects->getCollection()->transform(function ($project) {
-            return [
-                'id' => $project->id,
-                'title' => $project->title,
-                'description' => $project->description,
-                'image' => $project->image,
-                'image_url' => $project->image_url,
-                'client_name' => $project->client_name,
-                'category' => $project->category,
-                'status' => $project->status,
-                'slug' => $project->slug,
-                'created_at' => $project->created_at,
-                'updated_at' => $project->updated_at,
-                'deleted_at' => $project->deleted_at,
-            ];
-        });
-        
-        return response()->json($projects);
     }
 
     // ✅ Store new project
     public function store(Request $request)
     {
-        $request->validate([
-            'title' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
-            'client_name' => 'nullable|string|max:255',
-            'category' => 'nullable|string|max:255',
-            'status' => 'required|in:active,inactive',
-        ]);
+        try {
+            $request->validate([
+                'title' => 'required|string|max:255',
+                'name' => 'nullable|string|max:255',
+                'description' => 'nullable|string',
+                'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+                'client_name' => 'nullable|string|max:255',
+                'category' => 'nullable|string|max:255',
+                'status' => 'required|in:active,inactive',
+                'location' => 'nullable|string|max:255',
+                'rating' => 'nullable|integer|min:1|max:5',
+                'year' => 'nullable|string|max:4',
+                'contract_type' => 'nullable|string|max:255',
+                'tags' => 'nullable|array',
+            ]);
 
-        $imagePath = null;
+            $imagePath = null;
 
-        if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->store('projects', 'public');
+            if ($request->hasFile('image')) {
+                $imagePath = $request->file('image')->store('projects', 'public');
+            }
+
+            $project = Project::create([
+                'title' => $request->title,
+                'name' => $request->name ?? $request->title,
+                'description' => $request->description,
+                'image' => $imagePath,
+                'client_name' => $request->client_name,
+                'category' => $request->category,
+                'status' => $request->status,
+                'location' => $request->location,
+                'rating' => $request->rating ?? 4,
+                'year' => $request->year,
+                'contract_type' => $request->contract_type,
+                'tags' => $request->tags,
+            ]);
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Project created successfully',
+                'data' => $this->formatProjectData($project)
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'error' => 'Failed to create project',
+                'message' => $e->getMessage()
+            ], 500);
         }
-
-        $project = Project::create([
-            'title' => $request->title,
-            'description' => $request->description,
-            'image' => $imagePath,
-            'client_name' => $request->client_name,
-            'category' => $request->category,
-            'status' => $request->status,
-        ]);
-
-        // Return the project with image_url
-        $projectData = $project->toArray();
-        $projectData['image_url'] = $project->image_url;
-
-        return response()->json([
-            'status' => true,
-            'message' => 'Project created successfully',
-            'data' => $projectData
-        ]);
     }
 
     // ✅ Update project
     public function update(Request $request, $id)
     {
-        $project = Project::findOrFail($id);
+        try {
+            $project = Project::findOrFail($id);
 
-        $request->validate([
-            'title' => 'sometimes|string|max:255',
-            'description' => 'nullable|string',
-            'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
-            'client_name' => 'nullable|string|max:255',
-            'category' => 'nullable|string|max:255',
-            'status' => 'sometimes|in:active,inactive',
-        ]);
+            $request->validate([
+                'title' => 'sometimes|string|max:255',
+                'name' => 'nullable|string|max:255',
+                'description' => 'nullable|string',
+                'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+                'client_name' => 'nullable|string|max:255',
+                'category' => 'nullable|string|max:255',
+                'status' => 'sometimes|in:active,inactive',
+                'location' => 'nullable|string|max:255',
+                'rating' => 'nullable|integer|min:1|max:5',
+                'year' => 'nullable|string|max:4',
+                'contract_type' => 'nullable|string|max:255',
+                'tags' => 'nullable|array',
+            ]);
 
-        $updateData = $request->only([
-            'title', 'description', 'client_name', 'category', 'status'
-        ]);
+            $updateData = $request->only([
+                'title', 'name', 'description', 'client_name', 'category', 
+                'status', 'location', 'rating', 'year', 'contract_type', 'tags'
+            ]);
 
-        if ($request->hasFile('image')) {
-            // Delete old image
-            if ($project->image && Storage::disk('public')->exists($project->image)) {
-                Storage::disk('public')->delete($project->image);
+            // Ensure name is set if title is updated
+            if ($request->has('title') && !$request->has('name')) {
+                $updateData['name'] = $request->title;
             }
 
-            // Store new image
-            $updateData['image'] = $request->file('image')->store('projects', 'public');
+            if ($request->hasFile('image')) {
+                // Delete old image
+                if ($project->image && Storage::disk('public')->exists($project->image)) {
+                    Storage::disk('public')->delete($project->image);
+                }
+
+                // Store new image
+                $updateData['image'] = $request->file('image')->store('projects', 'public');
+            }
+
+            $project->update($updateData);
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Project updated successfully',
+                'data' => $this->formatProjectData($project->fresh())
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'error' => 'Failed to update project',
+                'message' => $e->getMessage()
+            ], 500);
         }
-
-        $project->update($updateData);
-
-        // Return the updated project with image_url
-        $projectData = $project->fresh()->toArray();
-        $projectData['image_url'] = $project->image_url;
-
-        return response()->json([
-            'status' => true,
-            'message' => 'Project updated successfully',
-            'data' => $projectData
-        ]);
     }
 
     // ✅ Delete project (Soft delete)
     public function destroy($id)
     {
-        $project = Project::findOrFail($id);
-        $project->delete();
+        try {
+            $project = Project::findOrFail($id);
+            $project->delete();
 
-        return response()->json([
-            'status' => true,
-            'message' => 'Project deleted successfully'
-        ]);
+            return response()->json([
+                'status' => true,
+                'message' => 'Project deleted successfully'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'error' => 'Failed to delete project',
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    // ✅ Helper method to format project data for frontend
+    private function formatProjectData($project)
+    {
+        // Handle tags - ensure it's always an array
+        $tags = $project->tags;
+        if (is_string($tags)) {
+            $tags = explode(',', $tags);
+        }
+        if (empty($tags)) {
+            $tags = [$project->category];
+        }
+        
+        return [
+            'id' => $project->id,
+            'name' => $project->name ?? $project->title,
+            'title' => $project->title,
+            'description' => $project->description,
+            'image' => $project->image_url,
+            'client_name' => $project->client_name,
+            'category' => $project->category,
+            'status' => $project->status,
+            'slug' => $project->slug,
+            'location' => $project->location ?? ($project->client_name ?? 'Various Locations'),
+            'rating' => $project->rating ?? 4,
+            'year' => $project->year ?? date('Y', strtotime($project->created_at)),
+            'contractType' => $project->contract_type ?? 'Full Project',
+            'tags' => $tags,
+            'created_at' => $project->created_at,
+            'updated_at' => $project->updated_at,
+        ];
     }
 }

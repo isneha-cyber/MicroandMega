@@ -11,19 +11,15 @@ const PRODUCTS_MENU = [
   { label: 'Data Network',                                path: '/products/data-network' },
   { label: 'Grounding ERT',                               path: '/products/grounding-ert' },
   { label: 'Control & Monitor System',                    path: '/products/control-monitor' },
-  { label: 'NVC Lighting',                                path: '/products/nvc-lighting' },
-  { label: 'Early Detection System',                      path: '/products/early-detection' },
-  { label: 'Remote Notification & Monitoring',            path: '/products/remote-monitoring' },
-  { label: 'Building Management System',                  path: '/products/bms' },
-  { label: 'IoT Customization (RF / GSM / LoRa / WiFi)', path: '/products/iot-customization' },
+ 
 ]
 
 const NAV_LINKS = [
   { label: 'Home',               path: '/' },
   { label: 'About Us',           path: '/about' },
-  { label: 'Products',           path: '/products', hasDropdown: true },
-  { label: 'Services',           path: '/services' },
-  { label: 'Clients & Projects', path: '/clients-projects' },
+  { label: 'Products',           path: '/product', hasDropdown: true },
+  { label: 'Services',           path: '/service' },
+  { label: 'Projects', path: '/projects-page' },
   { label: 'Contact Us',         path: '/contact' },
 ]
 

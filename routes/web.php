@@ -39,10 +39,11 @@ Route::middleware('auth')->group(function () {
     return Inertia::render('AdminPages/Testimonials');
 });
 
-Route::get('/ourprojects',           [ProjectController::class, 'index'])  ->name('ourprojects.index');
-Route::post('/ourprojects',          [ProjectController::class, 'store'])  ->name('ourprojects.store');
-Route::put('/ourprojects/{id}',     [ProjectController::class, 'update']) ->name('ourprojects.update'); 
-Route::delete('/ourprojects/{id}',   [ProjectController::class, 'destroy'])->name('ourprojects.destroy');
+   Route::get('/ourprojects', [ProjectController::class, 'index'])->name('ourprojects.index');
+    Route::post('/ourprojects', [ProjectController::class, 'store'])->name('ourprojects.store');
+    Route::get('/ourprojects/{slug}', [ProjectController::class, 'show'])->name('ourprojects.show');
+    Route::put('/ourprojects/{id}', [ProjectController::class, 'update'])->name('ourprojects.update');
+    Route::delete('/ourprojects/{id}', [ProjectController::class, 'destroy'])->name('ourprojects.destroy');
   
   
     // ── Products ──────────────────────────────────────────────────────────
@@ -82,6 +83,30 @@ Route::delete('/ourprojects/{id}',   [ProjectController::class, 'destroy'])->nam
 
     Route::get('/about',function(){
         return Inertia::render('About');
+    });
+
+
+     Route::get('/service',function(){
+        return Inertia::render('Service');
+    });
+
+
+   Route::get('/projects-page', function () {
+    return Inertia::render('ProjectsPage');
+})->name('projects.page');
+
+Route::get('/project-details/{slug}', function ($slug) {
+    return Inertia::render('ProjectDetailPage', ['slug' => $slug]);
+})->name('project.details');
+
+
+
+
+      Route::get('/contact',function(){
+        return Inertia::render('ContactUs');
+    });
+      Route::get('/product-details',function(){
+        return Inertia::render('ProductDetailPage');
     });
 
 

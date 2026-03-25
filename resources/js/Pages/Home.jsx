@@ -2,7 +2,7 @@ import ContactBanner from '@/M&M/ContactBanner'
 import FAQ from '@/M&M/FAQ'
 import Hero from '@/M&M/Hero'
 import Products from '@/M&M/Products'
-import Projects from '@/M&M/Project'
+import Project from '@/M&M/Project'
 import SecurityAbout from '@/M&M/Securityabout'
 import Services from '@/M&M/Services'
 import Testimonials from '@/M&M/Testimonials'
@@ -16,7 +16,7 @@ const Home = () => {
    <Products/>
    <WhyChooseUs/>
    <Services/>
-    <Projects/>
+    <Project/>
     <ContactBanner/>
     <Testimonials/>
     <FAQ/>
