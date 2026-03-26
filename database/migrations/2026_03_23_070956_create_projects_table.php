@@ -24,7 +24,6 @@ return new class extends Migration
             $table->integer('rating')->default(4);
             $table->string('year')->nullable();
             $table->string('contract_type')->nullable();
-            $table->json('tags')->nullable();
             
             $table->timestamps();
             $table->softDeletes();

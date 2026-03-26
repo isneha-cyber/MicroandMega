@@ -1,4 +1,4 @@
-// import { useState, useRef } from "react";
+﻿// import { useState, useRef } from "react";
 
 // const PROJECTS = [
 //   {
@@ -41,7 +41,7 @@
 
 // const TABS = ["All", "Hospitality", "Bank", "Medical", "Others"];
 
-// // ── Single project card ──
+// // â”€â”€ Single project card â”€â”€
 // const ProjectCard = ({ project }) => (
 //   <div className="flex flex-col gap-3 group cursor-pointer">
 //     <div className="relative rounded-2xl overflow-hidden">
@@ -60,7 +60,7 @@
 //   </div>
 // );
 
-// // ── Mobile carousel ──
+// // â”€â”€ Mobile carousel â”€â”€
 // const MobileCarousel = ({ items }) => {
 //   const [index, setIndex] = useState(0);
 //   const touchStartX = useRef(null);
@@ -154,7 +154,7 @@
 //   );
 // };
 
-// // ── Main component ──
+// // â”€â”€ Main component â”€â”€
 // export default function Projects() {
 //   const [active, setActive] = useState("All");
 
@@ -174,7 +174,7 @@
 //       >
 //         <div className="max-w-7xl mx-auto">
 
-//           {/* ── Header ── */}
+//           {/* â”€â”€ Header â”€â”€ */}
 //           <div className="text-center mb-8 sm:mb-10">
 //             <div className="inline-flex items-center gap-2 mb-3">
 //               <span className="text-md font-semibold text-gray-700 uppercase">
@@ -189,7 +189,7 @@
 //             </h2>
 //           </div>
 
-//           {/* ── Filter tabs ── */}
+//           {/* â”€â”€ Filter tabs â”€â”€ */}
 //           <div className="flex flex-wrap items-center justify-center gap-x-1 gap-y-2 mb-10 sm:mb-12">
 //             {TABS.map((tab, i) => (
 //               <div key={tab} className="flex items-center">
@@ -208,12 +208,12 @@
 //             ))}
 //           </div>
 
-//           {/* ── Mobile: carousel ── */}
+//           {/* â”€â”€ Mobile: carousel â”€â”€ */}
 //           <div className="sm:hidden">
 //             <MobileCarousel items={filtered} />
 //           </div>
 
-//           {/* ── Tablet + Desktop: grid ── */}
+//           {/* â”€â”€ Tablet + Desktop: grid â”€â”€ */}
 //           <div className="hidden sm:grid sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-12">
 //             {filtered.length > 0 ? (
 //               filtered.map((project) => (
@@ -232,55 +232,16 @@
 //   );
 // }
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import axios from "axios";
 
 // Register ScrollTrigger
 gsap.registerPlugin(ScrollTrigger);
 
-const PROJECTS = [
-  {
-    id: 1,
-    title: "Bir Hospital Surgical Building",
-    category: "Medical",
-    img: "/images/p1.jpeg",
-  },
-  {
-    id: 2,
-    title: "Nepal Rastrya Bank, Baluwatar",
-    category: "Bank",
-    img: "/images/p2.jpeg",
-  },
-  {
-    id: 3,
-    title: "Nepal Rastrya Bank, Thapathali",
-    category: "Bank",
-    img: "/images/p3.jpeg",
-  },
-  {
-    id: 4,
-    title: "DI Skin Hospital",
-    category: "Medical",
-    img: "/images/p4.jpeg",
-  },
-  {
-    id: 5,
-    title: "Mountain Glory Pokhara",
-    category: "Hospitality",
-    img: "/images/p5.jpeg",
-  },
-  {
-    id: 6,
-    title: "The Flip Resort, Pokhara",
-    category: "Hospitality",
-    img: "/images/p6.jpeg",
-  },
-];
 
-const TABS = ["All", "Hospitality", "Bank", "Medical", "Others"];
-
-// ── Single project card ──
+// â”€â”€ Single project card â”€â”€
 const ProjectCard = ({ project, index }) => {
   const cardRef = useRef(null);
 
@@ -313,22 +274,22 @@ const ProjectCard = ({ project, index }) => {
     <div ref={cardRef} className="flex flex-col gap-3 group cursor-pointer">
       <div className="relative rounded-2xl overflow-hidden">
         <img
-          src={project.img}
-          alt={project.title}
+          src={project.image || project.image_url || "/placeholder-image.jpg"}
+          alt={project.title || project.name}
           className="w-full h-[220px] sm:h-[320px] object-cover transition-transform duration-500 group-hover:scale-105"
         />
         <span className="absolute top-4 left-4 bg-[#cc1400] text-white text-sm font-semibold px-3 py-1 rounded-md">
-          {project.category}
+          {project.category || "Project"}
         </span>
       </div>
       <p className="text-center text-gray-800 font-semibold text-lg leading-relaxed group-hover:text-[#cc1400] transition-colors duration-150">
-        {project.title}
+        {project.title || project.name}
       </p>
     </div>
   );
 };
 
-// ── Mobile carousel ──
+// â”€â”€ Mobile carousel â”€â”€
 const MobileCarousel = ({ items }) => {
   const [index, setIndex] = useState(0);
   const touchStartX = useRef(null);
@@ -439,16 +400,46 @@ const MobileCarousel = ({ items }) => {
   );
 };
 
-// ── Main component ──
+// â”€â”€ Main component â”€â”€
 export default function Project() {
   const [active, setActive] = useState("All");
+  const [projects, setProjects] = useState([]);
+  const [loading, setLoading] = useState(true);
   const sectionRef = useRef(null);
   const headerRef = useRef(null);
   const tabsRef = useRef(null);
   const gridRef = useRef(null);
 
+  const tabs = useMemo(() => {
+    const categories = projects.map((p) => p.category).filter(Boolean);
+    return ["All", ...Array.from(new Set(categories))];
+  }, [projects]);
+
   const filtered =
-    active === "All" ? PROJECTS : PROJECTS.filter((p) => p.category === active);
+    active === "All" ? projects : projects.filter((p) => p.category === active);
+
+  useEffect(() => {
+    const fetchLatest = async () => {
+      try {
+        setLoading(true);
+        const response = await axios.get("/ourprojects?per_page=6");
+        setProjects(response.data?.data || []);
+      } catch (error) {
+        console.error("Error fetching latest projects:", error);
+        setProjects([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchLatest();
+  }, []);
+
+  useEffect(() => {
+    if (!tabs.includes(active)) {
+      setActive("All");
+    }
+  }, [tabs, active]);
 
   useEffect(() => {
     // Initial entrance animation when page loads
@@ -559,7 +550,7 @@ export default function Project() {
         }
       );
     }
-  }, [active]);
+  }, [active, projects]);
 
   return (
     <>
@@ -578,7 +569,7 @@ export default function Project() {
       >
         <div className="max-w-7xl mx-auto relative z-10">
 
-          {/* ── Header ── */}
+          {/* â”€â”€ Header â”€â”€ */}
           <div ref={headerRef} className="text-center mb-8 sm:mb-10">
             <div className="inline-flex items-center gap-2 mb-3">
               <span className="text-md font-semibold text-gray-700 uppercase tracking-wide">
@@ -599,12 +590,12 @@ export default function Project() {
             </h2>
           </div>
 
-          {/* ── Filter tabs ── */}
+          {/* â”€â”€ Filter tabs â”€â”€ */}
           <div 
             ref={tabsRef} 
             className="flex flex-wrap items-center justify-center gap-x-1 gap-y-2 mb-10 sm:mb-12"
           >
-            {TABS.map((tab, i) => (
+            {tabs.map((tab, i) => (
               <div key={tab} className="flex items-center">
                 <button
                   onClick={() => setActive(tab)}
@@ -619,24 +610,32 @@ export default function Project() {
                     <span className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-6 h-0.5 bg-[#cc1400] rounded-full"></span>
                   )}
                 </button>
-                {i < TABS.length - 1 && (
+                {i < tabs.length - 1 && (
                   <span className="w-1.5 h-1.5 rounded-full bg-[#cc1400] inline-block mx-0.5 opacity-70" />
                 )}
               </div>
             ))}
           </div>
 
-          {/* ── Mobile: carousel ── */}
+          {/* â”€â”€ Mobile: carousel â”€â”€ */}
           <div className="sm:hidden">
-            <MobileCarousel items={filtered} />
+            {loading ? (
+              <p className="text-center text-gray-400 py-10 text-sm">Loading projects...</p>
+            ) : (
+              <MobileCarousel items={filtered} />
+            )}
           </div>
 
-          {/* ── Tablet + Desktop: grid ── */}
+          {/* â”€â”€ Tablet + Desktop: grid â”€â”€ */}
           <div 
             ref={gridRef}
             className="hidden sm:grid sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-12"
           >
-            {filtered.length > 0 ? (
+            {loading ? (
+              <p className="col-span-3 text-center text-gray-400 py-10 text-sm">
+                Loading projects...
+              </p>
+            ) : filtered.length > 0 ? (
               filtered.map((project, idx) => (
                 <ProjectCard key={project.id} project={project} index={idx} />
               ))
@@ -658,3 +657,4 @@ export default function Project() {
     </>
   );
 }
+

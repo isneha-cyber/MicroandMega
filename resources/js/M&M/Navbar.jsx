@@ -1,18 +1,9 @@
 
 import { Link, usePage } from '@inertiajs/react'
 import React, { useState, useEffect, useRef } from 'react'
+import axios from 'axios'
 
-const PRODUCTS_MENU = [
-  { label: 'Fire Alarm',                                  path: '/products/fire-alarm' },
-  { label: 'Access Control',                              path: '/products/access-control' },
-  { label: 'Public Address',                              path: '/products/public-address' },
-  { label: 'CCTV',                                        path: '/products/cctv' },
-  { label: 'Digital Lighting',                            path: '/products/digital-lighting' },
-  { label: 'Data Network',                                path: '/products/data-network' },
-  { label: 'Grounding ERT',                               path: '/products/grounding-ert' },
-  { label: 'Control & Monitor System',                    path: '/products/control-monitor' },
- 
-]
+const PRODUCTS_MENU = []
 
 const NAV_LINKS = [
   { label: 'Home',               path: '/' },
@@ -49,6 +40,7 @@ export default function Navbar() {
   const [mobileOpen,     setMobileOpen]     = useState(false)
   const [mobileProdOpen, setMobileProdOpen] = useState(false)
   const [scrolled,       setScrolled]       = useState(false)
+  const [productMenu,    setProductMenu]    = useState(PRODUCTS_MENU)
   const dropdownRef = useRef(null)
   const { url } = usePage()
 
@@ -56,6 +48,24 @@ export default function Navbar() {
     const onScroll = () => setScrolled(window.scrollY > 60)
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
+  }, [])
+
+  useEffect(() => {
+    const loadCategories = async () => {
+      try {
+        const res = await axios.get('/ourcategories')
+        const data = Array.isArray(res.data) ? res.data : res.data?.data || []
+        const menu = data.map((c) => ({
+          label: c.name,
+          path: `/products/category/${c.slug}`,
+        }))
+        setProductMenu(menu)
+      } catch (e) {
+        // keep fallback empty
+        console.error('Error loading product menu', e)
+      }
+    }
+    loadCategories()
   }, [])
 
   useEffect(() => {
@@ -144,7 +154,7 @@ export default function Navbar() {
                       <div className="h-[3px] bg-[#bb1403]" />
                       {/* FIX: fixed max height with scroll */}
                       <ul className="py-1.5 m-0 p-0 list-none max-h-[340px] overflow-y-auto">
-                        {PRODUCTS_MENU.map((sub) => (
+                        {productMenu.map((sub) => (
                           <li key={sub.label}>
                             <Link
                               href={sub.path}
@@ -244,7 +254,7 @@ export default function Navbar() {
                   </button>
                   {mobileProdOpen && (
                     <div className="ml-3 pl-3 pb-1 border-l-2 border-[#bb1403]/20 flex flex-col gap-0.5">
-                      {PRODUCTS_MENU.map((sub) => (
+                      {productMenu.map((sub) => (
                         <Link
                           key={sub.label}
                           href={sub.path}

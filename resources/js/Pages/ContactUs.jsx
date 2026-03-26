@@ -99,7 +99,7 @@ const ContactUS = () => {
 
       {/* Hero Banner */}
       <div
-        className="relative flex min-h-[220px] items-center justify-center bg-cover bg-center bg-no-repeat px-6 py-12 sm:min-h-[420px] sm:py-20 lg:min-h-[550px] lg:bg-fixed"
+        className="relative flex min-h-[320px] items-center justify-center bg-cover bg-center bg-no-repeat px-6 py-12 sm:min-h-[420px] sm:py-20 lg:min-h-[550px] lg:bg-fixed"
         style={{ backgroundImage: "url('/images/about-bg.jpg')" }}
       >
         <div className="absolute inset-0 bg-gray-900/70 pointer-events-none" />
@@ -109,7 +109,8 @@ const ContactUS = () => {
       <Link to="/" className="hover:text-red-500 transition-colors duration-300">Home</Link>
       <span className="mx-2">/</span>
       <span>Contact Us</span>
-    </h3>        </div>
+    </h3>   
+         </div>
       </div>
 
       {/* Section 1: Info Row */}

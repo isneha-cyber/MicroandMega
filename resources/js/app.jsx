@@ -17,7 +17,10 @@ createInertiaApp({
         ).then((module) => {
             const Page = module.default;
 
-            if (Page && Page.layout === undefined) {
+            const isAuthPage = name.startsWith('Auth/');
+            const isProfilePage = name.startsWith('Profile/');
+
+            if (Page && Page.layout === undefined && !isAuthPage && !isProfilePage) {
                 Page.layout = (page) => <SiteLayout>{page}</SiteLayout>;
             }
 

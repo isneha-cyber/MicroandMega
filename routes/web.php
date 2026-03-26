@@ -9,6 +9,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\TestimonialController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\LogController;
+use App\Http\Controllers\CategoryController;
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [
@@ -48,11 +49,11 @@ Route::middleware('auth')->group(function () {
   
     // ── Products ──────────────────────────────────────────────────────────
 
-   Route::get('/ourproducts', [ProductController::class, 'index'])->name('ourproducts.index');
     Route::post('/ourproducts', [ProductController::class, 'store'])->name('ourproducts.store');
     Route::put('/ourproducts/{id}', [ProductController::class, 'update'])->name('ourproducts.update');
     Route::delete('/ourproducts/{id}', [ProductController::class, 'destroy'])->name('ourproducts.destroy');
   
+
      // ── Testimonials ──────────────────────────────────────────────────────
     Route::get('/ourtestimonials',                 [TestimonialController::class, 'index'])  ->name('ourtestimonials.index');
     Route::post('/ourtestimonials',                [TestimonialController::class, 'store'])  ->name('ourtestimonials.store');
@@ -79,6 +80,25 @@ Route::middleware('auth')->group(function () {
    
 });
 
+
+// Public Category Routes
+Route::get('/ourcategories', [CategoryController::class, 'index'])->name('ourcategories.index');
+Route::get('/ourcategories/dropdown', [CategoryController::class, 'getForDropdown'])->name('ourcategories.dropdown');
+Route::get('/ourcategories/{slug}', [CategoryController::class, 'show'])->name('ourcategories.show');
+
+// Public Product Routes (API)
+Route::get('/ourproducts', [ProductController::class, 'index'])->name('ourproducts.index');
+Route::get('/ourproducts/{slug}', [ProductController::class, 'show'])->name('ourproducts.show');
+Route::get('/ourproducts/category/{categorySlug}', [ProductController::class, 'getByCategory'])->name('ourproducts.category');
+
+// Product Detail Pages (public)
+Route::get('/products/category/{categorySlug}', function ($categorySlug) {
+    return Inertia::render('ProductDetailPage', ['categorySlug' => $categorySlug]);
+})->name('products.category');
+
+Route::get('/products/{slug}', function ($slug) {
+    return Inertia::render('ProductDetailPage', ['productSlug' => $slug]);
+})->name('products.show');
 
 
     Route::get('/about',function(){

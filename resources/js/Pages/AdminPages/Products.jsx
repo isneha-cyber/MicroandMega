@@ -3,26 +3,54 @@ import AdminWrapper from "@/AdminDashboard/AdminWrapper";
 import axios from "axios";
 import { Plus } from "lucide-react";
 import React, { useEffect, useState } from "react";
+import { ChevronDown } from "lucide-react";
 
 const Products = () => {
     const [allProducts, setAllProducts] = useState([]);
+    const [filteredProducts, setFilteredProducts] = useState([]);
+    const [categories, setCategories] = useState([]);
+    const [selectedCategory, setSelectedCategory] = useState("all");
     const [reloadTrigger, setReloadTrigger] = useState(false);
     const [editingProducts, setEditingProducts] = useState(null);
     const [showAddForm, setShowAddForm] = useState(false);
 
-    // For fetching the products data
     useEffect(() => {
-        const fetchProducts = async () => {
+    const fetchProducts = async () => {
+        try {
+            // Change from route("ourproducts.index") to just the URL
+            const response = await axios.get('/ourproducts');
+            const list = response.data.data || response.data;
+            setAllProducts(list);
+        } catch (error) {
+            console.error("fetching error ", error);
+        }
+    };
+
+    fetchProducts();
+}, [reloadTrigger]);
+
+    useEffect(() => {
+        const fetchCategories = async () => {
             try {
-                const response = await axios.get(route("ourproducts.index"));
-                setAllProducts(response.data.data || response.data);
+                const res = await axios.get('/ourcategories');
+                const data = Array.isArray(res.data) ? res.data : res.data?.data || [];
+                setCategories(data);
             } catch (error) {
-                console.error("fetching error ", error);
+                console.error("fetching categories error", error);
             }
         };
+        fetchCategories();
+    }, []);
 
-        fetchProducts();
-    }, [reloadTrigger]);
+    useEffect(() => {
+        if (selectedCategory === "all") {
+            setFilteredProducts(allProducts);
+            return;
+        }
+        setFilteredProducts(
+            allProducts.filter((p) => p.category?.slug === selectedCategory)
+        );
+    }, [allProducts, selectedCategory]);
 
     // For delete the products
     const handleDelete = async (id) => {
@@ -86,37 +114,61 @@ const Products = () => {
                         </button>
                     </div>
                     
-                    {/* Products List */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {allProducts.map((product) => (
-                            <div key={product.id} className="bg-white rounded-lg shadow-md p-4">
-                                {product.image && (
-                                    <img 
-                                        src={`/storage/${product.image}`} 
-                                        alt={product.name}
-                                        className="w-full h-48 object-cover rounded-md mb-4"
-                                    />
-                                )}
-                                <h3 className="text-xl font-semibold mb-2">{product.name}</h3>
-                                <p className="text-gray-600 mb-2">{product.description}</p>
-                                <p className="text-sm text-gray-500 mb-4">Category: {product.category}</p>
-                                <div className="flex gap-2">
-                                    <button
-                                        onClick={() => handleEdit(product)}
-                                        className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-                                    >
-                                        Edit
-                                    </button>
-                                    <button
-                                        onClick={() => handleDelete(product.id)}
-                                        className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
-                                    >
-                                        Delete
-                                    </button>
-                                </div>
-                            </div>
-                        ))}
+                    <div className="flex items-center gap-3 mb-6">
+                        <div className="relative w-64">
+                            <select
+                                value={selectedCategory}
+                                onChange={(e) => setSelectedCategory(e.target.value)}
+                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 appearance-none bg-white"
+                            >
+                                <option value="all">All Categories</option>
+                                {categories.map((c) => (
+                                    <option key={c.id} value={c.slug}>
+                                        {c.name}
+                                    </option>
+                                ))}
+                            </select>
+                            <ChevronDown className="absolute right-3 top-3 h-4 w-4 text-gray-400 pointer-events-none" />
+                        </div>
                     </div>
+
+                    {/* Products List */}
+<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    {filteredProducts.map((product) => (
+        <div key={product.id} className="bg-white rounded-lg shadow-md p-4">
+            {product.featured_image && (
+                <img 
+                    src={`/storage/${product.featured_image}`} 
+                    alt={product.name}
+                    className="w-full h-48 object-cover rounded-md mb-4"
+                    onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.src = "/images/placeholder.jpg";
+                    }}
+                />
+            )}
+            <h3 className="text-xl font-semibold mb-2">{product.name}</h3>
+            <p className="text-gray-600 mb-2">{product.description}</p>
+            <p className="text-sm text-gray-500 mb-4">
+                Category: {product.category?.name || "—"}
+            </p>
+            <div className="flex gap-2">
+                <button
+                    onClick={() => handleEdit(product)}
+                    className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+                >
+                    Edit
+                </button>
+                <button
+                    onClick={() => handleDelete(product.id)}
+                    className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+                >
+                    Delete
+                </button>
+            </div>
+        </div>
+    ))}
+</div>
 
                     {showAddForm && (
                         <AddProducts

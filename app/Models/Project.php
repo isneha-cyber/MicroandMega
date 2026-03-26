@@ -17,7 +17,6 @@ class Project extends Model
         'name',
         'description',
         'image',
-        'client_name',
         'category',
         'status',
         'slug',
@@ -25,11 +24,9 @@ class Project extends Model
         'rating',
         'year',
         'contract_type',
-        'tags',
     ];
 
     protected $casts = [
-        'tags' => 'array',
         'rating' => 'integer',
     ];
 
@@ -69,9 +66,7 @@ class Project extends Model
             }
             
             // Set default location if not provided
-            if (!$project->location && $project->client_name) {
-                $project->location = $project->client_name;
-            } elseif (!$project->location) {
+            if (!$project->location) {
                 $project->location = 'Various Locations';
             }
             
@@ -80,10 +75,6 @@ class Project extends Model
                 $project->rating = 4;
             }
             
-            // Set default tags from category if not provided
-            if (!$project->tags && $project->category) {
-                $project->tags = [$project->category];
-            }
         });
 
         static::created(function ($project) {

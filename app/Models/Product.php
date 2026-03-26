@@ -1,4 +1,5 @@
 <?php
+// app/Models/Product.php
 
 namespace App\Models;
 
@@ -14,9 +15,14 @@ class Product extends Model
     protected $fillable = [
         'name',
         'description',
-        'image',
+        'image',           // Make sure this matches your database column
         'category',
-        'slug'
+        'slug',
+        'title',
+        'content',
+        'featured_image',
+        'category_id',
+        'status'
     ];
 
     protected static function boot()
@@ -27,13 +33,15 @@ class Product extends Model
             $randomNumber = rand(10000, 99999);
             $product->slug = Str::slug($product->name) . '-' . $randomNumber;
         });
-        
-        // Also handle updating to prevent slug issues
-        static::updating(function ($product) {
-            if ($product->isDirty('name')) {
-                $randomNumber = rand(10000, 99999);
-                $product->slug = Str::slug($product->name) . '-' . $randomNumber;
-            }
-        });
+    }
+
+    public function category()
+    {
+        return $this->belongsTo(Category::class);
+    }
+
+    public function images()
+    {
+        return $this->hasMany(ProductImage::class);
     }
 }

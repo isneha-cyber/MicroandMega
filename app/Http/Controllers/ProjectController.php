@@ -78,14 +78,12 @@ class ProjectController extends Controller
                 'name' => 'nullable|string|max:255',
                 'description' => 'nullable|string',
                 'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
-                'client_name' => 'nullable|string|max:255',
                 'category' => 'nullable|string|max:255',
                 'status' => 'required|in:active,inactive',
                 'location' => 'nullable|string|max:255',
                 'rating' => 'nullable|integer|min:1|max:5',
                 'year' => 'nullable|string|max:4',
                 'contract_type' => 'nullable|string|max:255',
-                'tags' => 'nullable|array',
             ]);
 
             $imagePath = null;
@@ -99,14 +97,12 @@ class ProjectController extends Controller
                 'name' => $request->name ?? $request->title,
                 'description' => $request->description,
                 'image' => $imagePath,
-                'client_name' => $request->client_name,
                 'category' => $request->category,
                 'status' => $request->status,
                 'location' => $request->location,
                 'rating' => $request->rating ?? 4,
                 'year' => $request->year,
                 'contract_type' => $request->contract_type,
-                'tags' => $request->tags,
             ]);
 
             return response()->json([
@@ -134,19 +130,17 @@ class ProjectController extends Controller
                 'name' => 'nullable|string|max:255',
                 'description' => 'nullable|string',
                 'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
-                'client_name' => 'nullable|string|max:255',
                 'category' => 'nullable|string|max:255',
                 'status' => 'sometimes|in:active,inactive',
                 'location' => 'nullable|string|max:255',
                 'rating' => 'nullable|integer|min:1|max:5',
                 'year' => 'nullable|string|max:4',
                 'contract_type' => 'nullable|string|max:255',
-                'tags' => 'nullable|array',
             ]);
 
             $updateData = $request->only([
-                'title', 'name', 'description', 'client_name', 'category', 
-                'status', 'location', 'rating', 'year', 'contract_type', 'tags'
+                'title', 'name', 'description', 'category', 
+                'status', 'location', 'rating', 'year', 'contract_type'
             ]);
 
             // Ensure name is set if title is updated
@@ -203,30 +197,20 @@ class ProjectController extends Controller
     // ✅ Helper method to format project data for frontend
     private function formatProjectData($project)
     {
-        // Handle tags - ensure it's always an array
-        $tags = $project->tags;
-        if (is_string($tags)) {
-            $tags = explode(',', $tags);
-        }
-        if (empty($tags)) {
-            $tags = [$project->category];
-        }
-        
         return [
             'id' => $project->id,
             'name' => $project->name ?? $project->title,
             'title' => $project->title,
             'description' => $project->description,
             'image' => $project->image_url,
-            'client_name' => $project->client_name,
+            'image_url' => $project->image_url,
             'category' => $project->category,
             'status' => $project->status,
             'slug' => $project->slug,
-            'location' => $project->location ?? ($project->client_name ?? 'Various Locations'),
+            'location' => $project->location ?? 'Various Locations',
             'rating' => $project->rating ?? 4,
             'year' => $project->year ?? date('Y', strtotime($project->created_at)),
             'contractType' => $project->contract_type ?? 'Full Project',
-            'tags' => $tags,
             'created_at' => $project->created_at,
             'updated_at' => $project->updated_at,
         ];

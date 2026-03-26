@@ -7,7 +7,11 @@ const AdminNavBar = ({ onMenuToggle }) => {
     const userMenuRef = useRef(null);
     const { auth } = usePage().props;
     const user = auth?.user;
-    const imgurl = import.meta.env.VITE_IMAGE_PATH;
+    const resolveUserImage = () => {
+        if (user?.image_url) return user.image_url;
+        if (user?.image) return `/storage/${user.image}`;
+        return null;
+    };
 
     // Get first letter of user's name for avatar fallback
     const getUserInitial = () => {
@@ -97,9 +101,9 @@ const AdminNavBar = ({ onMenuToggle }) => {
                             >
                                 <div className="flex items-center space-x-3">
                                     <div className="w-8 h-8 rounded-full flex items-center justify-center overflow-hidden bg-gradient-to-br from-blue-500 to-blue-600">
-                                        {user?.image ? (
+                                        {resolveUserImage() ? (
                                             <img
-                                                src={`${imgurl}/${user.image}`}
+                                                src={resolveUserImage()}
                                                 alt={`${
                                                     user?.name || "User"
                                                 } profile`}

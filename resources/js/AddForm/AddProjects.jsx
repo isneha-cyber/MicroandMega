@@ -16,10 +16,7 @@ const AddProjects = ({ editingProjects, setEditingProjects, setReloadTrigger, se
         rating: 4, // New field with default value
         year: new Date().getFullYear().toString(), // New field
         contract_type: "Full Project", // New field
-        tags: [], // New field as array
     });
-
-    const [tagInput, setTagInput] = useState("");
 
     // Use Effect for editing
     useEffect(() => {
@@ -36,7 +33,6 @@ const AddProjects = ({ editingProjects, setEditingProjects, setReloadTrigger, se
                 rating: editingProjects.rating || 4,
                 year: editingProjects.year || new Date().getFullYear().toString(),
                 contract_type: editingProjects.contractType || editingProjects.contract_type || "Full Project",
-                tags: editingProjects.tags || [],
             });
             setShowForm(true);
         } else {
@@ -52,7 +48,6 @@ const AddProjects = ({ editingProjects, setEditingProjects, setReloadTrigger, se
                 rating: 4,
                 year: new Date().getFullYear().toString(),
                 contract_type: "Full Project",
-                tags: [],
             });
         }
     }, [editingProjects, setShowForm]);
@@ -85,10 +80,7 @@ const AddProjects = ({ editingProjects, setEditingProjects, setReloadTrigger, se
         // Append all form data
         for (const key in projectsForm) {
             if (projectsForm[key] !== null && projectsForm[key] !== "" && projectsForm[key] !== undefined) {
-                if (key === 'tags' && Array.isArray(projectsForm[key])) {
-                    // Send tags as JSON string
-                    formData.append(key, JSON.stringify(projectsForm[key]));
-                } else if (key !== 'image') {
+                if (key !== 'image') {
                     formData.append(key, projectsForm[key]);
                 }
             }
@@ -123,10 +115,8 @@ const AddProjects = ({ editingProjects, setEditingProjects, setReloadTrigger, se
                 rating: 4,
                 year: new Date().getFullYear().toString(),
                 contract_type: "Full Project",
-                tags: [],
+                
             });
-            setTagInput("");
-
             setShowForm(false);
             setEditingProjects(null);
             setReloadTrigger(prev => !prev);
@@ -145,33 +135,6 @@ const AddProjects = ({ editingProjects, setEditingProjects, setReloadTrigger, se
             ...prev,
             [name]: type === "file" ? files[0] : value,
         }));
-    };
-
-    // Handle tag addition
-    const handleAddTag = () => {
-        if (tagInput.trim() && !projectsForm.tags.includes(tagInput.trim())) {
-            setProjectsForm(prev => ({
-                ...prev,
-                tags: [...prev.tags, tagInput.trim()]
-            }));
-            setTagInput("");
-        }
-    };
-
-    // Handle tag removal
-    const handleRemoveTag = (tagToRemove) => {
-        setProjectsForm(prev => ({
-            ...prev,
-            tags: prev.tags.filter(tag => tag !== tagToRemove)
-        }));
-    };
-
-    // Handle key press for tags
-    const handleTagKeyPress = (e) => {
-        if (e.key === 'Enter') {
-            e.preventDefault();
-            handleAddTag();
-        }
     };
 
     return (
@@ -328,46 +291,6 @@ const AddProjects = ({ editingProjects, setEditingProjects, setReloadTrigger, se
                                 <option value="Maintenance">Maintenance</option>
                                 <option value="Design Only">Design Only</option>
                             </select>
-                        </div>
-                    </div>
-
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Tags
-                        </label>
-                        <div className="flex gap-2 mb-2">
-                            <input
-                                type="text"
-                                value={tagInput}
-                                onChange={(e) => setTagInput(e.target.value)}
-                                onKeyPress={handleTagKeyPress}
-                                className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                                placeholder="Add a tag and press Enter"
-                            />
-                            <button
-                                type="button"
-                                onClick={handleAddTag}
-                                className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300"
-                            >
-                                Add
-                            </button>
-                        </div>
-                        <div className="flex flex-wrap gap-2">
-                            {projectsForm.tags.map((tag, index) => (
-                                <span
-                                    key={index}
-                                    className="inline-flex items-center gap-1 px-2 py-1 bg-blue-100 text-blue-700 rounded-full text-sm"
-                                >
-                                    {tag}
-                                    <button
-                                        type="button"
-                                        onClick={() => handleRemoveTag(tag)}
-                                        className="hover:text-red-600"
-                                    >
-                                        ×
-                                    </button>
-                                </span>
-                            ))}
                         </div>
                     </div>
 
