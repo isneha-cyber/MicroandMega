@@ -1,7 +1,8 @@
 import AdminWrapper from "@/AdminDashboard/AdminWrapper";
+import MyTable from "@/MyTable/MyTable";
 import axios from "axios";
 import { RefreshCw, Plus } from "lucide-react";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 
 const ActivityLog = () => {
     const [allLog, setAllLog] = useState([]);
@@ -34,6 +35,23 @@ const ActivityLog = () => {
         if (!dateString) return 'N/A';
         return new Date(dateString).toLocaleString();
     };
+
+    const columns = useMemo(
+        () => [
+            { Header: "ID", accessor: "id" },
+            { Header: "User Name", accessor: "name" },
+            { Header: "IP Address", accessor: "ip_address" },
+            { Header: "Activity", accessor: "title" },
+            {
+                Header: "Date & Time",
+                accessor: "created_at",
+                Cell: ({ value }) => formatDate(value),
+            },
+        ],
+        []
+    );
+
+    const tableData = useMemo(() => allLog, [allLog]);
 
  
 
@@ -77,50 +95,7 @@ const ActivityLog = () => {
 
                     {/* Logs Table */}
                     {!loading && !error && allLog.length > 0 && (
-                        <div className="overflow-x-auto">
-                            <table className="min-w-full bg-white border border-gray-200 rounded-lg">
-                                <thead className="bg-gray-50">
-                                    <tr>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            ID
-                                        </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            User Name
-                                        </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            IP Address
-                                        </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            Activity
-                                        </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            Date & Time
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y divide-gray-200">
-                                    {allLog.map((log) => (
-                                        <tr key={log.id} className="hover:bg-gray-50">
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                                {log.id}
-                                            </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                                {log.name}
-                                            </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                                {log.ip_address}
-                                            </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                                {log.title}
-                                            </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                {formatDate(log.created_at)}
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
+                        <MyTable columns={columns} data={tableData} />
                     )}
                 </div>
             </AdminWrapper>

@@ -10,6 +10,7 @@ use App\Http\Controllers\TestimonialController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\LogController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\ServiceTicketController;
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [
@@ -38,6 +39,10 @@ Route::middleware('auth')->group(function () {
 });
     Route::get('/testimonials', function () {
     return Inertia::render('AdminPages/Testimonials');
+});
+
+    Route::get('/service-tickets', function () {
+    return Inertia::render('AdminPages/ServiceTicket');
 });
 
    Route::get('/ourprojects', [ProjectController::class, 'index'])->name('ourprojects.index');
@@ -76,6 +81,9 @@ Route::middleware('auth')->group(function () {
         return Inertia::render('AdminPages/ActivityLog');
     });
     Route::get('/logs', [LogController::class, 'index'])->name('logs.index');  
+
+    // Service Tickets (Admin)
+    Route::get('/ourservicetickets', [ServiceTicketController::class, 'index'])->name('ourservicetickets.index');
 
    
 });
@@ -130,6 +138,14 @@ Route::get('/project-details/{slug}', function ($slug) {
       Route::get('/product-details',function(){
         return Inertia::render('ProductDetailPage');
     });
+
+
+      Route::get('/service-ticket',function(){
+        return Inertia::render('ServiceTicket');
+    });
+
+// Service Ticket submission (public)
+Route::post('/service-tickets', [ServiceTicketController::class, 'store'])->name('service-tickets.store');
 
 
 

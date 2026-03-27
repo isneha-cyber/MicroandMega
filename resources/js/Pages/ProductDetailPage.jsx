@@ -206,6 +206,14 @@ export default function ProductDetailPage() {
     const [selectedCategory, setSelectedCategory] = useState(null);
     const [loading, setLoading] = useState(true);
 
+    const updateCategoryUrl = (slug) => {
+        if (!slug) return;
+        const nextPath = `/products/category/${slug}`;
+        if (typeof window !== "undefined" && window.history?.replaceState) {
+            window.history.replaceState(null, "", nextPath);
+        }
+    };
+
     const fetchCategories = async () => {
         try {
             const response = await axios.get('/ourcategories');
@@ -277,6 +285,7 @@ export default function ProductDetailPage() {
     const handleCategorySelect = async (category) => {
         if (category?.slug) {
             await fetchProductsByCategory(category.slug);
+            updateCategoryUrl(category.slug);
             setSidebarOpen(false);
             return;
         }
@@ -284,6 +293,7 @@ export default function ProductDetailPage() {
             const found = categories.find(c => c.id === category.id);
             if (found?.slug) {
                 await fetchProductsByCategory(found.slug);
+                updateCategoryUrl(found.slug);
                 setSidebarOpen(false);
             }
         }
