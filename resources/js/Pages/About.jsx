@@ -14,7 +14,7 @@ const About = () => {
 				<div className="relative z-20 flex flex-col items-center text-center">
 					<h2 className="text-4xl font-extrabold uppercase text-white sm:text-5xl lg:text-6xl">About Us</h2>
 					<h3 className="mt-2 text-sm font-semibold text-white sm:text-base lg:text-xl">
-						<Link to="/" className="hover:text-red-500 transition-colors duration-300">Home</Link>
+<Link href="/" className="hover:text-red-500 transition-colors duration-300">Home</Link>
 						<span className="mx-2">/</span>
 						<span>About us</span>
 					</h3>

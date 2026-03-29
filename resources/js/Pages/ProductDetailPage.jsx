@@ -205,6 +205,7 @@ export default function ProductDetailPage() {
     const [selectedProduct, setSelectedProduct] = useState(null);
     const [selectedCategory, setSelectedCategory] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [activeImage, setActiveImage] = useState(null);
 
     const updateCategoryUrl = (slug) => {
         if (!slug) return;
@@ -315,6 +316,22 @@ export default function ProductDetailPage() {
         init();
     }, [categorySlug, productSlug]);
 
+    useEffect(() => {
+        const imgs = [];
+        if (selectedProduct?.featured_image) {
+            imgs.push(`/storage/${selectedProduct.featured_image}`);
+        }
+        if (Array.isArray(selectedProduct?.images)) {
+            selectedProduct.images.forEach((img) => {
+                if (img?.image_path) {
+                    imgs.push(`/storage/${img.image_path}`);
+                }
+            });
+        }
+        const unique = [...new Set(imgs)];
+        setActiveImage(unique[0] || "/images/firealram.jpg");
+    }, [selectedProduct]);
+
     if (loading) {
         return (
             <div className="min-h-screen flex items-center justify-center">
@@ -338,7 +355,7 @@ export default function ProductDetailPage() {
                         {selectedCategory?.name || selectedProduct?.category?.name || "Products"}
                     </h2>
                     <h3 className="mt-2 text-sm font-semibold text-white sm:text-base lg:text-xl">
-                        <Link href="/" className="hover:text-red-500 transition-colors duration-300">Home</Link>
+<Link href="/" className="hover:text-red-500 transition-colors duration-300">Home</Link>
                         <span className="mx-2">/</span>
                         <span>{selectedCategory?.name || selectedProduct?.category?.name || "Product Details"}</span>
                     </h3>
@@ -384,7 +401,7 @@ export default function ProductDetailPage() {
                             
                             {/* Product Image */}
                             <img
-                                src={selectedProduct?.featured_image ? `/storage/${selectedProduct.featured_image}` : "/images/firealram.jpg"}
+                                src={activeImage || "/images/firealram.jpg"}
                                 alt={selectedProduct?.name || "Product"}
                                 className="w-full max-h-[420px] sm:max-h-[520px] object-contain rounded-xl border border-gray-200 bg-white"
                                 onError={(e) => {
@@ -392,6 +409,48 @@ export default function ProductDetailPage() {
                                     e.target.src = "/images/firealram.jpg";
                                 }}
                             />
+
+                            {/* Product Gallery Thumbnails */}
+                            {(() => {
+                                const imgs = [];
+                                if (selectedProduct?.featured_image) {
+                                    imgs.push(`/storage/${selectedProduct.featured_image}`);
+                                }
+                                if (Array.isArray(selectedProduct?.images)) {
+                                    selectedProduct.images.forEach((img) => {
+                                        if (img?.image_path) {
+                                            imgs.push(`/storage/${img.image_path}`);
+                                        }
+                                    });
+                                }
+                                const unique = [...new Set(imgs)];
+                                if (unique.length <= 1) return null;
+                                return (
+                                    <div className="mt-4 grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3">
+                                        {unique.map((src) => (
+                                              <button
+                                                  key={src}
+                                                  onClick={() => setActiveImage(src)}
+                                                  className={`border rounded-lg overflow-hidden bg-gray-50 aspect-square ${
+                                                      activeImage === src
+                                                          ? "border-red-500 ring-2 ring-red-200"
+                                                          : "border-gray-200 hover:border-gray-300"
+                                                  }`}
+                                              >
+                                                  <img
+                                                      src={src}
+                                                      alt="Product thumbnail"
+                                                      className="h-full w-full object-cover"
+                                                      onError={(e) => {
+                                                          e.target.onerror = null;
+                                                          e.target.src = "/images/firealram.jpg";
+                                                      }}
+                                                  />
+                                            </button>
+                                        ))}
+                                    </div>
+                                );
+                            })()}
                             
                             {/* Product Content */}
                             <div className="prose-sm md:prose max-w-none mt-6">

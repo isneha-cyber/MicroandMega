@@ -151,10 +151,10 @@ function ServiceCard({ service, cardRef }) {
       </div>
 
       {/* ── Icon badge — lives OUTSIDE image div, so it's never clipped ── */}
-      <div className="relative flex justify-center" style={{ height: 0 }}>
+      <div className="relative flex justify-center" style={{ height: 12 }}>
         <div
           ref={iconWrapRef}
-          className="absolute -top-[26px] w-[52px] h-[52px] bg-[#c0201c] rounded-full flex items-center justify-center shadow-lg z-10"
+          className="absolute -top-[26px] w-[62px] h-[62px] bg-[#c0201c] rounded-full flex items-center justify-center shadow-lg z-10"
           style={{ willChange: 'transform' }}
         >
           <service.Icon />

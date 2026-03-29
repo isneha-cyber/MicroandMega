@@ -206,7 +206,7 @@ export default function ProjectDetailPage() {
                    
                     {/* Breadcrumb */}
                     <nav className="flex items-center gap-2 text-md text-white/50 mt-1">
-                        <Link href="/" className="hover:text-red-400 transition-colors">Home</Link>
+<Link href="/" className="hover:text-red-500 transition-colors duration-300">Home</Link>
                         <ChevronRight size={11} />
                         <Link href="/projects-page" className="hover:text-red-400 transition-colors">Projects</Link>
                         <ChevronRight size={11} />

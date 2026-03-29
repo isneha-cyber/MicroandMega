@@ -1,5 +1,5 @@
 import { Link } from "@inertiajs/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 function PhoneIcon() {
   return (
@@ -75,6 +75,10 @@ function ContactInfoCard({ icon, label, value, href }) {
 }
 
 const ContactUS = () => {
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+  }, []);
+
   const [formData, setFormData] = useState({
     firstName: "", lastName: "", email: "", phone: "", message: "",
   });
@@ -106,7 +110,7 @@ const ContactUS = () => {
         <div className="relative z-20 flex flex-col items-center text-center">
           <h2 className="text-3xl font-extrabold uppercase text-white sm:text-5xl lg:text-6xl">Contact Us</h2>
 <h3 className="mt-2 text-sm font-semibold text-white sm:text-base lg:text-xl">
-      <Link to="/" className="hover:text-red-500 transition-colors duration-300">Home</Link>
+<Link href="/" className="hover:text-red-500 transition-colors duration-300">Home</Link>
       <span className="mx-2">/</span>
       <span>Contact Us</span>
     </h3>   

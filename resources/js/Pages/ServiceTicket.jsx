@@ -1,6 +1,6 @@
 import { Link } from '@inertiajs/react'
 import axios from 'axios'
-import React, { useState, useRef } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import { useForm } from 'react-hook-form'
 
 // ─── Icons ──────────────────────────────────────────────────────────────────
@@ -84,6 +84,10 @@ const generateTicketId = () =>
   '#TK-' + Math.floor(1000 + Math.random() * 9000)
 
 export default function ServiceTicket() {
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' })
+  }, [])
+
   const [submitted, setSubmitted] = useState(false)
   const [ticketId, setTicketId]   = useState('')
   const [isLoading, setIsLoading] = useState(false)
@@ -210,20 +214,14 @@ export default function ServiceTicket() {
         rel="stylesheet"
       />
 
-      <div
-        className="min-h-screen py-16 "
-        style={{
-          fontFamily: 'Barlow, sans-serif',
-          background: 'linear-gradient(135deg, #fdf5f5 0%, #ffffff 60%, #f9f9f9 100%)',
-        }}
-      >
+    
 
 <div className="relative flex min-h-[420px] items-center justify-center bg-[url('/images/about-bg.jpg')] bg-cover bg-center bg-no-repeat px-6 py-12 sm:min-h-[420px] sm:py-20 lg:min-h-[550px] lg:bg-fixed">
 				<div className="absolute inset-0 bg-gray-900/70 pointer-events-none"/>
 				<div className="relative z-20 flex flex-col items-center text-center">
 					<h2 className="text-4xl font-extrabold uppercase text-white sm:text-5xl lg:text-6xl">Service Ticket</h2>
 					<h3 className="mt-2 text-sm font-semibold text-white sm:text-base lg:text-xl">
-						<Link href="/" className="hover:text-red-500 transition-colors duration-300">Home</Link>
+<Link href="/" className="hover:text-red-500 transition-colors duration-300">Home</Link>
 						<span className="mx-2">/</span>
 						<span>Service Ticket</span>
 					</h3>
@@ -490,7 +488,7 @@ export default function ServiceTicket() {
         <p className="text-center text-xs text-gray-400 mt-6">
           A unique Ticket ID will be generated upon submission for tracking purposes.
         </p>
-      </div>
+     
     </>
   )
 }

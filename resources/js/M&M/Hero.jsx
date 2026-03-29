@@ -477,9 +477,9 @@ const FEATURES = [
   },
 ]
 
-const DiscoverBtn = ({ href }) => (
+const DiscoverBtn = () => (
   <Link
-    href={href}
+    href="/contact"
     className="inline-flex items-center gap-2 bg-[#bb1403] hover:bg-[#9e1102] text-white px-6 py-2.5 rounded-full text-md font-semibold no-underline whitespace-nowrap font-['Barlow',sans-serif] transition-colors duration-150"
   >
     Get Started Now
@@ -487,7 +487,8 @@ const DiscoverBtn = ({ href }) => (
       <path d="M4 10h12M12 6l4 4-4 4" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   </Link>
-)
+);
+
 
 export default function Hero() {
   const [current, setCurrent] = useState(0)
