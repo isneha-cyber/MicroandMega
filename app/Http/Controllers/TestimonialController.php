@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\Testimonial;
+use App\Models\Log;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log as LaravelLog;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -29,12 +31,10 @@ class TestimonialController extends Controller
 
         $testimonials = $query->latest()->paginate(10);
         
-        // Check if this is an API request (expecting JSON)
         if ($request->expectsJson() || $request->header('X-Requested-With') === 'XMLHttpRequest') {
             return response()->json($testimonials);
         }
         
-        // Return Inertia response for normal page loads
         return Inertia::render('Admin/Testimonials/Index', [
             'testimonials' => $testimonials,
             'filters'      => $request->only(['search', 'status']),
@@ -58,6 +58,13 @@ class TestimonialController extends Controller
 
         $testimonial = Testimonial::create($data);
 
+        // Log testimonial creation
+        Log::create([
+            'name'       => auth()->user()?->name ?? 'Guest',
+            'ip_address' => $request->ip(),
+            'title'      => 'Testimonial Created: ' . $testimonial->client_name,
+        ]);
+
         if ($request->expectsJson() || $request->header('X-Requested-With') === 'XMLHttpRequest') {
             return response()->json($testimonial, 201);
         }
@@ -65,9 +72,10 @@ class TestimonialController extends Controller
         return back()->with('success', 'Testimonial created successfully.');
     }
 
-   public function update(Request $request, $id)  // changed from: Testimonial $testimonial
-{
-    $testimonial = Testimonial::findOrFail($id);
+    public function update(Request $request, $id)
+    {
+        $testimonial = Testimonial::findOrFail($id);
+
         $data = $request->validate([
             'client_name' => 'required|string|max:255',
             'company'     => 'nullable|string|max:255',
@@ -84,6 +92,13 @@ class TestimonialController extends Controller
 
         $testimonial->update($data);
 
+        // Log testimonial update
+        Log::create([
+            'name'       => auth()->user()?->name ?? 'Guest',
+            'ip_address' => $request->ip(),
+            'title'      => 'Testimonial Updated: ' . $testimonial->client_name,
+        ]);
+
         if ($request->expectsJson() || $request->header('X-Requested-With') === 'XMLHttpRequest') {
             return response()->json($testimonial);
         }
@@ -91,11 +106,22 @@ class TestimonialController extends Controller
         return back()->with('success', 'Testimonial updated successfully.');
     }
 
-   public function destroy(Request $request, $id)  // changed from: Testimonial $testimonial
-{
-    $testimonial = Testimonial::findOrFail($id);
+    public function destroy(Request $request, $id)
+    {
+        $testimonial = Testimonial::findOrFail($id);
+
+        // Capture client name before deletion for the log
+        $clientName = $testimonial->client_name;
+
         if ($testimonial->photo) Storage::disk('public')->delete($testimonial->photo);
         $testimonial->delete();
+
+        // Log testimonial deletion
+        Log::create([
+            'name'       => auth()->user()?->name ?? 'Guest',
+            'ip_address' => $request->ip(),
+            'title'      => 'Testimonial Deleted: ' . $clientName,
+        ]);
 
         if ($request->expectsJson() || $request->header('X-Requested-With') === 'XMLHttpRequest') {
             return response()->json(['message' => 'Testimonial deleted successfully']);

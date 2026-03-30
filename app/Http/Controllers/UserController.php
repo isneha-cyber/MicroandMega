@@ -17,11 +17,9 @@ class UserController extends Controller
     private function formatUserWithImageUrl($user)
     {
         if ($user->image) {
-            // Check if it's already a full URL
             if (filter_var($user->image, FILTER_VALIDATE_URL)) {
                 $user->image_url = $user->image;
             } else {
-                // Generate full URL for storage path
                 $user->image_url = asset('storage/' . $user->image);
             }
         } else {
@@ -38,7 +36,6 @@ class UserController extends Controller
     {
         $users = User::all();
         
-        // Format each user with image URL
         $users->transform(function ($user) {
             return $this->formatUserWithImageUrl($user);
         });
@@ -58,7 +55,6 @@ class UserController extends Controller
             'image'    => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
-        // Handle image upload
         $imagePath = null;
         if ($request->hasFile('image')) {
             $imagePath = $request->file('image')->store('users', 'public');
@@ -71,14 +67,13 @@ class UserController extends Controller
             'image'    => $imagePath,
         ]);
 
-        // Log creation
+        // Log user creation
         Log::create([
-            'name' => Auth::check() ? Auth::user()->name : 'Guest',
+            'name'       => Auth::check() ? Auth::user()->name : 'Guest',
             'ip_address' => $request->ip(),
-            'title' => 'Created new user (ID: ' . $user->id . ')',
+            'title'      => 'User Created: ' . $user->name,
         ]);
 
-        // Format user with image URL
         $user = $this->formatUserWithImageUrl($user);
 
         return response()->json([
@@ -101,16 +96,13 @@ class UserController extends Controller
             'image'    => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
-        // Handle image update
         if ($request->hasFile('image')) {
-            // Delete old image if exists
             if ($user->image && Storage::disk('public')->exists($user->image)) {
                 Storage::disk('public')->delete($user->image);
             }
             $validated['image'] = $request->file('image')->store('users', 'public');
         }
 
-        // Hash password if updating
         if (!empty($validated['password'])) {
             $validated['password'] = Hash::make($validated['password']);
         } else {
@@ -119,14 +111,13 @@ class UserController extends Controller
 
         $user->update($validated);
 
-        // Log update
+        // Log user update
         Log::create([
-            'name' => Auth::check() ? Auth::user()->name : 'Guest',
+            'name'       => Auth::check() ? Auth::user()->name : 'Guest',
             'ip_address' => $request->ip(),
-            'title' => 'Updated user (ID: ' . $user->id . ')',
+            'title'      => 'User Updated: ' . $user->name,
         ]);
 
-        // Format user with image URL
         $user = $this->formatUserWithImageUrl($user);
 
         return response()->json([
@@ -138,22 +129,24 @@ class UserController extends Controller
     /**
      * Remove the specified user from storage.
      */
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
         $user = User::findOrFail($id);
 
-        // Delete user image if exists
+        // Capture name before deletion for the log
+        $userName = $user->name;
+
         if ($user->image && Storage::disk('public')->exists($user->image)) {
             Storage::disk('public')->delete($user->image);
         }
 
         $user->delete();
 
-        // Log deletion
+        // Log user deletion
         Log::create([
-            'name' => Auth::check() ? Auth::user()->name : 'Guest',
-            'ip_address' => request()->ip(),
-            'title' => 'Deleted user (ID: ' . $id . ')',
+            'name'       => Auth::check() ? Auth::user()->name : 'Guest',
+            'ip_address' => $request->ip(),
+            'title'      => 'User Deleted: ' . $userName,
         ]);
 
         return response()->json([

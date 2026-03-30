@@ -506,4 +506,3 @@ function SectionHeading({ number, title }) {
     </div>
   )
 }
-

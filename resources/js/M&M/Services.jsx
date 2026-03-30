@@ -619,7 +619,7 @@ function useCountUp(target, duration = 2000, startCounting = false) {
 // ── 8 key services extracted from client's product list ──
 const FEATURES = [
 	{
-		title: "Fire Detection & Suppression",
+		title: "Fire Alarm",
 		desc: "UL & EN listed fire alarm systems, suppression, deluge and integrated safety infrastructure for all building types.",
 		icon: (
 			<svg viewBox="0 0 48 48" fill="none" stroke="white"

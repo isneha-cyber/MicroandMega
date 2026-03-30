@@ -9,7 +9,10 @@ const ActivityLog = () => {
     const [reloadTrigger, setReloadTrigger] = useState(false);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [creatingSample, setCreatingSample] = useState(false);
+    
+    // Pagination state for client-side
+    const [currentPage, setCurrentPage] = useState(1);
+    const [itemsPerPage, setItemsPerPage] = useState(10);
 
     // For fetching the log data
     useEffect(() => {
@@ -17,7 +20,7 @@ const ActivityLog = () => {
             try {
                 setLoading(true);
                 const response = await axios.get('/logs');
-                setAllLog(response.data);
+                setAllLog(response.data.data || []);
                 setError(null);
             } catch (error) {
                 console.error("fetching error ", error);
@@ -30,6 +33,18 @@ const ActivityLog = () => {
         fetchLog();
     }, [reloadTrigger]);
 
+    // Client-side pagination calculations
+    const totalItems = allLog.length;
+    const totalPages = Math.ceil(totalItems / itemsPerPage);
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    const currentData = allLog.slice(startIndex, endIndex);
+
+    // Reset to first page when changing items per page
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [itemsPerPage]);
+
     // Function to format date
     const formatDate = (dateString) => {
         if (!dateString) return 'N/A';
@@ -38,7 +53,12 @@ const ActivityLog = () => {
 
     const columns = useMemo(
         () => [
-            { Header: "ID", accessor: "id" },
+            {
+                Header: "ID",
+                accessor: (row, i) => startIndex + i + 1,
+                id: "rowIndex",
+                width: 60,
+            },
             { Header: "User Name", accessor: "name" },
             { Header: "IP Address", accessor: "ip_address" },
             { Header: "Activity", accessor: "title" },
@@ -48,12 +68,10 @@ const ActivityLog = () => {
                 Cell: ({ value }) => formatDate(value),
             },
         ],
-        []
+        [startIndex]
     );
 
-    const tableData = useMemo(() => allLog, [allLog]);
-
- 
+  
 
     return (
         <>
@@ -66,7 +84,7 @@ const ActivityLog = () => {
                             </h1>
                             <p className="text-gray-600 mt-2">Track all user activities and system events</p>
                         </div>
-                    
+                        
                     </div>
 
                     {/* Loading State */}
@@ -88,14 +106,24 @@ const ActivityLog = () => {
                         <div className="text-center py-8">
                             <p className="text-gray-500">No activity logs found.</p>
                             <p className="text-sm text-gray-400 mt-2">
-                                Click "Create Sample Logs" to add test data, or "Add Manual Log" to create your own.
+                                No activity logs available at the moment.
                             </p>
                         </div>
                     )}
 
-                    {/* Logs Table */}
+                    {/* Logs Table with Client-side Pagination */}
                     {!loading && !error && allLog.length > 0 && (
-                        <MyTable columns={columns} data={tableData} />
+                        <MyTable 
+                            columns={columns} 
+                            data={currentData}
+                            pagination={{
+                                currentPage: currentPage,
+                                lastPage: totalPages,
+                                perPage: itemsPerPage,
+                                onPageChange: setCurrentPage,
+                                onPerPageChange: setItemsPerPage
+                            }}
+                        />
                     )}
                 </div>
             </AdminWrapper>

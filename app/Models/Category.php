@@ -5,28 +5,29 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Str;
 
 class Category extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory;
 
     protected $fillable = [
         'name',
+        'slug',
         'description',
-        'icon',
-        'is_active',
         'parent_id',
-        'slug'
+        'is_active'
     ];
 
-    protected $casts = [
-        'is_active' => 'boolean',
-    ];
-
-    public function products()
+    protected static function boot()
     {
-        return $this->hasMany(Product::class, 'category_id');
+        parent::boot();
+
+        static::creating(function ($category) {
+            if (empty($category->slug)) {
+                $category->slug = Str::slug($category->name);
+            }
+        });
     }
 
     public function parent()
@@ -37,5 +38,10 @@ class Category extends Model
     public function children()
     {
         return $this->hasMany(Category::class, 'parent_id');
+    }
+
+    public function products()
+    {
+        return $this->hasMany(Product::class);
     }
 }

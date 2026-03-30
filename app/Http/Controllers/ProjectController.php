@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Project;
+use App\Models\Log;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log as LaravelLog;
 
 class ProjectController extends Controller
 {
@@ -14,7 +16,6 @@ class ProjectController extends Controller
         try {
             $query = Project::query();
             
-            // Apply search filter
             if ($request->has('search') && !empty($request->search)) {
                 $search = $request->search;
                 $query->where(function($q) use ($search) {
@@ -25,23 +26,19 @@ class ProjectController extends Controller
                 });
             }
             
-            // Apply category filter
             if ($request->has('category') && !empty($request->category) && $request->category !== 'All') {
                 $query->where('category', $request->category);
             }
             
-            // Apply status filter - only show active projects for frontend
             if ($request->has('status') && !empty($request->status)) {
                 $query->where('status', $request->status);
             } else {
                 $query->where('status', 'active');
             }
             
-            // Get paginated results
             $perPage = $request->get('per_page', 10);
             $projects = $query->latest()->paginate($perPage);
             
-            // Transform the data to include image_url and format for frontend
             $projects->getCollection()->transform(function ($project) {
                 return $this->formatProjectData($project);
             });
@@ -105,6 +102,13 @@ class ProjectController extends Controller
                 'contract_type' => $request->contract_type,
             ]);
 
+            // Log project creation
+            Log::create([
+                'name' => auth()->user()?->name ?? 'Guest',
+                'ip_address' => $request->ip(),
+                'title' => 'Project Created: ' . $project->title,
+            ]);
+
             return response()->json([
                 'status' => true,
                 'message' => 'Project created successfully',
@@ -143,22 +147,25 @@ class ProjectController extends Controller
                 'status', 'location', 'rating', 'year', 'contract_type'
             ]);
 
-            // Ensure name is set if title is updated
             if ($request->has('title') && !$request->has('name')) {
                 $updateData['name'] = $request->title;
             }
 
             if ($request->hasFile('image')) {
-                // Delete old image
                 if ($project->image && Storage::disk('public')->exists($project->image)) {
                     Storage::disk('public')->delete($project->image);
                 }
-
-                // Store new image
                 $updateData['image'] = $request->file('image')->store('projects', 'public');
             }
 
             $project->update($updateData);
+
+            // Log project update
+            Log::create([
+                'name' => auth()->user()?->name ?? 'Guest',
+                'ip_address' => $request->ip(),
+                'title' => 'Project Updated: ' . $project->title,
+            ]);
 
             return response()->json([
                 'status' => true,
@@ -174,12 +181,23 @@ class ProjectController extends Controller
         }
     }
 
-    // ✅ Delete project (Soft delete)
-    public function destroy($id)
+    // ✅ Delete project
+    public function destroy(Request $request, $id)
     {
         try {
             $project = Project::findOrFail($id);
+
+            // Capture title before deletion for the log
+            $projectTitle = $project->title;
+
             $project->delete();
+
+            // Log project deletion
+            Log::create([
+                'name' => auth()->user()?->name ?? 'Guest',
+                'ip_address' => $request->ip(),
+                'title' => 'Project Deleted: ' . $projectTitle,
+            ]);
 
             return response()->json([
                 'status' => true,

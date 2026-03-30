@@ -15,9 +15,6 @@ class Product extends Model
     protected $fillable = [
         'name',
         'description',
-        'image',           // Make sure this matches your database column
-        'category',
-        'slug',
         'title',
         'content',
         'featured_image',
@@ -32,6 +29,14 @@ class Product extends Model
         static::creating(function ($product) {
             $randomNumber = rand(10000, 99999);
             $product->slug = Str::slug($product->name) . '-' . $randomNumber;
+        });
+        
+        static::updating(function ($product) {
+            // Only update slug if name changed
+            if ($product->isDirty('name')) {
+                $randomNumber = rand(10000, 99999);
+                $product->slug = Str::slug($product->name) . '-' . $randomNumber;
+            }
         });
     }
 

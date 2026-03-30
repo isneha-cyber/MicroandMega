@@ -5,30 +5,32 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 // Register ScrollTrigger
 gsap.registerPlugin(ScrollTrigger);
 
+const PLACEHOLDER_IMG = "/images/person-placeholder.svg";
+
 const teamMembers = [
   {
     name: "Arjun Khanna",
     role: "Technical Engineer",
-    img: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=500&fit=crop&crop=face",
-    alt: "Male professional in suit against dark office background",
+    img: PLACEHOLDER_IMG,
+    alt: "Person placeholder",
   },
   {
     name: "Cameron Williamson",
     role: "Security Specialist",
-    img: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&h=500&fit=crop&crop=face",
-    alt: "Female security specialist with badge",
+    img: PLACEHOLDER_IMG,
+    alt: "Person placeholder",
   },
   {
     name: "Leslie Alexander",
     role: "Security Specialist",
-    img: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=400&h=500&fit=crop&crop=face",
-    alt: "Female officer in uniform against bright background",
+    img: PLACEHOLDER_IMG,
+    alt: "Person placeholder",
   },
   {
     name: "Michael Johnson",
     role: "Support Manager",
-    img: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=500&fit=crop&crop=face",
-    alt: "Male security manager in dark uniform",
+    img: PLACEHOLDER_IMG,
+    alt: "Person placeholder",
   },
 ];
 
@@ -37,7 +39,6 @@ export default function Team() {
   const sectionRef = useRef(null);
   const headerRef = useRef(null);
   const descriptionRef = useRef(null);
-  const buttonRef = useRef(null);
   const cardsRef = useRef([]);
 
   useEffect(() => {
@@ -54,10 +55,7 @@ export default function Team() {
         x: 30,
       });
       
-      gsap.set(buttonRef.current, {
-        opacity: 0,
-        y: 30,
-      });
+     
       
       cardsRef.current.forEach((card, index) => {
         gsap.set(card, {
@@ -88,15 +86,6 @@ export default function Team() {
             duration: 0.6,
           },
           "-=0.4"
-        )
-        .to(
-          buttonRef.current,
-          {
-            opacity: 1,
-            y: 0,
-            duration: 0.5,
-          },
-          "-=0.3"
         )
         .to(
           cardsRef.current,
@@ -253,25 +242,6 @@ export default function Team() {
             provide advanced, reliable, and tailored solutions to safeguard your
             home and business.
           </p>
-          <button
-            ref={buttonRef}
-            className="flex items-center gap-2 bg-red-600 hover:bg-red-700 active:scale-95 text-white text-sm font-semibold px-6 py-3 rounded-full transition-all duration-200 shadow-md hover:shadow-lg group"
-          >
-            View All Team
-            <svg
-              className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth={2.5}
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M17 8l4 4m0 0l-4 4m4-4H3"
-              />
-            </svg>
-          </button>
         </div>
       </div>
 
@@ -295,38 +265,19 @@ export default function Team() {
               <img
                 src={member.img}
                 alt={member.alt}
-                className="w-full h-full object-cover object-top "
+                className="w-full h-full object-cover object-top"
               />
-              {/* Gradient overlay */}
-              {/* <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" /> */}
-              
-              {/* Hover overlay with social links (optional) */}
-              {/* <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-500">
-                <div className="flex gap-3 translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
-                  <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center cursor-pointer hover:bg-red-600 hover:text-white transition-colors duration-300">
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                    </svg>
-                  </div>
-                  <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center cursor-pointer hover:bg-red-600 hover:text-white transition-colors duration-300">
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z" />
-                      <circle cx="4" cy="4" r="2" stroke="none" />
-                    </svg>
-                  </div>
-                </div>
-              </div> */}
             </div>
 
             {/* Name & role with hover effect */}
-            {/* <div className="mt-4 text-center transform transition-all duration-300 group-hover:translate-y-1">
+            <div className="mt-4 text-center transform transition-all duration-300 group-hover:translate-y-1">
               <p className="font-bold text-gray-900 text-sm md:text-base group-hover:text-red-600 transition-colors duration-300">
                 {member.name}
               </p>
               <p className="text-gray-400 text-xs md:text-sm mt-0.5 group-hover:text-gray-600 transition-colors duration-300">
                 {member.role}
               </p>
-            </div> */}
+            </div>
           </div>
         ))}
       </div>

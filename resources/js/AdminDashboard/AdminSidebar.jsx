@@ -6,11 +6,17 @@ import {
     Image,
     FileText,
     Calendar,
-    Users,
     LayoutDashboard,
     List,
     Newspaper,
     Users2,
+    Package,
+    FolderKanban,
+    MessageSquare,
+    Ticket,
+    Activity,
+    UserCircle,
+    FolderTree, // Add this import
 } from "lucide-react";
 
 const SideBar = ({
@@ -108,7 +114,7 @@ const SideBar = ({
                             ${isCollapsed ? "p-3 justify-center" : "p-3"}
                             ${
                                 isActive("/dashboard")
-                                    ? "bg-gray-200 text-gray-600 "
+                                    ? "bg-gray-200 text-gray-600"
                                     : "text-gray-600 hover:bg-gray-50"
                             }
                         `}
@@ -136,21 +142,57 @@ const SideBar = ({
                         )}
                     </Link>
 
-                    {/* Category */}
+                    {/* Category - Using FolderTree icon instead of Package */}
+                    <Link
+                        href="/category"
+                        className={`
+                            flex items-center rounded-lg transition-colors duration-200 group relative
+                            ${isCollapsed ? "p-3 justify-center" : "p-3"}
+                            ${
+                                isActive("/category")
+                                    ? "bg-gray-200 text-gray-600"
+                                    : "text-gray-600 hover:bg-gray-50"
+                            }
+                        `}
+                        title={isCollapsed ? "Category" : ""}
+                    >
+                        <FolderTree
+                            className={`
+                            ${isCollapsed ? "w-5 h-5" : "w-5 h-5"}
+                            ${
+                                isActive("/category")
+                                    ? "text-gray-600"
+                                    : "text-gray-500 group-hover:text-gray-700"
+                            }
+                        `}
+                        />
+                        {!isCollapsed && (
+                            <span className="ml-3 font-medium whitespace-nowrap">
+                                Category
+                            </span>
+                        )}
+                        {isCollapsed && (
+                            <div className="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-sm rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50">
+                                Category
+                            </div>
+                        )}
+                    </Link>
+
+                    {/* Products - Using Package icon */}
                     <Link
                         href="/products"
                         className={`
                             flex items-center rounded-lg transition-colors duration-200 group relative
                             ${isCollapsed ? "p-3 justify-center" : "p-3"}
                             ${
-                                isActive("/categories")
-                                    ? "bg-gray-200 text-gray-600 "
+                                isActive("/products")
+                                    ? "bg-gray-200 text-gray-600"
                                     : "text-gray-600 hover:bg-gray-50"
                             }
                         `}
-                        title={isCollapsed ? "Category" : ""}
+                        title={isCollapsed ? "Products" : ""}
                     >
-                        <List
+                        <Package
                             className={`
                             ${isCollapsed ? "w-5 h-5" : "w-5 h-5"}
                             ${
@@ -162,17 +204,17 @@ const SideBar = ({
                         />
                         {!isCollapsed && (
                             <span className="ml-3 font-medium whitespace-nowrap">
-                               Products
+                                Products
                             </span>
                         )}
                         {isCollapsed && (
                             <div className="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-sm rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50">
-                               Products
+                                Products
                             </div>
                         )}
                     </Link>
 
-                    {/* Article */}
+                    {/* Projects - Using FolderKanban icon */}
                     <Link
                         href="/projects"
                         className={`
@@ -184,9 +226,9 @@ const SideBar = ({
                                     : "text-gray-600 hover:bg-gray-50"
                             }
                         `}
-                        title={isCollapsed ? "projects" : ""}
+                        title={isCollapsed ? "Projects" : ""}
                     >
-                        <Newspaper
+                        <FolderKanban
                             className={`
                             ${isCollapsed ? "w-5 h-5" : "w-5 h-5"}
                             ${
@@ -208,7 +250,7 @@ const SideBar = ({
                         )}
                     </Link>
 
-                    {/* Banners */}
+                    {/* Testimonials - Using MessageSquare icon */}
                     <Link
                         href="/testimonials"
                         className={`
@@ -220,9 +262,9 @@ const SideBar = ({
                                     : "text-gray-600 hover:bg-gray-50"
                             }
                         `}
-                        title={isCollapsed ? "Banners" : ""}
+                        title={isCollapsed ? "Testimonials" : ""}
                     >
-                        <Image
+                        <MessageSquare
                             className={`
                             ${isCollapsed ? "w-5 h-5" : "w-5 h-5"}
                             ${
@@ -244,7 +286,7 @@ const SideBar = ({
                         )}
                     </Link>
 
-                    {/* Service Tickets */}
+                    {/* Service Tickets - Using Ticket icon */}
                     <Link
                         href="/service-tickets"
                         className={`
@@ -258,7 +300,7 @@ const SideBar = ({
                         `}
                         title={isCollapsed ? "Service Tickets" : ""}
                     >
-                        <FileText
+                        <Ticket
                             className={`
                             ${isCollapsed ? "w-5 h-5" : "w-5 h-5"}
                             ${
@@ -280,9 +322,7 @@ const SideBar = ({
                         )}
                     </Link>
 
-          
-
-                    {/* Users */}
+                    {/* Users - Using UserCircle icon */}
                     <Link
                         href="/user"
                         className={`
@@ -290,13 +330,13 @@ const SideBar = ({
                             ${isCollapsed ? "p-3 justify-center" : "p-3"}
                             ${
                                 isActive("/user")
-                                    ? "bg-gray-200 text-gray-600 "
+                                    ? "bg-gray-200 text-gray-600"
                                     : "text-gray-600 hover:bg-gray-50"
                             }
                         `}
                         title={isCollapsed ? "Users" : ""}
                     >
-                        <Users2
+                        <UserCircle
                             className={`
                             ${isCollapsed ? "w-5 h-5" : "w-5 h-5"}
                             ${
@@ -318,7 +358,7 @@ const SideBar = ({
                         )}
                     </Link>
 
-                    {/* Activity Logs */}
+                    {/* Activity Logs - Using Activity icon */}
                     <Link
                         href="/log"
                         className={`
@@ -330,9 +370,9 @@ const SideBar = ({
                                     : "text-gray-600 hover:bg-gray-50"
                             }
                         `}
-                        title={isCollapsed ? "User Reservation" : ""}
+                        title={isCollapsed ? "Activity Logs" : ""}
                     >
-                        <Calendar
+                        <Activity
                             className={`
                             ${isCollapsed ? "w-5 h-5" : "w-5 h-5"}
                             ${

@@ -218,6 +218,7 @@
 import { useState, useEffect, useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { Link } from "@inertiajs/react";
 
 // Register ScrollTrigger plugin
 if (typeof window !== 'undefined') {
@@ -605,15 +606,16 @@ const SecurityAbout = () => {
                 >
                   Call Directly 24/7
                 </p>
-                <p
+                <a 
+                  href="tel:+977 01-4535104"
                   className="text-gray-900 font-bold text-lg sm:text-xl lg:text-2xl tracking-tight hover:text-red-600 transition-colors duration-300"
                   style={{ fontFamily: "'Barlow Condensed', sans-serif" }}
                 >
                   +977 01-4535104
-                </p>
+                </a>
               </div>
             </div>
-
+<Link href="/about">
             <button
               className="bg-red-600 hover:bg-red-700 transition-all duration-300 text-white text-sm lg:text-base font-bold px-6 sm:px-7 py-3 sm:py-3.5 rounded-full flex items-center gap-2.5 whitespace-nowrap shadow-lg w-full sm:w-auto justify-center group"
               style={{ fontFamily: "'Barlow', sans-serif" }}
@@ -623,6 +625,7 @@ const SecurityAbout = () => {
                 <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
               </svg>
             </button>
+            </Link>
           </div>
         </div>
 

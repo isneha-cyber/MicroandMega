@@ -317,7 +317,7 @@ const Stars = ({ count = 5 }) => (
 );
 
 const TestimonialCard = ({ testimonial }) => (
-  <div className="bg-white rounded-2xl border border-gray-300 shadow-sm p-12 flex flex-col gap-5 h-full">
+  <div className="bg-white rounded-2xl border border-gray-300 shadow-sm p-12 flex flex-col gap-5 h-[340px] sm:h-[360px] lg:h-[380px] overflow-hidden">
     <div className="flex items-center justify-between">
       <div className="flex items-center gap-3">
         <img
@@ -341,10 +341,14 @@ const TestimonialCard = ({ testimonial }) => (
 
     <Stars count={testimonial.rating || 5} />
 
-    <p className="text-gray-700 text-md leading-relaxed"
-      style={{ fontFamily: "'Barlow', sans-serif" }}>
-      "{testimonial.message}"
-    </p>
+    <div className="flex-1 overflow-y-auto pr-2">
+      <p
+        className="text-gray-700 text-md leading-relaxed"
+        style={{ fontFamily: "'Barlow', sans-serif" }}
+      >
+        "{testimonial.message}"
+      </p>
+    </div>
   </div>
 );
 

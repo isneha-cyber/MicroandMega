@@ -330,194 +330,94 @@ export default function Footer() {
   const copyrightRef = useRef(null);
 
   useEffect(() => {
-    // Initial animation on page load - footer elements fade in with stagger
     const ctx = gsap.context(() => {
-      // Set initial states
-      gsap.set([aboutColRef.current, quickLinksRef.current, servicesRef.current, subscribeRef.current], {
-        opacity: 0,
-        y: 50,
-      });
-      
-      gsap.set(topBarRef.current, {
-        opacity: 0,
-        y: 30,
-      });
-      
-      gsap.set(copyrightRef.current, {
-        opacity: 0,
-      });
+      const addFrom = (el, vars, triggerEl = el) => {
+        if (!el) return;
+        gsap.from(el, {
+          ...vars,
+          immediateRender: false,
+          scrollTrigger: {
+            trigger: triggerEl,
+            start: "top 85%",
+            once: true,
+          },
+        });
+      };
 
-      // Initial load animations
-      const tl = gsap.timeline();
-      tl.to(topBarRef.current, {
-        opacity: 1,
-        y: 0,
-        duration: 0.8,
-        ease: "power3.out",
-      })
-      .to([aboutColRef.current, quickLinksRef.current, servicesRef.current, subscribeRef.current], {
-        opacity: 1,
-        y: 0,
-        duration: 0.6,
-        stagger: 0.15,
-        ease: "back.out(0.7)",
-      }, "-=0.3")
-      .to(copyrightRef.current, {
-        opacity: 1,
-        duration: 0.5,
-      }, "-=0.2");
+      addFrom(topBarRef.current, { opacity: 0, y: 30, duration: 0.6, ease: "power3.out" });
+      addFrom(aboutColRef.current, { opacity: 0, y: 40, duration: 0.6, ease: "power3.out" });
+      addFrom(quickLinksRef.current, { opacity: 0, y: 40, duration: 0.6, ease: "power3.out" });
+      addFrom(servicesRef.current, { opacity: 0, y: 40, duration: 0.6, ease: "power3.out" });
+      addFrom(subscribeRef.current, { opacity: 0, y: 40, duration: 0.6, ease: "power3.out" });
+      addFrom(copyrightRef.current, { opacity: 0, y: 20, duration: 0.5, ease: "power3.out" });
 
-      // Scroll-triggered animations for each column
-      const sections = [
-        { ref: aboutColRef.current, direction: "left" },
-        { ref: quickLinksRef.current, direction: "right" },
-        { ref: servicesRef.current, direction: "left" },
-        { ref: subscribeRef.current, direction: "right" },
-      ];
-
-      sections.forEach((section, index) => {
-        if (section.ref) {
-          // Reset any existing animations
-          gsap.set(section.ref, { clearProps: "all" });
-          
-          // Create scroll-triggered animation
-          gsap.fromTo(section.ref,
-            {
-              opacity: 0,
-              x: section.direction === "left" ? -80 : 80,
-              scale: 0.95,
-            },
-            {
-              opacity: 1,
-              x: 0,
-              scale: 1,
-              duration: 0.8,
-              ease: "power3.out",
-              scrollTrigger: {
-                trigger: section.ref,
-                start: "top 85%",
-                end: "bottom 20%",
-                toggleActions: "play none none reverse",
-                once: false,
-              },
-            }
-          );
-        }
-      });
-
-      // Animate contact info items with hover effect
       const contactItems = topBarRef.current?.querySelectorAll('.contact-item');
       if (contactItems) {
         contactItems.forEach((item, i) => {
-          gsap.fromTo(item,
-            {
-              opacity: 0,
-              x: 20,
+          gsap.from(item, {
+            opacity: 0,
+            x: 20,
+            duration: 0.5,
+            delay: i * 0.1,
+            immediateRender: false,
+            scrollTrigger: {
+              trigger: item,
+              start: "top 90%",
+              once: true,
             },
-            {
-              opacity: 1,
-              x: 0,
-              duration: 0.5,
-              delay: i * 0.1,
-              scrollTrigger: {
-                trigger: item,
-                start: "top 90%",
-                toggleActions: "play none none reverse",
-              },
-            }
-          );
+          });
         });
       }
 
-      // Animate social icons with subtle bounce on scroll
       const socialIcons = aboutColRef.current?.querySelectorAll('.social-icon');
       if (socialIcons) {
-        gsap.fromTo(socialIcons,
-          {
-            opacity: 0,
-            scale: 0,
-            rotation: -180,
+        gsap.from(socialIcons, {
+          opacity: 0,
+          scale: 0,
+          rotation: -180,
+          duration: 0.5,
+          stagger: 0.1,
+          ease: "back.out(1.2)",
+          immediateRender: false,
+          scrollTrigger: {
+            trigger: aboutColRef.current,
+            start: "top 80%",
+            once: true,
           },
-          {
-            opacity: 1,
-            scale: 1,
-            rotation: 0,
-            duration: 0.5,
-            stagger: 0.1,
-            ease: "back.out(1.2)",
-            scrollTrigger: {
-              trigger: aboutColRef.current,
-              start: "top 80%",
-              toggleActions: "play none none reverse",
-            },
-          }
-        );
+        });
       }
 
-      // Animate newsletter form
       if (subscribeRef.current) {
         const form = subscribeRef.current.querySelector('form');
         if (form) {
-          gsap.fromTo(form,
-            {
-              opacity: 0,
-              scale: 0.9,
+          gsap.from(form, {
+            opacity: 0,
+            scale: 0.9,
+            duration: 0.6,
+            delay: 0.2,
+            immediateRender: false,
+            scrollTrigger: {
+              trigger: subscribeRef.current,
+              start: "top 80%",
+              once: true,
             },
-            {
-              opacity: 1,
-              scale: 1,
-              duration: 0.6,
-              delay: 0.3,
-              scrollTrigger: {
-                trigger: subscribeRef.current,
-                start: "top 80%",
-                toggleActions: "play none none reverse",
-              },
-            }
-          );
+          });
         }
       }
 
-      // Animate copyright links with fade up
       const copyrightLinks = copyrightRef.current?.querySelectorAll('a, span');
       if (copyrightLinks) {
-        gsap.fromTo(copyrightLinks,
-          {
-            opacity: 0,
-            y: 10,
+        gsap.from(copyrightLinks, {
+          opacity: 0,
+          y: 10,
+          duration: 0.4,
+          stagger: 0.05,
+          immediateRender: false,
+          scrollTrigger: {
+            trigger: copyrightRef.current,
+            start: "top 90%",
+            once: true,
           },
-          {
-            opacity: 1,
-            y: 0,
-            duration: 0.4,
-            stagger: 0.05,
-            scrollTrigger: {
-              trigger: copyrightRef.current,
-              start: "top 90%",
-              toggleActions: "play none none reverse",
-            },
-          }
-        );
-      }
-
-      // Add hover animation for all interactive elements
-      const interactiveElements = footerRef.current?.querySelectorAll('a, button');
-      if (interactiveElements) {
-        interactiveElements.forEach(el => {
-          el.addEventListener('mouseenter', () => {
-            gsap.to(el, {
-              scale: 1.05,
-              duration: 0.2,
-              ease: "power2.out",
-            });
-          });
-          el.addEventListener('mouseleave', () => {
-            gsap.to(el, {
-              scale: 1,
-              duration: 0.2,
-              ease: "power2.out",
-            });
-          });
         });
       }
     }, footerRef);
@@ -637,105 +537,93 @@ export default function Footer() {
           </div>
         </div>
       </div>
-
       {/* ── MAIN FOOTER GRID ── */}
-      <div className="max-w-7xl mx-auto px-8 lg:px-0 py-16 sm:py-24">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
-          {/* Col 1 — About */}
-          <div ref={aboutColRef} className="flex flex-col gap-5">
-            <h4 className="text-white font-bold text-lg">About Solutions</h4>
-            <p className="text-gray-400 text-md leading-relaxed">
-              We provide advanced Security and CCTV solutions, ensuring 24/7 protection with high-quality systems.
-            </p>
-            {/* Social icons */}
-            <div className="flex items-center gap-2 mt-1">
-              {[
-                { Icon: Facebook,  href: "https://www.facebook.com/micronmega",        label: "Facebook" },
-                { Icon: Instagram, href: "https://www.instagram.com/microandmega/",    label: "Instagram" },
-              ].map(({ Icon, href, label }) => (
-                <a
-                  key={label}
-                  href={href}
-                  target="_blank"
-                  rel="noreferrer"
-                  aria-label={label}
-                  className="social-icon w-8 h-8 rounded-full border border-white/20 flex items-center justify-center text-gray-400 hover:bg-[#cc1400] hover:border-[#cc1400] hover:text-white transition-all duration-150"
-                >
-                  <Icon />
-                </a>
-              ))}
-            </div>
-          </div>
-
-          {/* Col 2 & 3 — Quick Links + Services */}
-          <div className="flex flex-row gap-12 sm:contents">
-            {/* Col 2 — Quick Links */}
-            <div ref={quickLinksRef} className="flex flex-col gap-5">
-              <h4 className="text-white font-bold text-lg">Quick link</h4>
-              <ul className="flex flex-col gap-3">
-                {QUICK_LINKS.map((l) => (
-                  <li key={l.label}>
-                    <Link
-                      href={l.path}
-                      className="text-gray-400 text-md hover:text-[#cc1400] transition-colors duration-150 no-underline"
-                    >
-                      {l.label}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            {/* Col 3 — Services */}
-            <div ref={servicesRef} className="flex flex-col gap-5">
-              <h4 className="text-white font-bold text-lg">Services</h4>
-              <ul className="flex flex-col gap-3">
-                {SERVICES.map((s) => (
-                  <li key={s.label}>
-                    <Link
-                      href={s.path}
-                      className="text-gray-400 text-md hover:text-[#cc1400] transition-colors duration-150 no-underline"
-                    >
-                      {s.label}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
-
-          {/* Col 4 — Subscribe */}
-          <div ref={subscribeRef} className="flex flex-col gap-5">
-            <h4 className="text-white font-bold text-lg">Subscribe</h4>
-            <p className="text-gray-400 text-md leading-relaxed">
-              Stay updated with the latest security trends offers by subscribing to our newsletter.
-            </p>
-            <form onSubmit={handleSubscribe} className="flex items-center mt-1">
-              <div className="flex-1 relative flex items-center bg-[#2a2a2a] rounded-full overflow-hidden pr-1 pl-4 py-1">
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Enter Your Email"
-                  required
-                  className="flex-1 bg-transparent text-white text-[13px] placeholder-gray-500 outline-none border-none py-2"
-                  style={{ fontFamily: "'Barlow', sans-serif" }}
-                />
-                <button
-                  type="submit"
-                  className="w-10 h-10 rounded-full bg-[#cc1400] hover:bg-[#aa1000] flex items-center justify-center flex-shrink-0 transition-colors duration-150"
-                  aria-label="Subscribe"
-                >
-                  <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
-                    <path d="M22 2L11 13"/>
-                    <path d="M22 2L15 22l-4-9-9-4 20-7z"/>
-                  </svg>
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
+<div className="max-w-7xl mx-auto px-8 lg:px-0 py-16 sm:py-24">
+  <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+    {/* Col 1 — About (3 columns) */}
+    <div ref={aboutColRef} className="lg:col-span-3 flex flex-col gap-5">
+      <h4 className="text-white font-bold text-lg">About Solutions</h4>
+      <p className="text-gray-400 text-md leading-relaxed">
+        We provide advanced Security and CCTV solutions, ensuring 24/7 protection with high-quality systems.
+      </p>
+      {/* Social icons */}
+      <div className="flex items-center gap-2 mt-1">
+        {[
+          { Icon: Facebook,  href: "https://www.facebook.com/micronmega",        label: "Facebook" },
+          { Icon: Instagram, href: "https://www.instagram.com/microandmega/",    label: "Instagram" },
+        ].map(({ Icon, href, label }) => (
+          <a
+            key={label}
+            href={href}
+            target="_blank"
+            rel="noreferrer"
+            aria-label={label}
+            className="social-icon w-8 h-8 rounded-full border border-white/20 flex items-center justify-center text-gray-400 hover:bg-[#cc1400] hover:border-[#cc1400] hover:text-white transition-all duration-150"
+          >
+            <Icon />
+          </a>
+        ))}
       </div>
+    </div>
+
+    {/* Col 2 & 3 — Quick Links + Services with flex between */}
+    <div className="lg:col-span-4 flex flex-row justify-between gap-8">
+      {/* Quick Links */}
+      <div ref={quickLinksRef} className="flex-1 flex flex-col gap-5">
+        <h4 className="text-white font-bold text-lg">Quick link</h4>
+        <ul className="flex flex-col gap-3">
+          {QUICK_LINKS.map((l) => (
+            <li key={l.label}>
+              <Link
+                href={l.path}
+                className="text-gray-400 text-md hover:text-[#cc1400] transition-colors duration-150 no-underline"
+              >
+                {l.label}
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      {/* Services (labels only) */}
+      <div ref={servicesRef} className="flex-1 flex flex-col gap-5">
+        <h4 className="text-white font-bold text-lg">Services</h4>
+        <ul className="flex flex-col gap-3">
+          {SERVICES.map((s) => (
+            <li key={s.label}>
+              <span className="text-gray-400 text-md">
+                {s.label}
+              </span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+
+    {/* Col 4 — Map (5 columns) */}
+    <div ref={subscribeRef} className="lg:col-span-5 flex flex-col gap-3">
+      <h4 className="text-white font-bold text-lg">Our Location</h4>
+      <div className="w-full overflow-hidden rounded-lg border border-white/10">
+        <iframe
+          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3531.7430059038925!2d85.32935807904262!3d27.72522006328628!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x39eb1914cb445939%3A0x24d838cffeda4811!2s429%20Ichhunadi%20Marg%2C%20Kathmandu%2044600!5e0!3m2!1sen!2snp!4v1774421469810!5m2!1sen!2snp"
+          title="Office Location"
+          className="w-full h-[210px] md:h-[280px]"
+          style={{ border: 0 }}
+          allowFullScreen
+          loading="lazy"
+          referrerPolicy="no-referrer-when-downgrade"
+        />
+      </div>
+      <p className="text-gray-400 text-sm flex items-center gap-2 mt-2">
+        <svg className="w-4 h-4 text-[#cc1400] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+        </svg>
+        <span>429 Ichhunadi Marg, Kathmandu 44600</span>
+      </p>
+    </div>
+  </div>
+</div>
 
       {/* ── COPYRIGHT BAR ── */}
       <div ref={copyrightRef} className="border-t border-white/10">

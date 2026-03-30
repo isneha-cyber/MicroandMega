@@ -269,7 +269,6 @@
 
 import {useEffect, useRef, useState} from "react";
 import {Link} from "@inertiajs/react";
-import {Filter} from "lucide-react";
 import gsap from "gsap";
 import {ScrollTrigger} from "gsap/ScrollTrigger";
 import axios from "axios";
@@ -305,20 +304,10 @@ function ProjectCard({project, cardRef}) {
     );
 }
 
-const ALL_CATEGORIES = [
-    "All",
-    "Healthcare",
-    "Hospitality",
-    "Education",
-    "Banking & Finance",
-    "Government",
-    "Diplomatic"
-];
-
-function FilterBar({active, onChange}) {
+function FilterBar({active, onChange, categories}) {
     return (
         <div className="flex flex-wrap items-center justify-center gap-0">
-            {ALL_CATEGORIES.map((cat, i) => (
+            {categories.map((cat, i) => (
                 <div key={cat} className="flex items-center">
                     <button
                         onClick={() => onChange(cat)}
@@ -331,7 +320,7 @@ function FilterBar({active, onChange}) {
                         {cat}
                     </button>
                     {/* Dot separator between items */}
-                    {i < ALL_CATEGORIES.length - 1 && (
+                    {i < categories.length - 1 && (
                         <span className="w-1.5 h-1.5 rounded-full bg-gray-400 mx-1 flex-shrink-0" />
                     )}
                 </div>
@@ -343,6 +332,7 @@ function FilterBar({active, onChange}) {
 export default function ProjectsPage() {
     const [activeCategory, setActiveCategory] = useState("All");
     const [projects, setProjects] = useState([]);
+    const [categories, setCategories] = useState(["All"]);
     const [loading, setLoading] = useState(true);
     const sectionRef = useRef(null);
     const cardRefs = useRef([]);
@@ -357,7 +347,8 @@ export default function ProjectsPage() {
         try {
             setLoading(true);
             const response = await axios.get('/ourprojects?per_page=100');
-            setProjects(response.data.data);
+            const items = response.data?.data || response.data || [];
+            setProjects(items);
         } catch (error) {
             console.error('Error fetching projects:', error);
             if (error.response) {
@@ -372,6 +363,17 @@ export default function ProjectsPage() {
     const filtered = activeCategory === "All"
         ? projects
         : projects.filter((p) => p.category === activeCategory);
+
+    useEffect(() => {
+        const unique = Array.from(
+            new Set(projects.map((p) => p.category).filter(Boolean))
+        );
+        const nextCategories = ["All", ...unique];
+        setCategories(nextCategories);
+        if (activeCategory !== "All" && !unique.includes(activeCategory)) {
+            setActiveCategory("All");
+        }
+    }, [projects, activeCategory]);
 
     useEffect(() => {
         if (loading) return;
@@ -460,7 +462,11 @@ export default function ProjectsPage() {
 
                     {/* Filter bar — centered, pill dots */}
                     <div ref={filterRef} className="flex justify-center">
-                        <FilterBar active={activeCategory} onChange={setActiveCategory} />
+                        <FilterBar
+                            active={activeCategory}
+                            onChange={setActiveCategory}
+                            categories={categories}
+                        />
                     </div>
 
                     {/* Grid */}

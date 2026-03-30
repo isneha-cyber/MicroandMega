@@ -70,81 +70,81 @@ function SidebarItem({ item, isOpen, onToggle, onCategorySelect }) {
     );
 }
 
-function QuickEnquiry() {
-    const [form, setForm] = useState({ name: "", phone: "", email: "", message: "" });
-    const [submitted, setSubmitted] = useState(false);
+// function QuickEnquiry() {
+//     const [form, setForm] = useState({ name: "", phone: "", email: "", message: "" });
+//     const [submitted, setSubmitted] = useState(false);
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        setSubmitted(true);
-        setTimeout(() => setSubmitted(false), 3000);
-    };
+//     const handleSubmit = (e) => {
+//         e.preventDefault();
+//         setSubmitted(true);
+//         setTimeout(() => setSubmitted(false), 3000);
+//     };
 
-    return (
-        <div className="bg-white border border-gray-200 rounded-lg shadow-sm p-4 mt-4">
-            <h2 className="text-base font-bold text-gray-800 mb-1 pb-2 border-b border-gray-200 uppercase tracking-wide">
-                Quick Enquiry
-            </h2>
-            <p className="text-xs text-red-600 mb-3">*All fields are required</p>
-            {submitted && (
-                <div className="bg-green-50 text-green-700 text-sm p-2 rounded mb-3 flex items-center gap-2">
-                    <CheckCircle2 className="h-4 w-4" />
-                    Message sent successfully!
-                </div>
-            )}
-            <form onSubmit={handleSubmit} className="space-y-2">
-                <input
-                    type="text"
-                    placeholder="Name"
-                    required
-                    value={form.name}
-                    onChange={(e) => setForm({ ...form, name: e.target.value })}
-                    className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-red-500"
-                />
-                <input
-                    type="tel"
-                    placeholder="Phone"
-                    required
-                    value={form.phone}
-                    onChange={(e) => setForm({ ...form, phone: e.target.value })}
-                    className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-red-500"
-                />
-                <input
-                    type="email"
-                    placeholder="Email Address"
-                    required
-                    value={form.email}
-                    onChange={(e) => setForm({ ...form, email: e.target.value })}
-                    className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-red-500"
-                />
-                <textarea
-                    placeholder="Message"
-                    required
-                    rows={3}
-                    value={form.message}
-                    onChange={(e) => setForm({ ...form, message: e.target.value })}
-                    className="w-full border border-gray-300 rounded px-3 py-2 text-sm resize-none"
-                />
-                <div>
-                    <label className="text-xs text-gray-600 block mb-1">Enter website name here *</label>
-                    <input
-                        type="text"
-                        placeholder="Type atss"
-                        required
-                        className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
-                    />
-                    <p className="text-xs text-gray-400 mt-1">Type website name "atss"</p>
-                </div>
-                <button
-                    type="submit"
-                    className="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded text-sm uppercase tracking-wide transition-colors"
-                >
-                    Submit
-                </button>
-            </form>
-        </div>
-    );
-}
+//     return (
+//         <div className="bg-white border border-gray-200 rounded-lg shadow-sm p-4 mt-4">
+//             <h2 className="text-base font-bold text-gray-800 mb-1 pb-2 border-b border-gray-200 uppercase tracking-wide">
+//                 Quick Enquiry
+//             </h2>
+//             <p className="text-xs text-red-600 mb-3">*All fields are required</p>
+//             {submitted && (
+//                 <div className="bg-green-50 text-green-700 text-sm p-2 rounded mb-3 flex items-center gap-2">
+//                     <CheckCircle2 className="h-4 w-4" />
+//                     Message sent successfully!
+//                 </div>
+//             )}
+//             <form onSubmit={handleSubmit} className="space-y-2">
+//                 <input
+//                     type="text"
+//                     placeholder="Name"
+//                     required
+//                     value={form.name}
+//                     onChange={(e) => setForm({ ...form, name: e.target.value })}
+//                     className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-red-500"
+//                 />
+//                 <input
+//                     type="tel"
+//                     placeholder="Phone"
+//                     required
+//                     value={form.phone}
+//                     onChange={(e) => setForm({ ...form, phone: e.target.value })}
+//                     className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-red-500"
+//                 />
+//                 <input
+//                     type="email"
+//                     placeholder="Email Address"
+//                     required
+//                     value={form.email}
+//                     onChange={(e) => setForm({ ...form, email: e.target.value })}
+//                     className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-red-500"
+//                 />
+//                 <textarea
+//                     placeholder="Message"
+//                     required
+//                     rows={3}
+//                     value={form.message}
+//                     onChange={(e) => setForm({ ...form, message: e.target.value })}
+//                     className="w-full border border-gray-300 rounded px-3 py-2 text-sm resize-none"
+//                 />
+//                 <div>
+//                     <label className="text-xs text-gray-600 block mb-1">Enter website name here *</label>
+//                     <input
+//                         type="text"
+//                         placeholder="Type atss"
+//                         required
+//                         className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+//                     />
+//                     <p className="text-xs text-gray-400 mt-1">Type website name "atss"</p>
+//                 </div>
+//                 <button
+//                     type="submit"
+//                     className="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded text-sm uppercase tracking-wide transition-colors"
+//                 >
+//                     Submit
+//                 </button>
+//             </form>
+//         </div>
+//     );
+// }
 
 function Sidebar({ isMobileOpen, onClose, categories, onCategorySelect }) {
     const [openItems, setOpenItems] = useState({});
@@ -190,7 +190,7 @@ function Sidebar({ isMobileOpen, onClose, categories, onCategorySelect }) {
                         ))}
                     </ul>
                 </nav>
-                <QuickEnquiry />
+            
             </aside>
         </>
     );

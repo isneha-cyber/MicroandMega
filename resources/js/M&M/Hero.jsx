@@ -397,7 +397,7 @@ const FEATURES = [
       </svg>
     ),
     label: 'Integrated Security Systems',
-    link: '/products/cctv',
+  
   },
   {
     icon: (
@@ -439,7 +439,7 @@ const FEATURES = [
       </svg>
     ),
     label: 'Access Control Systems',
-    link: '/products/fire-alarm',
+   
   },
   {
     icon: (
@@ -473,7 +473,7 @@ const FEATURES = [
       </svg>
     ),
     label: 'Fire Detection',
-    link: '/products',
+
   },
 ]
 
@@ -746,37 +746,36 @@ export default function Hero() {
           </div>
         </div>
 
-        {/* Feature cards */}
-        <div
-          ref={cardsRef}
-          className="
-         relative z-30 mx-4 -mt-20 rounded-[20px] shadow-[0_8px_48px_rgba(0,0,0,0.14)]
-             md:absolute md:-bottom-32 md:left-[clamp(40px,7vw,120px)] md:right-[clamp(40px,7vw,120px)]
-             md:translate-y-1/2 md:mx-0 md:mt-0 md:max-w-3xl
-          "
-        >
-          <div className="grid grid-cols-3 bg-white rounded-[20px] overflow-hidden border border-gray-100">
-            {FEATURES.map((f, i) => (
-              <div
-                key={i}
-                className={[
-                  'flex flex-col items-start gap-4 sm:gap-2.5 py-6 sm:py-0 sm:px-0 px-6 p-6 md:p-10 hover:bg-gray-50 transition-all duration-300 cursor-pointer group',
-                  i < FEATURES.length - 1
-                    ? 'border-b border-gray-100 sm:border-b-0 sm:border-r sm:border-gray-100'
-                    : '',
-                ].join(' ')}
-                onClick={() => window.location.href = f.link}
-              >
-                <div className="flex-shrink-0 sm:hidden group-hover:scale-110 transition-transform duration-300">{f.iconSmall}</div>
-                <div className="hidden sm:block group-hover:scale-110 transition-transform duration-300">{f.icon}</div>
+       {/* Feature cards */}
+<div
+  ref={cardsRef}
+  className="
+    relative z-30 mx-4 -mt-20 rounded-[20px] shadow-[0_8px_48px_rgba(0,0,0,0.14)]
+    md:absolute md:-bottom-32 md:left-[clamp(40px,7vw,120px)] md:right-[clamp(40px,7vw,120px)]
+    md:translate-y-1/2 md:mx-0 md:mt-0 md:max-w-3xl
+  "
+>
+  <div className="grid grid-cols-3 bg-white rounded-[20px] overflow-hidden border border-gray-100">
+    {FEATURES.map((f, i) => (
+      <div
+        key={i}
+        className={[
+          'flex flex-col items-start gap-4 sm:gap-2.5 py-6 sm:py-0 sm:px-0 px-6 p-6 md:p-10 hover:bg-gray-50 transition-all duration-300 cursor-default',
+          i < FEATURES.length - 1
+            ? 'border-b border-gray-100 sm:border-b-0 sm:border-r sm:border-gray-100'
+            : '',
+        ].join(' ')}
+      >
+        <div className="flex-shrink-0 sm:hidden group-hover:scale-110 transition-transform duration-300">{f.iconSmall}</div>
+        <div className="hidden sm:block group-hover:scale-110 transition-transform duration-300">{f.icon}</div>
 
-                <div className="font-['Barlow',sans-serif] font-bold text-md sm:text-lg text-gray-900 leading-snug group-hover:text-[#bb1403] transition-colors duration-300">
-                  {f.label}
-                </div>
-              </div>
-            ))}
-          </div>
+        <div className="font-['Barlow',sans-serif] font-bold text-md sm:text-lg text-gray-900 leading-snug group-hover:text-[#bb1403] transition-colors duration-300">
+          {f.label}
         </div>
+      </div>
+    ))}
+  </div>
+</div>
       </div>
     </>
   )

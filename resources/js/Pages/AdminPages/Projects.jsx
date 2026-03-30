@@ -78,7 +78,7 @@
 //                                 setEditingProjects(null);
 //                                 setShowAddForm(true);
 //                             }}
-//                             className="flex items-center gap-2 bg-indigo-600 text-amber-50 px-6 py-2.5 rounded-full text-sm font-medium tracking-widest uppercase hover:bg-indigo-700 transition-all duration-200 shadow-md hover:shadow-lg hover:-translate-y-0.5"
+//                             className="flex items-center gap-2 bg-[#dc2626] text-amber-50 px-6 py-2.5 rounded-full text-sm font-medium tracking-widest uppercase hover:bg-[#dc2626] transition-all duration-200 shadow-md hover:shadow-lg hover:-translate-y-0.5"
 //                         >
 //                             <Plus size={18} />
 //                             Create
@@ -218,7 +218,7 @@ const Projects = () => {
                                 setEditingProjects(null);
                                 setShowAddForm(true);
                             }}
-                            className="flex items-center gap-2 bg-indigo-600 text-amber-50 px-6 py-2.5 rounded-full text-sm font-medium tracking-widest uppercase hover:bg-indigo-700 transition-all duration-200 shadow-md hover:shadow-lg hover:-translate-y-0.5"
+                            className="flex items-center gap-2 bg-[#dc2626] text-amber-50 px-6 py-2.5 rounded-lg text-sm font-medium tracking-widest uppercase hover:bg-[#dc2626] transition-all duration-200 shadow-md hover:shadow-lg hover:-translate-y-0.5"
                         >
                             <Plus size={18} />
                             Create Project
@@ -281,13 +281,13 @@ const Projects = () => {
                                                 Delete
                                             </button>
                                         </div>
-                                        <Link 
+                                        {/* <Link 
                                             href={`/project-details/${project.slug}`}
-                                            className="text-indigo-600 hover:text-indigo-700 text-sm flex items-center gap-1"
+                                            className="text-[#dc2626] hover:text-[#dc2626] text-sm flex items-center gap-1"
                                         >
                                             <Eye size={14} />
                                             View
-                                        </Link>
+                                        </Link> */}
                                     </div>
                                 </div>
                             </div>

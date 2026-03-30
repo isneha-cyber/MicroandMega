@@ -95,7 +95,7 @@ const handleUpdate = async (formData, id) => {
 									setShowAddForm(true);
 								}
 							}
-							className="flex items-center gap-2 bg-indigo-600 text-amber-50 px-6 py-2.5 rounded-full text-sm font-medium tracking-widest uppercase hover:bg-indigo-700 transition-all duration-200 shadow-md hover:shadow-lg hover:-translate-y-0.5">
+							className="flex items-center gap-2 bg-[#dc2626]  text-amber-50 px-6 py-2.5 rounded-lg text-sm font-medium tracking-widest uppercase hover:bg-[#dc2626]  transition-all duration-200 shadow-md hover:shadow-lg hover:-translate-y-0.5">
 							<Plus size={18}/>
 							Create Testimonial
 						</button>
@@ -121,7 +121,7 @@ const handleUpdate = async (formData, id) => {
 												}
 												className="w-16 h-16 rounded-full object-cover"/>
 										) : (
-											<div className="w-16 h-16 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white text-xl font-bold">
+											<div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#dc2626]  to-purple-600 flex items-center justify-center text-white text-xl font-bold">
 												{
 												testimonial.client_name ?. charAt(0) || "?"
 											} </div>
@@ -174,7 +174,7 @@ const handleUpdate = async (formData, id) => {
 											<button onClick={
 													() => handleEdit(testimonial)
 												}
-												className="px-3 py-1 text-sm text-indigo-600 hover:bg-indigo-50 rounded transition">
+												className="px-3 py-1 text-sm text-[#dc2626]  hover:bg-[#dc2626] rounded transition">
 												Edit
 											</button>
 											<button onClick={

@@ -103,19 +103,49 @@ const AddTestimonials = ({
         }));
     };
 
+    // Handle modal close
+    const handleClose = () => {
+        setShowForm(false);
+        setEditingTestimonials(null);
+    };
+
+    // Handle backdrop click
+    const handleBackdropClick = (e) => {
+        // Only close if clicking on the backdrop itself, not the modal content
+        if (e.target === e.currentTarget) {
+            handleClose();
+        }
+    };
+
+    // Prevent body scroll when modal is open
+    useEffect(() => {
+        // Save original overflow style
+        const originalOverflow = document.body.style.overflow;
+        // Prevent scrolling on body
+        document.body.style.overflow = 'hidden';
+        
+        // Cleanup function to restore scroll when component unmounts
+        return () => {
+            document.body.style.overflow = originalOverflow;
+        };
+    }, []);
+
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="relative px-6 py-6 rounded-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-white shadow-2xl">
-                <div className="flex justify-between items-center mb-6 bg-white pb-4 border-b sticky top-0 bg-white">
+        <div 
+            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+            onClick={handleBackdropClick}
+        >
+            <div 
+                className="relative px-6 py-6 rounded-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-white shadow-2xl"
+                onClick={(e) => e.stopPropagation()} // Prevent clicks inside modal from closing it
+            >
+                <div className="flex justify-between items-center mb-6 bg-white pb-4 border-b  z-10">
                     <h2 className="text-2xl font-bold">
                         {editingTestimonials ? "Edit Testimonial" : "Add New Testimonial"}
                     </h2>
                     <button
                         type="button"
-                        onClick={() => {
-                            setShowForm(false);
-                            setEditingTestimonials(null);
-                        }}
+                        onClick={handleClose}
                         className="p-2 hover:bg-gray-100 rounded-full transition"
                     >
                         <X size={24} />
@@ -243,10 +273,7 @@ const AddTestimonials = ({
                     <div className="flex justify-end gap-3 pt-4 border-t">
                         <button
                             type="button"
-                            onClick={() => {
-                                setShowForm(false);
-                                setEditingTestimonials(null);
-                            }}
+                            onClick={handleClose}
                             className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition"
                         >
                             Cancel
@@ -254,7 +281,7 @@ const AddTestimonials = ({
                         <button
                             type="submit"
                             disabled={submitting}
-                            className="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="px-6 py-2 bg-[#dc2626] text-white rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             {submitting 
                                 ? (editingTestimonials ? "Updating..." : "Creating...") 
