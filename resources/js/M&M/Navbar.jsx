@@ -1,9 +1,27 @@
 
 import { Link, usePage } from '@inertiajs/react'
 import React, { useState, useEffect, useRef } from 'react'
-import axios from 'axios'
 
-const PRODUCTS_MENU = []
+const slugify = (value) =>
+  value
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+
+const PRODUCTS_MENU = [
+  {name:'Fire Alarm', slug:'fire-detection-notification-and-suppression'},
+  {name:'Public Address', slug:'public-addressal-systems'},
+  {name:'Access Control', slug:'modern-access-control-systems',},
+  {name:'CCTV', slug:'integrated-security-systems'},
+ {name:'Digital Lighting', slug: 'digital-lighting'},
+ { name:'Data Network',slug:'data-network'},
+ {name:'Grounding ERT', slug: 'grounding-ert'},
+ { name:'Control and Monitor System',slug: 'control-and-monitor-system'},
+].map((label) => ({
+  label:label.name,
+  path: `/category/${label.slug}`,
+}))
 
 const NAV_LINKS = [
   { label: 'Home',               path: '/' },
@@ -40,7 +58,7 @@ export default function Navbar() {
   const [mobileOpen,     setMobileOpen]     = useState(false)
   const [mobileProdOpen, setMobileProdOpen] = useState(false)
   const [scrolled,       setScrolled]       = useState(false)
-  const [productMenu,    setProductMenu]    = useState(PRODUCTS_MENU)
+  const [productMenu] = useState(PRODUCTS_MENU)
   const dropdownRef = useRef(null)
   const { url } = usePage()
 
@@ -50,23 +68,7 @@ export default function Navbar() {
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
-  useEffect(() => {
-    const loadCategories = async () => {
-      try {
-        const res = await axios.get('/ourcategories')
-        const data = Array.isArray(res.data) ? res.data : res.data?.data || []
-        const menu = data.map((c) => ({
-          label: c.name,
-          path: `/products/category/${c.slug}`,
-        }))
-        setProductMenu(menu)
-      } catch (e) {
-        // keep fallback empty
-        console.error('Error loading product menu', e)
-      }
-    }
-    loadCategories()
-  }, [])
+  // Static product categories for dropdown (no backend fetch)
 
   useEffect(() => {
     const handler = (e) => {

@@ -4,14 +4,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Category;
 use App\Models\Log;
 use App\Models\Product;
 use App\Models\ProductImage;
+use App\Models\ProductCategory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log as LaravelLog;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 
 class ProductController extends Controller
 {
@@ -40,7 +39,7 @@ class ProductController extends Controller
     public function getByCategory($categorySlug)
     {
         try {
-            $category = Category::where('slug', $categorySlug)->first();
+            $category = ProductCategory::where('slug', $categorySlug)->first();
 
             if (! $category) {
                 return response()->json([
@@ -50,7 +49,7 @@ class ProductController extends Controller
             }
 
             $products = Product::with('category', 'images')
-                ->where('category_id', $category->id)
+                ->where('product_category_id', $category->id)
                 ->where('status', true)
                 ->latest()
                 ->get();
@@ -104,7 +103,7 @@ public function store(Request $request)
             'content' => 'nullable|string',
             'featured_image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
             'images.*' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
-            'category_id' => 'required|exists:categories,id', // Made required
+    'product_category_id' => 'required|exists:product_categories,id', // ← changed
             'status' => 'boolean',
         ]);
 
@@ -113,18 +112,13 @@ public function store(Request $request)
             $featuredImagePath = $request->file('featured_image')->store('products', 'public');
         }
 
-        // Generate slug before creating
-        $randomNumber = rand(10000, 99999);
-        $slug = Str::slug($validated['name']) . '-' . $randomNumber;
-
         $product = Product::create([
             'name' => $validated['name'],
-            'slug' => $slug, // Explicitly set slug
             'description' => $validated['description'] ?? null,
             'title' => $validated['title'] ?? null,
             'content' => $validated['content'] ?? null,
             'featured_image' => $featuredImagePath,
-            'category_id' => $validated['category_id'],
+    'product_category_id' => $validated['product_category_id'], // ← changed
             'status' => $validated['status'] ?? true,
         ]);
 
@@ -179,7 +173,7 @@ public function update(Request $request, $id)
             'content' => 'nullable|string',
             'featured_image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
             'images.*' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
-            'category_id' => 'required|exists:categories,id',
+    'product_category_id' => 'required|exists:product_categories,id', // ← changed
             'status' => 'boolean',
         ]);
 
@@ -197,15 +191,9 @@ public function update(Request $request, $id)
             'description' => $request->description ?? $product->description,
             'title' => $request->title ?? $product->title,
             'content' => $request->content ?? $product->content,
-            'category_id' => $request->category_id,
+    'product_category_id' => $request->product_category_id,
             'status' => $request->status ?? $product->status,
         ];
-        
-        // If name changed, update slug
-        if ($request->has('name') && $request->name !== $product->name) {
-            $randomNumber = rand(10000, 99999);
-            $updateData['slug'] = Str::slug($request->name) . '-' . $randomNumber;
-        }
         
         $product->update($updateData);
 

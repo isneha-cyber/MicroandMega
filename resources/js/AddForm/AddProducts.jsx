@@ -1,7 +1,7 @@
 // resources/js/AddForm/AddProducts.jsx
 
 import axios from "axios";
-import { X, Trash2, ChevronDown } from "lucide-react";
+import { X, Trash2 } from "lucide-react";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import React, { useEffect, useState } from "react";
@@ -26,7 +26,7 @@ const AddProducts = ({
         content: "",
         featured_image: null,
         images: [],
-        category_id: "",
+        product_category_id: "",   // ← was category_id
     });
 
     // Lock background scroll when modal is open
@@ -52,7 +52,7 @@ const AddProducts = ({
                 content: editingProducts.content || "",
                 featured_image: null,
                 images: [],
-                category_id: editingProducts.category_id || "",
+                product_category_id: editingProducts.product_category_id || "",  // ← was category_id
             });
             setCategoriesError("");
         }
@@ -62,7 +62,8 @@ const AddProducts = ({
         try {
             setCategoriesLoading(true);
             setCategoriesError("");
-            const response = await axios.get(route("ourcategories.dropdown"));
+            // ← updated endpoint from ourcategories.dropdown to ourproductcategories/flat
+            const response = await axios.get("/ourproductcategories/flat");
             const list = Array.isArray(response.data)
                 ? response.data
                 : response.data?.data || [];
@@ -76,27 +77,21 @@ const AddProducts = ({
         }
     };
 
-    // Build flat react-select options from nested categories
-    const buildSelectOptions = (categories, level = 0) => {
-        let options = [];
-        for (const cat of categories) {
-            options.push({
-                value: cat.id,
-                label: (level > 0 ? "└─ " : "") + cat.name,
-                isDisabled: false,
-                level,
-            });
-            if (cat.children && cat.children.length > 0) {
-                options = options.concat(buildSelectOptions(cat.children, level + 1));
-            }
-        }
-        return options;
+    // Build flat react-select options from the flat list returned by /ourproductcategories/flat
+    // Each item has: { id, name, slug, parent_id, parent_name, ... }
+    const buildSelectOptions = (flatList) => {
+        return flatList.map((cat) => ({
+            value: cat.id,
+            label: cat.parent_name ? `└─ ${cat.name}` : cat.name,
+            parentName: cat.parent_name || null,
+        }));
     };
 
     const categoryOptions = buildSelectOptions(categories);
 
+    // Find the currently selected option
     const selectedCategoryOption =
-        categoryOptions.find((o) => o.value === productForm.category_id) || null;
+        categoryOptions.find((o) => o.value === productForm.product_category_id) || null;  // ← was category_id
 
     const handleCreate = async (formData) => {
         try {
@@ -119,7 +114,8 @@ const AddProducts = ({
             return;
         }
 
-        if (!productForm.category_id) {
+        // ← was category_id
+        if (!productForm.product_category_id) {
             alert("Please select a category");
             return;
         }
@@ -152,13 +148,24 @@ const AddProducts = ({
                 content: "",
                 featured_image: null,
                 images: [],
-                category_id: "",
+                product_category_id: "",  // ← was category_id
             });
             setShowForm(false);
             setEditingProducts(null);
         } catch (error) {
             console.log("Error saving data", error);
-            alert("Error saving product. Please try again.");
+            const serverMessage =
+                error?.response?.data?.message ||
+                error?.response?.data?.error ||
+                null;
+            const validationErrors = error?.response?.data?.errors || null;
+            if (validationErrors) {
+                const firstField = Object.keys(validationErrors)[0];
+                const firstMessage = validationErrors[firstField]?.[0];
+                alert(firstMessage || "Please check the form fields.");
+            } else {
+                alert(serverMessage || "Error saving product. Please try again.");
+            }
         } finally {
             setSubmitting(false);
         }
@@ -192,29 +199,36 @@ const AddProducts = ({
         setEditingProducts(null);
     };
 
-    // react-select custom styles to match existing Tailwind look
+    // react-select custom styles matching existing Tailwind look
     const selectStyles = {
         control: (base, state) => ({
             ...base,
-            borderColor: state.isFocused ? "#6366f1" : "#d1d5db",
-            boxShadow: state.isFocused ? "0 0 0 1px #6366f1" : "none",
-            "&:hover": { borderColor: "#6366f1" },
+            borderColor: state.isFocused ? "#dc2626" : "#d1d5db",
+            boxShadow: state.isFocused ? "0 0 0 1px #dc2626" : "none",
+            "&:hover": { borderColor: "#dc2626" },
             borderRadius: "0.375rem",
             minHeight: "38px",
         }),
         option: (base, { data, isSelected, isFocused }) => ({
             ...base,
-            paddingLeft: `${(data.level || 0) * 16 + 12}px`,
+            paddingLeft: data.parentName ? "28px" : "12px",
             backgroundColor: isSelected
-                ? "#6366f1"
+                ? "#dc2626"
                 : isFocused
-                ? "#e0e7ff"
+                ? "#fee2e2"
                 : "white",
             color: isSelected ? "white" : "#111827",
             fontSize: "0.875rem",
         }),
-        placeholder: (base) => ({ ...base, color: "#9ca3af", fontSize: "0.875rem" }),
-        singleValue: (base) => ({ ...base, fontSize: "0.875rem" }),
+        placeholder: (base) => ({
+            ...base,
+            color: "#9ca3af",
+            fontSize: "0.875rem",
+        }),
+        singleValue: (base) => ({
+            ...base,
+            fontSize: "0.875rem",
+        }),
     };
 
     return (
@@ -223,8 +237,8 @@ const AddProducts = ({
             onClick={(e) => e.target === e.currentTarget && closeForm()}
         >
             <div className="relative px-6 py-6 rounded-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto bg-white shadow-2xl">
-                {/* Sticky Header */}
-                <div className="flex justify-between items-center mb-6 pb-4 border-b  bg-white z-10">
+                {/* Header */}
+                <div className="flex justify-between items-center mb-6 pb-4 border-b bg-white z-10">
                     <h2 className="text-2xl font-bold">
                         {editingProducts ? "Edit Product" : "Add New Product"}
                     </h2>
@@ -238,8 +252,10 @@ const AddProducts = ({
                 </div>
 
                 <form onSubmit={handleSubmit} className="space-y-4">
+
                     {/* Row: Category + Product Name side by side */}
                     <div className="flex gap-4">
+
                         {/* Category Selection */}
                         <div className="flex-1">
                             <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -251,7 +267,7 @@ const AddProducts = ({
                                 onChange={(selected) =>
                                     setProductForm((prev) => ({
                                         ...prev,
-                                        category_id: selected ? selected.value : "",
+                                        product_category_id: selected ? selected.value : "",  // ← was category_id
                                     }))
                                 }
                                 isLoading={categoriesLoading}
@@ -262,10 +278,16 @@ const AddProducts = ({
                                 }
                                 isClearable
                                 styles={selectStyles}
-                                noOptionsMessage={() => "No categories found"}
+                                noOptionsMessage={() =>
+                                    categoriesError
+                                        ? categoriesError
+                                        : "No categories found"
+                                }
                             />
                             {categoriesError && (
-                                <p className="text-xs text-red-600 mt-1">{categoriesError}</p>
+                                <p className="text-xs text-red-600 mt-1">
+                                    {categoriesError}
+                                </p>
                             )}
                         </div>
 
@@ -316,26 +338,30 @@ const AddProducts = ({
                         />
                     </div>
 
-                   {/* Detailed Content - Rich Text */}
-<div>
-    <label className="block text-sm font-medium text-gray-700 mb-2">
-        Detailed Content (HTML supported)
-    </label>
-    <div className="rounded-md border border-gray-300 focus-within:border-[#dc2626] focus-within:ring-1 focus-within:ring-[#dc2626] bg-white">
-        <ReactQuill
-            theme="snow"
-            value={productForm.content}
-            onChange={(value) =>
-                setProductForm((prev) => ({ ...prev, content: value }))
-            }
-            placeholder="Write product details here..."
-            style={{ height: '400px' }} // Add this line
-        />
-    </div>
-    <p className="text-xs text-gray-500 mt-1">
-        You can use HTML tags for formatting: h1–h6, p, ul, ol, li, strong, em, etc.
-    </p>
-</div>
+                    {/* Detailed Content - Rich Text */}
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Detailed Content (HTML supported)
+                        </label>
+                        <div className="rounded-md border border-gray-300 focus-within:border-[#dc2626] focus-within:ring-1 focus-within:ring-[#dc2626] bg-white">
+                            <ReactQuill
+                                theme="snow"
+                                value={productForm.content}
+                                onChange={(value) =>
+                                    setProductForm((prev) => ({
+                                        ...prev,
+                                        content: value,
+                                    }))
+                                }
+                                placeholder="Write product details here..."
+                                style={{ height: "400px" }}
+                            />
+                        </div>
+                        <p className="text-xs text-gray-500 mt-8">
+                            You can use HTML tags for formatting: h1–h6, p, ul, ol, li,
+                            strong, em, etc.
+                        </p>
+                    </div>
 
                     {/* Featured Image */}
                     <div>
@@ -349,7 +375,9 @@ const AddProducts = ({
                                     alt="Current featured"
                                     className="h-32 w-32 object-cover rounded-md"
                                 />
-                                <p className="text-xs text-gray-500 mt-1">Current featured image</p>
+                                <p className="text-xs text-gray-500 mt-1">
+                                    Current featured image (upload a new one to replace)
+                                </p>
                             </div>
                         )}
                         <input
@@ -359,6 +387,28 @@ const AddProducts = ({
                             accept="image/*"
                             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-[#dc2626] focus:border-[#dc2626]"
                         />
+                        {productForm.featured_image && (
+                            <div className="mt-2 flex items-center gap-2">
+                                <img
+                                    src={URL.createObjectURL(productForm.featured_image)}
+                                    alt="New featured preview"
+                                    className="h-20 w-20 object-cover rounded-md"
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() =>
+                                        setProductForm((prev) => ({
+                                            ...prev,
+                                            featured_image: null,
+                                        }))
+                                    }
+                                    className="flex items-center gap-1 text-sm text-red-600 hover:text-red-700"
+                                >
+                                    <Trash2 size={14} />
+                                    Remove
+                                </button>
+                            </div>
+                        )}
                     </div>
 
                     {/* Multiple Images */}
@@ -395,7 +445,9 @@ const AddProducts = ({
                         />
                         {productForm.images.length > 0 && (
                             <div className="mt-2">
-                                <p className="text-sm font-medium mb-2">Selected Images:</p>
+                                <p className="text-sm font-medium mb-2">
+                                    Selected Images:
+                                </p>
                                 <div className="flex gap-2 flex-wrap">
                                     {productForm.images.map((image, idx) => (
                                         <div key={idx} className="relative">
@@ -422,7 +474,7 @@ const AddProducts = ({
                     </div>
 
                     {/* Form Actions */}
-                    <div className="flex justify-end gap-3 pt-4 border-t bottom-0 bg-white py-4 z-10">
+                    <div className="flex justify-end gap-3 pt-4 border-t bg-white py-4 z-10">
                         <button
                             type="button"
                             onClick={closeForm}
@@ -433,7 +485,7 @@ const AddProducts = ({
                         <button
                             type="submit"
                             disabled={submitting}
-                            className="px-4 py-2 bg-[#dc2626] text-white rounded-md  transition disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="px-4 py-2 bg-[#dc2626] text-white rounded-md transition disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             {submitting
                                 ? "Saving..."

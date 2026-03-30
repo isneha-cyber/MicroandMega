@@ -9,7 +9,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\TestimonialController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\LogController;
-use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\ProductCategoryController;
 use App\Http\Controllers\ServiceTicketController;
 
 Route::get('/', function () {
@@ -58,9 +58,21 @@ Route::middleware('auth')->group(function () {
   
     // ── Products ──────────────────────────────────────────────────────────
 
-    Route::post('/ourproducts', [ProductController::class, 'store'])->name('ourproducts.store');
-    Route::put('/ourproducts/{id}', [ProductController::class, 'update'])->name('ourproducts.update');
-    Route::delete('/ourproducts/{id}', [ProductController::class, 'destroy'])->name('ourproducts.destroy');
+   Route::post('/ourproducts', [ProductController::class, 'store'])
+        ->name('ourproducts.store');
+    Route::put('/ourproducts/{id}', [ProductController::class, 'update'])
+        ->name('ourproducts.update');
+    Route::delete('/ourproducts/{id}', [ProductController::class, 'destroy'])
+        ->name('ourproducts.destroy');
+
+    // Product Categories (Admin)
+    Route::prefix('ourproductcategories')->group(function () {
+        Route::post('/', [ProductCategoryController::class, 'store'])->name('ourproductcategories.store');
+        Route::post('/{id}', [ProductCategoryController::class, 'update'])->name('ourproductcategories.update');
+        Route::delete('/{id}', [ProductCategoryController::class, 'destroy'])->name('ourproductcategories.destroy');
+        Route::delete('/{id}/images/{imageId}', [ProductCategoryController::class, 'destroyImage'])
+            ->name('ourproductcategories.images.destroy');
+    });
   
 
      // ── Testimonials ──────────────────────────────────────────────────────
@@ -94,19 +106,36 @@ Route::put('/ourservicetickets/{id}', [ServiceTicketController::class, 'update']
 });
 
 
-// Public Category Routes
-Route::get('/ourcategories', [CategoryController::class, 'index'])->name('ourcategories.index');
-Route::get('/ourcategories/dropdown', [CategoryController::class, 'getDropdown'])->name('ourcategories.dropdown');
-Route::get('/ourcategories/{slug}', [CategoryController::class, 'show'])->name('ourcategories.show');
+
 
 // Public Project Routes (API)
 Route::get('/ourprojects', [ProjectController::class, 'index'])->name('ourprojects.index');
 Route::get('/ourprojects/{slug}', [ProjectController::class, 'show'])->name('ourprojects.show');
 
 // Public Product Routes (API)
-Route::get('/ourproducts', [ProductController::class, 'index'])->name('ourproducts.index');
-Route::get('/ourproducts/{slug}', [ProductController::class, 'show'])->name('ourproducts.show');
-Route::get('/ourproducts/category/{categorySlug}', [ProductController::class, 'getByCategory'])->name('ourproducts.category');
+// ── Products ──────────────────────────────────────────────────
+Route::get('/ourproducts', [ProductController::class, 'index'])
+    ->name('ourproducts.index');
+Route::get('/ourproducts/category/{categorySlug}', [ProductController::class, 'getByCategory'])
+    ->name('ourproducts.by-category');          // ← MUST come before /{slug}
+Route::get('/ourproducts/{slug}', [ProductController::class, 'show'])
+    ->name('ourproducts.show');
+
+// Public Product Categories (API)
+Route::prefix('ourproductcategories')->group(function () {
+    Route::get('/', [ProductCategoryController::class, 'index'])->name('ourproductcategories.index');
+    Route::get('/flat', [ProductCategoryController::class, 'flat'])->name('ourproductcategories.flat');
+    Route::get('/{slug}', [ProductCategoryController::class, 'show'])->name('ourproductcategories.show');
+});
+
+Route::get('/category/{categorySlug}', function ($categorySlug) {
+    return Inertia::render('ProductDetailPage', ['categorySlug' => $categorySlug]);
+})->name('products.category');
+
+Route::get('/products/{slug}', function ($slug) {
+    return Inertia::render('ProductDetailPage', ['productSlug' => $slug]);
+})->name('products.show');
+
 
 
 
@@ -114,13 +143,6 @@ Route::get('/ourproducts/category/{categorySlug}', [ProductController::class, 'g
 Route::get('/ourtestimonials', [TestimonialController::class, 'index'])->name('ourtestimonials.index');
 
 // Product Detail Pages (public)
-Route::get('/products/category/{categorySlug}', function ($categorySlug) {
-    return Inertia::render('ProductDetailPage', ['categorySlug' => $categorySlug]);
-})->name('products.category');
-
-Route::get('/products/{slug}', function ($slug) {
-    return Inertia::render('ProductDetailPage', ['productSlug' => $slug]);
-})->name('products.show');
 
 
     Route::get('/about',function(){
