@@ -626,7 +626,7 @@ const FEATURES = [
 				strokeWidth={1.8}
 				strokeLinecap="round"
 				strokeLinejoin="round"
-				className="w-24 h-24">
+				className="sm:w-24 sm:h-24 w-16 h-16">
 				<path d="M24 4c0 0-10 8-10 20a10 10 0 0020 0C34 12 24 4 24 4z"/>
 				<path d="M20 28a4 4 0 008 0c0-4-4-7-4-7s-4 3-4 7z" fill="white" stroke="none" opacity="0.8"/>
 				<circle cx="24" cy="4" r="1.5" fill="white" stroke="none"/>
@@ -641,7 +641,7 @@ const FEATURES = [
 				strokeWidth={1.8}
 				strokeLinecap="round"
 				strokeLinejoin="round"
-				className="w-24 h-24">
+				className="sm:w-24 sm:h-24 w-16 h-16">
 				<rect x="8" y="20" width="32" height="22" rx="3"/>
 				<path d="M14 20V14a10 10 0 0120 0v6"/>
 				<circle cx="24" cy="31" r="3" fill="white" stroke="none"/>
@@ -657,7 +657,7 @@ const FEATURES = [
 				strokeWidth={1.8}
 				strokeLinecap="round"
 				strokeLinejoin="round"
-				className="w-24 h-24">
+				className="sm:w-24 sm:h-24 w-16 h-16">
 				<rect x="3" y="12" width="30" height="20" rx="3"/>
 				<path d="M33 18l12-5v22l-12-5"/>
 				<circle cx="18" cy="22" r="6"/>
@@ -673,7 +673,7 @@ const FEATURES = [
 				strokeWidth={1.8}
 				strokeLinecap="round"
 				strokeLinejoin="round"
-				className="w-24 h-24">
+				className="sm:w-24 sm:h-24 w-16 h-16">
 				<path d="M20 10L10 18H4v12h6l10 8V10z"/>
 				<path d="M34 10a18 18 0 010 28"/>
 				<path d="M28 16a10 10 0 010 16"/>
@@ -687,7 +687,7 @@ const FEATURES = [
 				strokeWidth={1.8}
 				strokeLinecap="round"
 				strokeLinejoin="round"
-				className="w-24 h-24">
+				className="sm:w-24 sm:h-24 w-16 h-16">
 				<rect x="18" y="4" width="12" height="8" rx="2"/>
 				<rect x="4" y="36" width="12" height="8" rx="2"/>
 				<rect x="32" y="36" width="12" height="8" rx="2"/>
@@ -703,7 +703,7 @@ const FEATURES = [
 				strokeWidth={1.8}
 				strokeLinecap="round"
 				strokeLinejoin="round"
-				className="w-24 h-24">
+				className="sm:w-24 sm:h-24 w-16 h-16">
 				<circle cx="24" cy="20" r="8"/>
 				<path d="M24 4v4M24 36v4M8 20H4M44 20h-4M11.5 7.5l3 3M33.5 33.5l3 3M11.5 32.5l3-3M33.5 7.5l3-3"/>
 				<path d="M18 34h12M19 38h10"/>
@@ -717,7 +717,7 @@ const FEATURES = [
 				strokeWidth={1.8}
 				strokeLinecap="round"
 				strokeLinejoin="round"
-				className="w-24 h-24">
+				className="sm:w-24 sm:h-24 w-16 h-16">
 				<path d="M10 24a14 14 0 0028 0"/>
 				<path d="M4 18a22 22 0 0040 0"/>
 				<path d="M16 30a10 10 0 0016 0"/>
@@ -734,7 +734,7 @@ const FEATURES = [
 				strokeWidth={1.8}
 				strokeLinecap="round"
 				strokeLinejoin="round"
-				className="w-24 h-24">
+				className="sm:w-24 sm:h-24 w-16 h-16">
 				<path d="M6 44V18L24 6l18 12v26"/>
 				<path d="M18 44V30h12v14"/>
 				<path d="M6 22h4M38 22h4M6 30h4M38 30h4"/>

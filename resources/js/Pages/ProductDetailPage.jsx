@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import {
     AlertTriangle,
     Bell,
@@ -28,14 +28,178 @@ const iconMap = {
     "Digital Lighting": Bell,
 };
 
+// ─── Shared card used for both sub-categories and products ───────────────────
+function ItemCard({ image, title, description, label, onClick }) {
+    return (
+        <div
+            onClick={onClick}
+            className="bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md hover:border-red-300 transition-all flex flex-col cursor-pointer group overflow-hidden"
+        >
+            <div className="w-full h-44 overflow-hidden bg-gray-50 flex items-center justify-center flex-shrink-0">
+                {image ? (
+                    <img
+                        src={image}
+                        alt={title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        onError={(e) => { e.target.onerror = null; e.target.src = "/images/placeholder.jpg"; }}
+                    />
+                ) : (
+                    <Shield className="h-12 w-12 text-red-300" />
+                )}
+            </div>
+            <div className="p-4 flex flex-col flex-1">
+                <h4 className="font-bold text-sm text-gray-800 mb-1 group-hover:text-red-700 transition-colors leading-snug">
+                    {title}
+                </h4>
+                {description && (
+                    <p className="text-xs text-gray-500 flex-1 mb-3 line-clamp-3 leading-relaxed">
+                        {description}
+                    </p>
+                )}
+                <span className="mt-auto inline-flex items-center gap-1 text-xs font-bold text-red-600 uppercase tracking-wide">
+                    {label} →
+                </span>
+            </div>
+        </div>
+    );
+}
+
+// ─── Category/Product Detail Component (Reusable for both categories and sub-categories) ───
+function DetailView({ item, type, onImageClick, onProductSelect }) {
+    const [activeImage, setActiveImage] = useState(null);
+    const [additionalImages, setAdditionalImages] = useState([]);
+
+    useEffect(() => {
+        // Set up images based on item type
+        let images = [];
+        
+        if (type === 'category') {
+            // Only add featured_image, NOT icon_image
+            if (item.featured_image) {
+                images.push({ src: `/storage/${item.featured_image}`, type: 'featured' });
+            }
+            // Add additional images from category (if available)
+            if (item.additional_images && Array.isArray(item.additional_images)) {
+                item.additional_images.forEach(img => {
+                    if (img?.image_path) images.push({ src: `/storage/${img.image_path}`, type: 'additional' });
+                });
+            }
+        } else if (type === 'product') {
+            if (item.featured_image) images.push({ src: `/storage/${item.featured_image}`, type: 'featured' });
+            if (item.images && Array.isArray(item.images)) {
+                item.images.forEach(img => {
+                    if (img?.image_path) images.push({ src: `/storage/${img.image_path}`, type: 'additional' });
+                });
+            }
+        }
+        
+        const featured = images.find(img => img.type === 'featured');
+        const others = images.filter(img => img.type !== 'featured');
+        
+        setActiveImage(featured?.src || (images[0]?.src || null));
+        setAdditionalImages(others.slice(0, 6)); // Up to 6 additional images for grid
+    }, [item, type]);
+
+    const handleThumbnailClick = (image) => {
+        setActiveImage(image);
+        if (onImageClick) onImageClick(image);
+    };
+
+    return (
+        <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+            {/* Title Section */}
+            <div className="px-5 pt-5 pb-3 border-b border-gray-100">
+                <h2 className="text-lg md:text-3xl font-bold text-gray-900">
+                    {item.title || item.name}
+                </h2>
+                {type === 'product' && item.category?.name && (
+                    <p className="text-lg text-red-600 font-medium mt-0.5 uppercase tracking-wide">
+                        {item.category.name}
+                    </p>
+                )}
+            </div>
+
+            {/* Banner-shaped Featured Image - Only shows featured_image, not icon_image */}
+            {activeImage && (
+                <div className="relative w-full bg-gradient-to-r from-gray-900 to-gray-800">
+                    <div className="relative h-[300px] sm:h-[400px] md:h-[500px] w-full overflow-hidden ">
+                        <img
+                            src={activeImage}
+                            alt={item.name || "Featured"}
+                            className="w-full h-full object-cover object-center"
+                            onError={(e) => { 
+                                e.target.onerror = null; 
+                                e.target.src = "/images/firealram.jpg";
+                            }}
+                        />
+                        {/* Overlay for better text readability if needed */}
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent pointer-events-none" />
+                    </div>
+                </div>
+            )}
+
+            {/* Additional Images Grid - 3 columns - Only shows additional images, not icon_image */}
+            {additionalImages.length > 0 && (
+                <div className="p-4 border-b border-gray-100 bg-gray-50">
+                    <h3 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
+                        <Camera className="h-4 w-4 text-red-500" />
+                        Gallery
+                    </h3>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-3 gap-3">
+                        {additionalImages.map((img, idx) => (
+                            <button
+                                key={idx}
+                                onClick={() => handleThumbnailClick(img.src)}
+                                className={`relative group rounded-lg overflow-hidden bg-white border-2 transition-all aspect-square ${
+                                    activeImage === img.src
+                                        ? "border-red-500 ring-2 ring-red-200 ring-offset-1"
+                                        : "border-gray-200 hover:border-red-300 hover:shadow-md"
+                                }`}
+                            >
+                                <img
+                                    src={img.src}
+                                    alt={`Gallery ${idx + 1}`}
+                                    className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                                    onError={(e) => { 
+                                        e.target.onerror = null; 
+                                        e.target.src = "/images/firealram.jpg";
+                                    }}
+                                />
+                                {activeImage === img.src && (
+                                    <div className="absolute inset-0 bg-red-500/10 pointer-events-none" />
+                                )}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+            )}
+
+            {/* Description and Content */}
+            <div className="px-5 py-6">
+                {item.content ? (
+                    <div className="prose prose-sm md:prose max-w-none">
+                        {parse(item.content)}
+                    </div>
+                ) : item.description ? (
+                    <div className="text-gray-600 text-sm leading-relaxed space-y-2">
+                        <p>{item.description}</p>
+                    </div>
+                ) : null}
+            </div>
+        </div>
+    );
+}
+
+// ─── Sidebar ─────────────────────────────────────────────────────────────────
 function SidebarItem({ item, isOpen, onToggle, onCategorySelect, onProductSelect }) {
     const Icon = iconMap[item.name] || Shield;
-    const hasChildren = item.children?.length > 0 || item.products?.length > 0;
+    const hasChildren = item.children?.length > 0;
+    const hasProducts = item.products?.length > 0;
+    const hasDropdown = hasChildren || hasProducts;
 
     return (
         <li className="border-b border-gray-100 last:border-0">
             <div className="flex items-center w-full hover:bg-gray-50 transition-colors">
-                {/* Label — navigates to category */}
                 <button
                     onClick={() => onCategorySelect(item)}
                     className="flex-1 flex items-center gap-2 px-3 py-2.5 text-left text-sm"
@@ -50,11 +214,10 @@ function SidebarItem({ item, isOpen, onToggle, onCategorySelect, onProductSelect
                     ) : (
                         <Icon className="h-4 w-4 text-red-600 flex-shrink-0" />
                     )}
-                    <span className="font-medium text-gray-800">{item.name}</span>
+                    <span className="font-medium text-lg text-gray-800">{item.name}</span>
                 </button>
 
-                {/* Chevron — only toggles dropdown */}
-                {hasChildren && (
+                {hasDropdown && (
                     <button
                         onClick={(e) => { e.stopPropagation(); onToggle(); }}
                         className="px-3 py-2.5 text-gray-400 hover:text-gray-600"
@@ -65,30 +228,25 @@ function SidebarItem({ item, isOpen, onToggle, onCategorySelect, onProductSelect
                 )}
             </div>
 
-            {/* Child categories */}
-            {item.children?.length > 0 && isOpen && (
+            {isOpen && (
                 <ul className="bg-gray-50 border-t border-gray-100">
-                    {item.children.map((child) => (
-                        <li
-                            key={child.id || child.slug || child.name}
-                            onClick={() => onCategorySelect(child)}
-                            className="px-6 py-2 text-sm text-gray-600 hover:text-red-700 hover:bg-red-50 cursor-pointer border-b border-gray-100 last:border-0"
-                        >
-                            {child.name}
+                    {item.children?.map((child) => (
+                        <li key={child.id || child.slug || child.name}>
+                            <button
+                                onClick={() => onCategorySelect(child)}
+                                className="w-full text-left px-6 py-2 text-sm text-gray-600 hover:text-red-700 hover:bg-red-50 cursor-pointer border-b border-gray-100 last:border-0"
+                            >
+                                {child.name}
+                            </button>
                         </li>
                     ))}
-                </ul>
-            )}
-
-            {/* Products under category */}
-            {item.products?.length > 0 && isOpen && (
-                <ul className="bg-gray-50 border-t border-gray-100">
-                    {item.products.map((product) => (
+                    {item.products?.map((product) => (
                         <li
                             key={product.id || product.slug || product.name}
                             onClick={() => onProductSelect(product)}
-                            className="px-6 py-2 text-sm text-gray-600 hover:text-red-700 hover:bg-red-50 cursor-pointer border-b border-gray-100 last:border-0"
+                            className="px-6 py-2 text-lg text-gray-500 hover:text-red-700 hover:bg-red-50 cursor-pointer border-b border-gray-100 last:border-0 flex items-center gap-1.5"
                         >
+                            <span className="w-1 h-1 rounded-full bg-red-400 flex-shrink-0" />
                             {product.name}
                         </li>
                     ))}
@@ -105,29 +263,24 @@ function Sidebar({ isMobileOpen, onClose, categories, onCategorySelect, onProduc
     return (
         <>
             {isMobileOpen && (
-                <div
-                    className="fixed inset-0 bg-black/50 z-40 lg:hidden"
-                    onClick={onClose}
-                />
+                <div className="fixed inset-0 bg-black/50 z-40 lg:hidden" onClick={onClose} />
             )}
             <aside
                 className={`
                     fixed lg:sticky top-0 lg:top-4 z-50 lg:z-auto
                     w-72 lg:w-full
                     h-screen lg:h-auto lg:max-h-[calc(100vh-2rem)]
-                    bg-white
-                    shadow-xl lg:shadow-none
-                    overflow-y-auto
+                    bg-white shadow-xl lg:shadow-none overflow-y-auto
                     transition-transform duration-300
                     ${isMobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
                 `}
             >
                 <div className="bg-gray-800 text-white py-3 px-4 flex items-center justify-between sticky top-0 z-10">
-                    <h3 className="text-xs font-bold uppercase tracking-widest flex items-center gap-2">
-                        <ShieldCheck className="h-4 w-4" /> Security Products
+                    <h3 className="text-lg font-bold uppercase tracking-widest flex items-center gap-2">
+                        <ShieldCheck className="h-8 w-8" /> Security Products
                     </h3>
                     <button onClick={onClose} className="lg:hidden text-white hover:text-gray-300 transition-colors">
-                        <X className="h-4 w-4" />
+                        <X className="h-6 w-6" />
                     </button>
                 </div>
                 <nav className="border border-gray-200 border-t-0">
@@ -149,100 +302,99 @@ function Sidebar({ isMobileOpen, onClose, categories, onCategorySelect, onProduc
     );
 }
 
+// ─── Main page ────────────────────────────────────────────────────────────────
 export default function ProductDetailPage() {
     const { props } = usePage();
+    const initKey = useRef(null);
+
     const categorySlug = props?.categorySlug || null;
-    const productSlug = props?.productSlug || null;
+    const productSlug  = props?.productSlug  || null;
 
-    const [sidebarOpen, setSidebarOpen] = useState(false);
-    const [categories, setCategories] = useState([]);
-    const [allProducts, setAllProducts] = useState([]);
-    const [selectedProduct, setSelectedProduct] = useState(null);
+    const [sidebarOpen,      setSidebarOpen]      = useState(false);
+    const [categories,       setCategories]       = useState([]);
+    const [allProducts,      setAllProducts]      = useState([]);
+    const [selectedProduct,  setSelectedProduct]  = useState(null);
     const [selectedCategory, setSelectedCategory] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [activeImage, setActiveImage] = useState(null);
+    const [loading,          setLoading]          = useState(true);
+    const [activeImage,      setActiveImage]      = useState(null);
 
-    const updateCategoryUrl = (slug) => {
-        if (!slug) return;
-        window.history?.replaceState(null, "", `/category/${slug}`);
+    // Products fetched on-demand when a category view is shown
+    const [categoryProducts,        setCategoryProducts]        = useState([]);
+    const [categoryProductsLoading, setCategoryProductsLoading] = useState(false);
+
+    // ── URL helper ────────────────────────────────────────────────────────────
+    const updateUrl = (slug) => {
+        if (slug) window.history?.replaceState(null, "", `/category/${slug}`);
     };
 
-    const updateProductUrl = (slug) => {
-        if (!slug) return;
-        window.history?.replaceState(null, "", `/products/${slug}`);
-    };
-
+    // ── Data fetchers ─────────────────────────────────────────────────────────
     const fetchCategories = async () => {
         try {
-            const response = await axios.get("/ourproductcategories");
-            const transformed = response.data.data.map((category) => ({
-                id: category.id,
-                name: category.name,
-                slug: category.slug,
-                icon_image: category.icon_image || null,
-                featured_image: category.featured_image || null,
-                description: category.description || "",
-                title: category.title || "",
-                content: category.content || "",
-                children: category.children?.map((child) => ({
-                    id: child.id,
-                    name: child.name,
-                    slug: child.slug,
-                    icon_image: child.icon_image || null,
+            const res = await axios.get("/ourproductcategories");
+            const transformed = res.data.data.map((cat) => ({
+                id:             cat.id,
+                name:           cat.name,
+                slug:           cat.slug,
+                icon_image:     cat.icon_image     || null,
+                featured_image: cat.featured_image || null,
+                description:    cat.description    || "",
+                title:          cat.title          || "",
+                content:        cat.content        || "",
+                additional_images: cat.additional_images || [],
+                children: (cat.children ?? []).map((child) => ({
+                    id:             child.id,
+                    name:           child.name,
+                    slug:           child.slug,
+                    icon_image:     child.icon_image     || null,
                     featured_image: child.featured_image || null,
-                    description: child.description || "",
-                    title: child.title || "",
-                    content: child.content || "",
-                })) || [],
+                    description:    child.description    || "",
+                    title:          child.title          || "",
+                    content:        child.content        || "",
+                    additional_images: child.additional_images || [],
+                })),
             }));
             setCategories(transformed);
             return transformed;
-        } catch (error) {
-            console.error("Error fetching categories:", error);
+        } catch (err) {
+            console.error("Error fetching categories:", err);
             return [];
-        } finally {
-            setLoading(false);
         }
     };
 
     const fetchAllProducts = async () => {
         try {
-            const response = await axios.get("/ourproducts");
-            const list = response.data?.data || response.data || [];
+            const res  = await axios.get("/ourproducts");
+            const list = res.data?.data || res.data || [];
             setAllProducts(list);
             return list;
-        } catch (error) {
-            console.error("Error fetching products:", error);
+        } catch (err) {
+            console.error("Error fetching products:", err);
             return [];
         }
     };
 
-    const fetchProductsByCategory = async (slug) => {
-        try {
-            setLoading(true);
-            const response = await axios.get(`/ourproducts/category/${slug}`);
-            const products = response.data.data || [];
-            setSelectedProduct(products.length > 0 ? products[0] : null);
-            const found = categories.find((c) => c.slug === slug);
-            setSelectedCategory(found || null);
-        } catch (error) {
-            console.error("Error fetching category products:", error);
-            setSelectedProduct(null);
-            setSelectedCategory(null);
-        } finally {
-            setLoading(false);
-        }
+    /**
+     * Find a category object purely from the already-loaded list.
+     * No API call — avoids the 404 on page refresh entirely.
+     */
+    const resolveCategoryBySlug = (slug, cats) => {
+        const source = cats ?? categories;
+        return (
+            source.find((c) => c.slug === slug) ??
+            source.flatMap((c) => c.children ?? []).find((c) => c.slug === slug) ??
+            null
+        );
     };
 
     const fetchProductBySlug = async (slug) => {
         try {
             setLoading(true);
-            const response = await axios.get(`/ourproducts/${slug}`);
-            const product = response.data?.data || null;
+            const res     = await axios.get(`/ourproducts/${slug}`);
+            const product = res.data?.data || null;
             setSelectedProduct(product);
             setSelectedCategory(product?.category || null);
-        } catch (error) {
-            console.error("Error fetching product:", error);
+        } catch (err) {
+            console.error("Error fetching product:", err);
             setSelectedProduct(null);
             setSelectedCategory(null);
         } finally {
@@ -250,74 +402,115 @@ export default function ProductDetailPage() {
         }
     };
 
-    const handleCategorySelect = async (category) => {
-        const slug = category?.slug;
-        if (!slug) return;
-        await fetchProductsByCategory(slug);
-        updateCategoryUrl(slug);
+    // ── Handlers ──────────────────────────────────────────────────────────────
+    const handleCategorySelect = (category) => {
+        if (!category?.slug) return;
+        setSelectedProduct(null);   // exit product view
+        setCategoryProducts([]);    // reset stale list
+        setSelectedCategory(category);
+        updateUrl(category.slug);
         setSidebarOpen(false);
     };
 
     const handleProductSelect = async (product) => {
-        const slug = product?.slug;
-        if (!slug) return;
-        await fetchProductBySlug(slug);
-        updateProductUrl(slug);
+        if (!product?.slug) return;
+        await fetchProductBySlug(product.slug);
+        updateUrl(product.slug);
         setSidebarOpen(false);
     };
 
+    // ── Initialise once per unique slug pair ──────────────────────────────────
     useEffect(() => {
+        const key = `${categorySlug ?? ""}|${productSlug ?? ""}`;
+        if (initKey.current === key) return; // prevent double-fire from Inertia re-renders
+        initKey.current = key;
+
         const init = async () => {
-            await fetchCategories();
-            await fetchAllProducts();
+            setLoading(true);
+            const [cats] = await Promise.all([fetchCategories(), fetchAllProducts()]);
+
             if (productSlug) {
+                // /category/{productSlug} — load the specific product
                 await fetchProductBySlug(productSlug);
             } else if (categorySlug) {
-                await fetchProductsByCategory(categorySlug);
+                // /category/{categorySlug} — show category view, no products API call needed
+                const cat = resolveCategoryBySlug(categorySlug, cats);
+                setSelectedProduct(null);
+                setSelectedCategory(cat);
+                setLoading(false);
+            } else {
+                setLoading(false);
             }
         };
+
         init();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [categorySlug, productSlug]);
 
+    // ── Lazily load products when a category is displayed ────────────────────
+    useEffect(() => {
+        if (!selectedCategory?.slug || selectedProduct) {
+            setCategoryProducts([]);
+            return;
+        }
+
+        let cancelled = false;
+        const load = async () => {
+            setCategoryProductsLoading(true);
+            try {
+                const res = await axios.get(`/ourproducts/category/${selectedCategory.slug}`);
+                if (!cancelled) setCategoryProducts(res.data?.data || []);
+            } catch {
+                // 404 = no products yet — show empty grid, not an error
+                if (!cancelled) setCategoryProducts([]);
+            } finally {
+                if (!cancelled) setCategoryProductsLoading(false);
+            }
+        };
+
+        load();
+        return () => { cancelled = true; };
+    }, [selectedCategory?.slug, selectedProduct]);
+
+    // ── Sidebar data ──────────────────────────────────────────────────────────
     const categoriesWithProducts = useMemo(() => {
         if (!categories.length) return [];
-        if (!allProducts.length) return categories.map((c) => ({ ...c, products: [] }));
 
-        const byCategorySlug = allProducts.reduce((acc, product) => {
-            const slug = product?.category?.slug;
+        const byCategorySlug = allProducts.reduce((acc, p) => {
+            const slug = p?.category?.slug;
             if (!slug) return acc;
             if (!acc[slug]) acc[slug] = [];
-            acc[slug].push({ id: product.id, name: product.name, slug: product.slug });
+            acc[slug].push({ id: p.id, name: p.name, slug: p.slug });
             return acc;
         }, {});
 
-        return categories.map((category) => ({
-            ...category,
-            products: byCategorySlug[category.slug] || [],
+        return categories.map((cat) => ({
+            ...cat,
+            products: byCategorySlug[cat.slug] || [],
         }));
     }, [categories, allProducts]);
 
-    // Collect all images for the selected product
+    // ── Product images ─────────────────────────────────────────────────────────
     const productImages = useMemo(() => {
         const imgs = [];
         if (selectedProduct?.featured_image) imgs.push(`/storage/${selectedProduct.featured_image}`);
-        if (Array.isArray(selectedProduct?.images)) {
-            selectedProduct.images.forEach((img) => {
-                if (img?.image_path) imgs.push(`/storage/${img.image_path}`);
-            });
-        }
+        (selectedProduct?.images ?? []).forEach((img) => {
+            if (img?.image_path) imgs.push(`/storage/${img.image_path}`);
+        });
         return [...new Set(imgs)];
     }, [selectedProduct]);
 
     useEffect(() => {
-        setActiveImage(productImages[0] || "/images/firealram.jpg");
+        setActiveImage(productImages[0] || null);
     }, [productImages]);
 
+    // ── Derived values ─────────────────────────────────────────────────────────
     const pageTitle =
-        selectedCategory?.name ||
         selectedProduct?.category?.name ||
+        selectedCategory?.name ||
         "Products";
 
+    // ── Loading screen ─────────────────────────────────────────────────────────
     if (loading) {
         return (
             <div className="min-h-screen flex items-center justify-center">
@@ -329,6 +522,7 @@ export default function ProductDetailPage() {
         );
     }
 
+    // ── Render ─────────────────────────────────────────────────────────────────
     return (
         <>
             {/* Hero Banner */}
@@ -338,28 +532,26 @@ export default function ProductDetailPage() {
             >
                 <div className="absolute inset-0 bg-gray-900/70 pointer-events-none" />
                 <div className="relative z-20 flex flex-col items-center text-center gap-3">
-                    <h2 className="text-3xl font-extrabold uppercase text-white sm:text-5xl lg:text-6xl">
+                    <h2 className="text-3xl font-extrabold uppercase text-white sm:text-5xl ">
                         {pageTitle}
                     </h2>
                     <p className="text-sm font-medium text-gray-300 sm:text-base">
-                        <Link href="/" className="hover:text-red-400 transition-colors">
-                            Home
-                        </Link>
+                        <Link href="/" className="hover:text-red-400 transition-colors">Home</Link>
                         <span className="mx-2 text-gray-500">/</span>
                         <span className="text-white">{pageTitle}</span>
                     </p>
                 </div>
             </div>
 
-            {/* Main Layout */}
-            <div className="min-h-screen bg-gray-50 py-10 sm:py-12">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            {/* Main layout */}
+            <div className="min-h-screen bg-gray-50 py-16 sm:py-24">
+                <div className="max-w-7xl mx-auto px-4 sm:px-0">
                     <div className="flex flex-col lg:flex-row gap-6 lg:gap-8 items-start">
 
-                        {/* Mobile sidebar */}
+                        {/* Mobile sidebar overlay */}
                         {sidebarOpen && (
                             <Sidebar
-                                isMobileOpen={sidebarOpen}
+                                isMobileOpen
                                 onClose={() => setSidebarOpen(false)}
                                 categories={categoriesWithProducts}
                                 onCategorySelect={handleCategorySelect}
@@ -381,151 +573,103 @@ export default function ProductDetailPage() {
                         {/* Main content */}
                         <main className="flex-1 min-w-0">
 
-                            {/* Page heading + mobile menu trigger */}
+                            {/* Heading + mobile categories button */}
                             <div className="flex items-start justify-between gap-4 mb-5">
-                                <h1 className="text-xl md:text-2xl lg:text-3xl font-bold text-gray-900 leading-tight">
-                                    {selectedProduct?.title ||
-                                        selectedProduct?.name ||
-                                        selectedCategory?.title ||
-                                        selectedCategory?.name ||
-                                        "Products"}
+                                <h1 className="text-xl md:text-2xl lg:text-4xl font-bold text-gray-900 leading-tight">
+                                    {selectedProduct?.title  ||
+                                     selectedProduct?.name   ||
+                                     selectedCategory?.title ||
+                                     selectedCategory?.name  ||
+                                     "Products"}
                                 </h1>
                                 <button
                                     onClick={() => setSidebarOpen(true)}
-                                    className="lg:hidden flex items-center gap-1.5 text-gray-700 text-sm border border-gray-300 px-3 py-1.5 rounded hover:bg-gray-100 transition-colors flex-shrink-0"
+                                    className="lg:hidden flex items-center gap-1.5 text-gray-700 text-md border border-gray-300 px-3 py-1.5 rounded hover:bg-gray-100 transition-colors flex-shrink-0"
                                 >
-                                    <Menu className="h-4 w-4" />
-                                    Categories
+                                    <Menu className="h-6 w-6" /> Categories
                                 </button>
                             </div>
 
-                            {/* Category info card */}
-                            {selectedCategory && (
-                                <section className="mb-6 bg-white border border-gray-200 rounded-xl p-4 md:p-6">
-                                    <div className="grid gap-6 md:grid-cols-[1fr_auto] items-start">
-                                        <div className="min-w-0">
-                                            <h2 className="text-lg md:text-xl font-bold text-gray-800 mb-2">
-                                                {selectedCategory.title || selectedCategory.name}
-                                            </h2>
-                                            {selectedCategory.description && (
-                                                <div className="text-sm text-gray-600 leading-relaxed">
-                                                    {parse(selectedCategory.description)}
-                                                </div>
-                                            )}
-                                            {selectedCategory.content && (
-                                                <div className="prose prose-sm max-w-none mt-3">
-                                                    {parse(selectedCategory.content)}
-                                                </div>
-                                            )}
-                                        </div>
-                                        {(selectedCategory.featured_image || selectedCategory.icon_image) && (
-                                            <div className="w-full md:w-56 flex-shrink-0">
-                                                <img
-                                                    src={`/storage/${selectedCategory.featured_image || selectedCategory.icon_image}`}
-                                                    alt={selectedCategory.name}
-                                                    className="w-full h-44 object-cover rounded-lg border border-gray-100"
-                                                    onError={(e) => { e.target.onerror = null; e.target.src = "/images/placeholder.jpg"; }}
-                                                />
-                                            </div>
-                                        )}
-                                    </div>
-                                </section>
-                            )}
+                            {/* ── PRODUCT VIEW ── */}
+                            {selectedProduct ? (
+                                <DetailView 
+                                    item={selectedProduct} 
+                                    type="product"
+                                    onImageClick={setActiveImage}
+                                />
 
-                            {/* Product main image */}
-                            {selectedProduct && (
-                                <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
-                                    <img
-                                        src={activeImage || "/images/firealram.jpg"}
-                                        alt={selectedProduct?.name || "Product"}
-                                        className="w-full max-h-[400px] sm:max-h-[480px] object-contain p-4"
-                                        onError={(e) => { e.target.onerror = null; e.target.src = "/images/firealram.jpg"; }}
+                            ) : selectedCategory ? (
+                                /* ── CATEGORY VIEW ── */
+                                <>
+                                    {/* Category Detail View with consistent layout */}
+                                    <DetailView 
+                                        item={selectedCategory} 
+                                        type="category"
+                                        onImageClick={setActiveImage}
+                                        onProductSelect={handleProductSelect}
                                     />
-                                </div>
-                            )}
 
-                            {/* Thumbnail gallery */}
-                            {productImages.length > 1 && (
-                                <div className="mt-3 grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 gap-2">
-                                    {productImages.map((src) => (
-                                        <button
-                                            key={src}
-                                            onClick={() => setActiveImage(src)}
-                                            className={`border rounded-lg overflow-hidden bg-gray-50 aspect-square transition-all ${
-                                                activeImage === src
-                                                    ? "border-red-500 ring-2 ring-red-200"
-                                                    : "border-gray-200 hover:border-red-300"
-                                            }`}
-                                        >
-                                            <img
-                                                src={src}
-                                                alt="Product thumbnail"
-                                                className="h-full w-full object-cover"
-                                                onError={(e) => { e.target.onerror = null; e.target.src = "/images/firealram.jpg"; }}
-                                            />
-                                        </button>
-                                    ))}
-                                </div>
-                            )}
-
-                            {/* Product content / description */}
-                            <div className="prose prose-sm md:prose max-w-none mt-6">
-                                {selectedProduct?.content ? (
-                                    <div>{parse(selectedProduct.content)}</div>
-                                ) : selectedProduct ? (
-                                    <div>
-                                        <h2 className="text-base md:text-lg font-bold text-red-700 uppercase mb-3 leading-snug">
-                                            {selectedProduct.title || selectedProduct.name}
-                                        </h2>
-                                        {selectedProduct.description && (
-                                            <p className="text-gray-600 text-sm">
-                                                {selectedProduct.description}
-                                            </p>
-                                        )}
-                                    </div>
-                                ) : null}
-                            </div>
-
-                            {/* Sub-category product cards */}
-                            {selectedCategory?.children?.length > 0 && (
-                                <div className="mt-10">
-                                    <h2 className="text-lg font-bold text-gray-800 mb-5 pb-2 border-b-2 border-red-600 inline-block">
-                                        {selectedCategory.name} Products
-                                    </h2>
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                                        {selectedCategory.children.map((child) => (
-                                            <div
-                                                key={child.id || child.slug || child.name}
-                                                className="bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md hover:border-red-300 transition-all p-4 flex flex-col"
-                                            >
-                                                {/* Image or icon placeholder */}
-                                                <div className="w-full h-32 rounded-lg mb-3 overflow-hidden bg-gray-50 border border-gray-100 flex items-center justify-center">
-                                                    {child.featured_image || child.icon_image ? (
-                                                        <img
-                                                            src={`/storage/${child.featured_image || child.icon_image}`}
-                                                            alt={child.name}
-                                                            className="w-full h-full object-cover"
-                                                            onError={(e) => { e.target.onerror = null; e.target.src = "/images/placeholder.jpg"; }}
-                                                        />
-                                                    ) : (
-                                                        <Shield className="h-10 w-10 text-red-400" />
-                                                    )}
-                                                </div>
-                                                <h4 className="font-bold text-sm text-gray-800 mb-1">{child.name}</h4>
-                                                {child.description && (
-                                                    <p className="text-xs text-gray-500 flex-1 mb-3 line-clamp-3">
-                                                        {child.description}
-                                                    </p>
-                                                )}
-                                                <button
-                                                    onClick={() => handleCategorySelect(child)}
-                                                    className="w-full bg-red-600 hover:bg-red-700 active:bg-red-800 text-white text-xs font-bold py-2 px-3 rounded-lg transition-colors uppercase tracking-wide mt-auto"
-                                                >
-                                                    View Products
-                                                </button>
+                                    {/* Sub-category cards — same ItemCard as products */}
+                                    {selectedCategory.children?.length > 0 && (
+                                        <div className="mt-8">
+                                            <h2 className="text-3xl font-bold text-gray-800 mb-5 pb-2 border-b-2 border-red-600 inline-block">
+                                                Sub-categories
+                                            </h2>
+                                            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                                                {selectedCategory.children.map((child) => (
+                                                    <ItemCard
+                                                        key={child.id || child.slug || child.name}
+                                                        image={
+                                                            (child.featured_image || child.icon_image)
+                                                                ? `/storage/${child.featured_image || child.icon_image}`
+                                                                : null
+                                                        }
+                                                        title={child.title || child.name}
+                                                        description={child.description}
+                                                        label="View Products"
+                                                        onClick={() => handleCategorySelect(child)}
+                                                    />
+                                                ))}
                                             </div>
-                                        ))}
-                                    </div>
+                                        </div>
+                                    )}
+
+                                    {/* Direct products under this category */}
+                                    {categoryProductsLoading && (
+                                        <div className="mt-8 flex items-center gap-2 text-sm text-gray-500">
+                                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-red-600" />
+                                            Loading products…
+                                        </div>
+                                    )}
+
+                                    {!categoryProductsLoading && categoryProducts.length > 0 && (
+                                        <div className="mt-8">
+                                            <h2 className="text-lg font-bold text-gray-800 mb-5 pb-2 border-b-2 border-red-600 inline-block">
+                                                {selectedCategory.name} Products
+                                            </h2>
+                                            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                                                {categoryProducts.map((product) => (
+                                                    <ItemCard
+                                                        key={product.id || product.slug}
+                                                        image={
+                                                            product.featured_image
+                                                                ? `/storage/${product.featured_image}`
+                                                                : null
+                                                        }
+                                                        title={product.title || product.name}
+                                                        description={product.description}
+                                                        label="View Details"
+                                                        onClick={() => handleProductSelect(product)}
+                                                    />
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+                                </>
+
+                            ) : (
+                                <div className="text-center text-gray-400 py-20">
+                                    Select a category or product from the sidebar.
                                 </div>
                             )}
                         </main>
