@@ -2,6 +2,14 @@ import axios from "axios";
 import { X } from "lucide-react";
 import React, { useEffect, useState } from "react";
 
+
+const imgurl = import.meta.env.VITE_IMAGE_PATH;
+const resolveImageUrl = (path) => {
+    if (!path) return "";
+    if (path.startsWith("http://") || path.startsWith("https://")) return path;
+    return `${imgurl}/${path}`;
+};
+
 const AddProjects = ({ editingProjects, setEditingProjects, setReloadTrigger, setShowForm, handleUpdate }) => {
     const [submitting, setSubmitting] = useState(false);
     const [projectsForm, setProjectsForm] = useState({
@@ -80,9 +88,27 @@ const AddProjects = ({ editingProjects, setEditingProjects, setReloadTrigger, se
         }
     };
 
+    const handleUpdateLocal = async (formData, id) => {
+        if (typeof formData?.get === "function" && !formData.get("_method")) {
+            formData.append("_method", "PUT");
+        }
+        const response = await axios.post(
+            route("ourprojects.update", { id }),
+            formData,
+            {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                    "X-HTTP-Method-Override": "PUT",
+                },
+            }
+        );
+        return response.data;
+    };
+
     // Handle Submit
     const handleSubmit = async (e) => {
         e.preventDefault();
+        const editingId = editingProjects?.id ?? editingProjects?.project_id ?? null;
         const formData = new FormData();
         
         // Append all form data
@@ -104,7 +130,17 @@ const AddProjects = ({ editingProjects, setEditingProjects, setReloadTrigger, se
 
             if (editingProjects) {
                 // Editing existing Projects
-                await handleUpdate(formData, editingProjects.id);
+                if (!editingId) {
+                    throw new Error("Missing project id for update.");
+                }
+                if (typeof formData?.get === "function" && !formData.get("_method")) {
+                    formData.append("_method", "PUT");
+                }
+                if (handleUpdate) {
+                    await handleUpdate(formData, editingId);
+                } else {
+                    await handleUpdateLocal(formData, editingId);
+                }
             } else {
                 // Creating new Projects
                 await handleCreate(formData);
@@ -212,7 +248,7 @@ const AddProjects = ({ editingProjects, setEditingProjects, setReloadTrigger, se
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
-                        <div>
+                        {/* <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">
                                 Client Name
                             </label>
@@ -223,7 +259,7 @@ const AddProjects = ({ editingProjects, setEditingProjects, setReloadTrigger, se
                                 onChange={handleChange}
                                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
                             />
-                        </div>
+                        </div> */}
 
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -336,7 +372,7 @@ const AddProjects = ({ editingProjects, setEditingProjects, setReloadTrigger, se
                         {editingProjects && editingProjects.image_url && (
                             <div className="mt-2">
                                 <img 
-                                    src={editingProjects.image_url} 
+                                    src={resolveImageUrl(editingProjects.image_url)} 
                                     alt="Current" 
                                     className="h-20 w-20 object-cover rounded"
                                 />

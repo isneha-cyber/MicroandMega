@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\Log;
 use App\Models\Product;
 use App\Models\ProductCategory;
-use App\Models\ProductCategoryImage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log as LaravelLog;
 use Illuminate\Support\Facades\Storage;
@@ -16,7 +15,7 @@ class ProductCategoryController extends Controller
     public function index()
     {
         try {
-            $categories = ProductCategory::with(['children', 'images'])
+            $categories = ProductCategory::with(['children'])
                 ->whereNull('parent_id')
                 ->where('status', true)
                 ->latest()
@@ -48,6 +47,7 @@ class ProductCategoryController extends Controller
                     'parent_name' => $c->parent?->name,
                     'icon_image'  => $c->icon_image,
                     'featured_image' => $c->featured_image,
+                    'gallery_images' => $c->gallery_images ?? [],
                     'status'      => $c->status,
                 ]);
 
@@ -61,7 +61,7 @@ class ProductCategoryController extends Controller
     public function show($slug)
     {
         try {
-            $category = ProductCategory::with(['children', 'images', 'products.images'])
+            $category = ProductCategory::with(['children', 'products.images'])
                 ->where('slug', $slug)
                 ->where('status', true)
                 ->firstOrFail();
@@ -87,7 +87,8 @@ class ProductCategoryController extends Controller
                 'content'       => 'nullable|string',
                 'featured_image'=> 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
                 'icon_image'    => 'nullable|image|mimes:jpg,jpeg,png,webp,svg|max:1024',
-                'images.*'      => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+                'gallery_images' => 'nullable|array',
+                'gallery_images.*' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
                 'parent_id'     => 'nullable|exists:product_categories,id',
                 'status'        => 'boolean',
             ]);
@@ -104,6 +105,15 @@ class ProductCategoryController extends Controller
                     ->store('product-categories/icons', 'public');
             }
 
+            // Handle gallery images - store as JSON array
+            $galleryPaths = [];
+            if ($request->hasFile('gallery_images')) {
+                foreach ($request->file('gallery_images') as $image) {
+                    $path = $image->store('product-categories/gallery', 'public');
+                    $galleryPaths[] = $path;
+                }
+            }
+
             $category = ProductCategory::create([
                 'name'           => $validated['name'],
                 'slug'           => $validated['slug'] ?? null,
@@ -112,22 +122,10 @@ class ProductCategoryController extends Controller
                 'content'        => $validated['content'] ?? null,
                 'featured_image' => $featuredPath,
                 'icon_image'     => $iconPath,
+                'gallery_images' => $galleryPaths,
                 'parent_id'      => $validated['parent_id'] ?? null,
                 'status'         => $validated['status'] ?? true,
             ]);
-
-            // Handle gallery images
-            if ($request->hasFile('images')) {
-                foreach ($request->file('images') as $index => $image) {
-                    $path = $image->store('product-categories/gallery', 'public');
-                    ProductCategoryImage::create([
-                        'product_category_id' => $category->id,
-                        'image_path'          => $path,
-                        'is_primary'          => $index === 0,
-                        'sort_order'          => $index,
-                    ]);
-                }
-            }
 
             Log::create([
                 'name'       => auth()->user()?->name ?? 'Guest',
@@ -138,7 +136,7 @@ class ProductCategoryController extends Controller
             return response()->json([
                 'status'  => true,
                 'message' => 'Product category created successfully',
-                'data'    => $category->load('images'),
+                'data'    => $category,
             ], 201);
 
         } catch (\Exception $e) {
@@ -161,7 +159,10 @@ class ProductCategoryController extends Controller
                 'content'       => 'nullable|string',
                 'featured_image'=> 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
                 'icon_image'    => 'nullable|image|mimes:jpg,jpeg,png,webp,svg|max:1024',
-                'images.*'      => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+                'gallery_images' => 'nullable|array',
+                'gallery_images.*' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+                'remove_gallery_images' => 'nullable|array',
+                'remove_gallery_images.*' => 'integer',
                 'parent_id'     => 'nullable|exists:product_categories,id',
                 'status'        => 'boolean',
             ]);
@@ -174,6 +175,7 @@ class ProductCategoryController extends Controller
                 ], 422);
             }
 
+            // Handle featured image
             if ($request->hasFile('featured_image')) {
                 if ($category->featured_image && Storage::disk('public')->exists($category->featured_image)) {
                     Storage::disk('public')->delete($category->featured_image);
@@ -183,6 +185,7 @@ class ProductCategoryController extends Controller
                 $category->featured_image = $featuredPath;
             }
 
+            // Handle icon image
             if ($request->hasFile('icon_image')) {
                 if ($category->icon_image && Storage::disk('public')->exists($category->icon_image)) {
                     Storage::disk('public')->delete($category->icon_image);
@@ -192,29 +195,46 @@ class ProductCategoryController extends Controller
                 $category->icon_image = $iconPath;
             }
 
-            $category->update([
-                'name'        => $request->name ?? $category->name,
-                'slug'        => $validated['slug'] ?? $category->slug,
-                'description' => $request->description ?? $category->description,
-                'title'       => $request->title ?? $category->title,
-                'content'     => $request->content ?? $category->content,
-                'parent_id'   => array_key_exists('parent_id', $validated)
-                                    ? $validated['parent_id']
-                                    : $category->parent_id,
-                'status'      => $request->has('status') ? $request->status : $category->status,
-            ]);
+            // Handle removal of specific gallery images
+            $currentGallery = $category->gallery_images ?? [];
+            if ($request->has('remove_gallery_images')) {
+                $toRemove = $request->remove_gallery_images;
+                $remaining = [];
+                
+                foreach ($currentGallery as $index => $imagePath) {
+                    if (!in_array($index, $toRemove)) {
+                        $remaining[] = $imagePath;
+                    } else {
+                        // Delete the image file
+                        if (Storage::disk('public')->exists($imagePath)) {
+                            Storage::disk('public')->delete($imagePath);
+                        }
+                    }
+                }
+                $currentGallery = $remaining;
+            }
 
-            if ($request->hasFile('images')) {
-                foreach ($request->file('images') as $index => $image) {
+            // Handle new gallery images
+            if ($request->hasFile('gallery_images')) {
+                foreach ($request->file('gallery_images') as $image) {
                     $path = $image->store('product-categories/gallery', 'public');
-                    ProductCategoryImage::create([
-                        'product_category_id' => $category->id,
-                        'image_path'          => $path,
-                        'is_primary'          => false,
-                        'sort_order'          => $category->images()->count() + $index,
-                    ]);
+                    $currentGallery[] = $path;
                 }
             }
+
+            // Update category
+            $category->update([
+                'name'           => $request->name ?? $category->name,
+                'slug'           => $validated['slug'] ?? $category->slug,
+                'description'    => $request->description ?? $category->description,
+                'title'          => $request->title ?? $category->title,
+                'content'        => $request->content ?? $category->content,
+                'gallery_images' => $currentGallery,
+                'parent_id'      => array_key_exists('parent_id', $validated)
+                                    ? $validated['parent_id']
+                                    : $category->parent_id,
+                'status'         => $request->has('status') ? $request->status : $category->status,
+            ]);
 
             Log::create([
                 'name'       => auth()->user()?->name ?? 'Guest',
@@ -225,7 +245,7 @@ class ProductCategoryController extends Controller
             return response()->json([
                 'status'  => true,
                 'message' => 'Product category updated successfully',
-                'data'    => $category->fresh()->load('images', 'parent', 'children'),
+                'data'    => $category->fresh()->load('parent', 'children'),
             ]);
 
         } catch (\Exception $e) {
@@ -253,16 +273,19 @@ class ProductCategoryController extends Controller
             if ($category->featured_image && Storage::disk('public')->exists($category->featured_image)) {
                 Storage::disk('public')->delete($category->featured_image);
             }
+            
             // Delete icon
             if ($category->icon_image && Storage::disk('public')->exists($category->icon_image)) {
                 Storage::disk('public')->delete($category->icon_image);
             }
-            // Delete gallery images
-            foreach ($category->images as $image) {
-                if (Storage::disk('public')->exists($image->image_path)) {
-                    Storage::disk('public')->delete($image->image_path);
+            
+            // Delete all gallery images
+            if (!empty($category->gallery_images)) {
+                foreach ($category->gallery_images as $imagePath) {
+                    if (Storage::disk('public')->exists($imagePath)) {
+                        Storage::disk('public')->delete($imagePath);
+                    }
                 }
-                $image->delete();
             }
 
             // Detach products (set product_category_id to null instead of deleting)
@@ -284,18 +307,29 @@ class ProductCategoryController extends Controller
         }
     }
 
-    // DELETE /ourproductcategories/{id}/images/{imageId} — remove one gallery image
-    public function destroyImage(Request $request, $id, $imageId)
+    // DELETE /ourproductcategories/{id}/gallery/{index} — remove one gallery image
+    public function destroyGalleryImage(Request $request, $id, $index)
     {
         try {
-            $image = ProductCategoryImage::where('product_category_id', $id)
-                ->findOrFail($imageId);
-
-            if (Storage::disk('public')->exists($image->image_path)) {
-                Storage::disk('public')->delete($image->image_path);
+            $category = ProductCategory::findOrFail($id);
+            $galleryImages = $category->gallery_images ?? [];
+            
+            if (!isset($galleryImages[$index])) {
+                return response()->json(['status' => false, 'message' => 'Image not found'], 404);
             }
-            $image->delete();
-
+            
+            $imagePath = $galleryImages[$index];
+            
+            // Delete the file
+            if (Storage::disk('public')->exists($imagePath)) {
+                Storage::disk('public')->delete($imagePath);
+            }
+            
+            // Remove from array
+            unset($galleryImages[$index]);
+            $category->gallery_images = array_values($galleryImages); // Reindex array
+            $category->save();
+            
             return response()->json(['status' => true, 'message' => 'Image deleted successfully']);
         } catch (\Exception $e) {
             return response()->json(['status' => false, 'message' => $e->getMessage()], 500);

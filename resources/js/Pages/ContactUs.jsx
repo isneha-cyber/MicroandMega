@@ -1,6 +1,34 @@
 import { Link } from "@inertiajs/react";
 import { useEffect, useState } from "react";
 
+// ─── Scroll To Top ────────────────────────────────────────────────────────────
+function ScrollToTop() {
+    const [visible, setVisible] = useState(false);
+
+    useEffect(() => {
+        const onScroll = () => setVisible(window.scrollY > 300);
+        window.addEventListener("scroll", onScroll, { passive: true });
+        return () => window.removeEventListener("scroll", onScroll);
+    }, []);
+
+    const scrollUp = () => window.scrollTo({ top: 0, behavior: "smooth" });
+
+    if (!visible) return null;
+
+    return (
+        <button
+            onClick={scrollUp}
+            aria-label="Scroll to top"
+            className="fixed bottom-6 right-6 z-[999] w-11 h-11 rounded-full bg-red-600 hover:bg-red-700 text-white shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center hover:-translate-y-1 active:translate-y-0"
+        >
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M5 15l7-7 7 7" />
+            </svg>
+        </button>
+    );
+}
+
+// ─── Icons ────────────────────────────────────────────────────────────────────
 function PhoneIcon() {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 35 35" fill="none">
@@ -35,7 +63,6 @@ function InstagramIcon() {
   );
 }
 
-
 function TikTokIcon() {
   return (
     <svg xmlns="https://www.tiktok.com/@micromega3" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
@@ -51,7 +78,6 @@ function FacebookIcon() {
     </svg>
   );
 }
-
 
 function TwitterXIcon() {
   return (
@@ -76,9 +102,9 @@ function ContactInfoCard({ icon, label, value, href }) {
   return href ? <a href={href} className="block">{inner}</a> : <div>{inner}</div>;
 }
 
+// ─── Main Component ───────────────────────────────────────────────────────────
 const ContactUS = () => {
   useEffect(() => {
-    // Ensure page starts at top when navigating here
     window.scrollTo({ top: 0, left: 0, behavior: "auto" });
     document.documentElement.scrollTop = 0;
     document.body.scrollTop = 0;
@@ -114,12 +140,12 @@ const ContactUS = () => {
         <div className="absolute inset-0 bg-gray-900/70 pointer-events-none" />
         <div className="relative z-20 flex flex-col items-center text-center">
           <h2 className="text-3xl font-extrabold uppercase text-white sm:text-5xl lg:text-6xl">Contact Us</h2>
-<h3 className="mt-2 text-sm font-semibold text-white sm:text-base lg:text-xl">
-<Link href="/" className="hover:text-red-500 transition-colors duration-300">Home</Link>
-      <span className="mx-2">/</span>
-      <span>Contact Us</span>
-    </h3>   
-         </div>
+          <h3 className="mt-2 text-sm font-semibold text-white sm:text-base lg:text-xl">
+            <Link href="/" className="hover:text-red-500 transition-colors duration-300">Home</Link>
+            <span className="mx-2">/</span>
+            <span>Contact Us</span>
+          </h3>
+        </div>
       </div>
 
       {/* Section 1: Info Row */}
@@ -146,7 +172,7 @@ const ContactUS = () => {
               {[
                 { icon: <InstagramIcon />, label: "Instagram" },
                 { icon: <TikTokIcon />, label: "Tiktok" },
-                { icon: <FacebookIcon/>, label: "Facebook" },
+                { icon: <FacebookIcon />, label: "Facebook" },
                 { icon: <TwitterXIcon />, label: "Twitter" },
               ].map(({ icon, label }) => (
                 <a key={label} href="#" aria-label={label}
@@ -166,8 +192,7 @@ const ContactUS = () => {
             <ContactInfoCard
               icon={<LocationIcon />}
               label="Location"
-              value="429/12 Ichhunadi Marg, Baluwatar, Kathmandu Nepal
-"
+              value="429/12 Ichhunadi Marg, Baluwatar, Kathmandu Nepal"
             />
           </div>
         </div>
@@ -184,7 +209,6 @@ const ContactUS = () => {
 
           {/* Map */}
           <div className="w-full lg:w-1/2 overflow-hidden border border-gray-100 min-h-[300px] sm:min-h-[420px] lg:min-h-[620px]">
-            {/* ✅ FIXED: style={{border:0}}, referrerPolicy camelCase, width/height via className */}
             <iframe
               src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3531.7430059038925!2d85.32935807904262!3d27.72522006328628!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x39eb1914cb445939%3A0x24d838cffeda4811!2s429%20Ichhunadi%20Marg%2C%20Kathmandu%2044600!5e0!3m2!1sen!2snp!4v1774421469810!5m2!1sen!2snp"
               title="Office Location"
@@ -235,6 +259,9 @@ const ContactUS = () => {
 
         </div>
       </section>
+
+      {/* Scroll to top */}
+      <ScrollToTop />
     </div>
   );
 };

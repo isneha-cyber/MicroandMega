@@ -1,8 +1,14 @@
+
+
 import AddProducts from "@/AddForm/AddProducts";
 import AdminWrapper from "@/AdminDashboard/AdminWrapper";
+import MyTable from "@/MyTable/MyTable";
 import axios from "axios";
-import { ChevronDown, Plus } from "lucide-react";
-import React, { useEffect, useState } from "react";
+import { ChevronDown, Pencil, Plus, Trash2 } from "lucide-react";
+import React, { useEffect, useMemo, useState } from "react";
+
+const imgurl = import.meta.env.VITE_IMAGE_PATH;
+
 
 const Products = () => {
     const [allProducts, setAllProducts] = useState([]);
@@ -12,6 +18,10 @@ const Products = () => {
     const [reloadTrigger, setReloadTrigger] = useState(false);
     const [editingProducts, setEditingProducts] = useState(null);
     const [showAddForm, setShowAddForm] = useState(false);
+
+    // Pagination state
+    const [currentPage, setCurrentPage] = useState(1);
+    const [perPage, setPerPage] = useState(10);
 
     useEffect(() => {
         const fetchProducts = async () => {
@@ -23,9 +33,9 @@ const Products = () => {
                 console.error("fetching error ", error);
             }
         };
-
         fetchProducts();
     }, [reloadTrigger]);
+   
 
     useEffect(() => {
         const fetchCategories = async () => {
@@ -41,6 +51,7 @@ const Products = () => {
     }, []);
 
     useEffect(() => {
+        setCurrentPage(1);
         if (selectedCategory === "all") {
             setFilteredProducts(allProducts);
             return;
@@ -51,17 +62,17 @@ const Products = () => {
     }, [allProducts, selectedCategory]);
 
     const handleDelete = async (id) => {
+        if (!confirm("Are you sure you want to delete this product?")) return;
         try {
-            const response = await axios.delete(route("ourproducts.destroy", { id }));
-            console.log(response.data);
+            await axios.delete(route("ourproducts.destroy", { id }));
             setReloadTrigger((prev) => !prev);
         } catch (error) {
             console.log(error);
         }
     };
 
-    const handleEdit = (products) => {
-        setEditingProducts(products);
+    const handleEdit = (product) => {
+        setEditingProducts(product);
         setShowAddForm(true);
     };
 
@@ -71,11 +82,7 @@ const Products = () => {
             const response = await axios.post(
                 route("ourproducts.update", { id }),
                 formData,
-                {
-                    headers: {
-                        "Content-Type": "multipart/form-data",
-                    },
-                }
+                { headers: { "Content-Type": "multipart/form-data" } }
             );
             setReloadTrigger((prev) => !prev);
             return response.data;
@@ -85,103 +92,171 @@ const Products = () => {
         }
     };
 
-    return (
-        <>
-            <AdminWrapper>
-                <div className="container mx-auto py-4">
-                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
-                        <div>
-                            <h1 className="text-4xl font-bold tracking-widest text-stone-800 uppercase">
-                                Products
-                            </h1>
-                        </div>
+    // Paginated data slice
+    const paginatedData = useMemo(() => {
+        const start = (currentPage - 1) * perPage;
+        return filteredProducts.slice(start, start + perPage);
+    }, [filteredProducts, currentPage, perPage]);
+
+    const lastPage = useMemo(
+        () => Math.max(1, Math.ceil(filteredProducts.length / perPage)),
+        [filteredProducts, perPage]
+    );
+
+    // Table columns definition
+    const columns = useMemo(
+        () => [
+            {
+                Header: "#",
+                id: "index",
+                disableSortBy: true,
+                Cell: ({ row }) => (
+                    <span className="text-gray-500 font-medium">
+                        {(currentPage - 1) * perPage + row.index + 1}
+                    </span>
+                ),
+            },
+            {
+                Header: "Category",
+                accessor: "category.name",
+                Cell: ({ value }) => (
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                        {value || "—"}
+                    </span>
+                ),
+            },
+            {
+                Header: "Product Name",
+                accessor: "name",
+                Cell: ({ row, value }) => (
+                    <div className="flex items-center gap-3">
+                        {row.original.featured_image && (
+                            <img
+                                src={`${imgurl}/${row.original.featured_image}`}
+                                alt={value}
+                                className="w-10 h-10 object-cover rounded-md border border-gray-200 flex-shrink-0"
+                                onError={(e) => {
+                                    e.target.onerror = null;
+                                    e.target.src = "/images/placeholder.jpg";
+                                }}
+                            />
+                        )}
+                        <span className="font-medium text-gray-800">{value}</span>
+                    </div>
+                ),
+            },
+            {
+                Header: "Detail Page Title",
+                accessor: "title",
+                Cell: ({ value }) => (
+                    <span className="text-gray-600">{value || "—"}</span>
+                ),
+            },
+            {
+                Header: "Actions",
+                id: "actions",
+                disableSortBy: true,
+                Cell: ({ row }) => (
+                    <div className="flex items-center gap-2">
                         <button
-                            onClick={() => {
-                                setEditingProducts(null);
-                                setShowAddForm(true);
-                            }}
-                            className="flex items-center gap-2 bg-[#dc2626] text-amber-50 px-6 py-2.5 rounded-lg text-sm font-medium tracking-widest uppercase  transition-all duration-200 shadow-md hover:shadow-lg hover:-translate-y-0.5"
+                            onClick={() => handleEdit(row.original)}
+                            className="inline-flex items-center gap-1.5 bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-md text-xs font-medium transition-colors duration-150"
                         >
-                            <Plus size={18} />
-                            Create
+                            <Pencil size={13} />
+                            Edit
+                        </button>
+                        <button
+                            onClick={() => handleDelete(row.original.id)}
+                            className="inline-flex items-center gap-1.5 bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded-md text-xs font-medium transition-colors duration-150"
+                        >
+                            <Trash2 size={13} />
+                            Delete
                         </button>
                     </div>
+                ),
+            },
+        ],
+        [currentPage, perPage]
+    );
 
-                    <div className="flex items-center gap-3 mb-6">
-                        <div className="relative w-64">
-                            <select
-                                value={selectedCategory}
-                                onChange={(e) => setSelectedCategory(e.target.value)}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none  appearance-none bg-white"
-                            >
-                                <option value="all">All Categories</option>
-                                {categories.map((c) => (
-                                    <option key={c.id} value={c.slug}>
-                                        {c.name}
-                                    </option>
-                                ))}
-                            </select>
-                            <ChevronDown className="absolute right-3 top-3 h-4 w-4 text-gray-400 pointer-events-none" />
-                        </div>
-                    </div>
-
-                    {/* Products List */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {filteredProducts.map((product) => (
-                            <div
-                                key={product.id}
-                                className="bg-white rounded-lg shadow-md p-4"
-                            >
-                                {product.featured_image && (
-                                    <img
-                                        src={`/storage/${product.featured_image}`}
-                                        alt={product.name}
-                                        className="w-full h-48 object-cover rounded-md mb-4"
-                                        onError={(e) => {
-                                            e.target.onerror = null;
-                                            e.target.src = "/images/placeholder.jpg";
-                                        }}
-                                    />
-                                )}
-                                <h3 className="text-xl font-semibold mb-2">
-                                    {product.name}
-                                </h3>
-                                <p className="text-gray-600 mb-2">
-                                    {product.description}
-                                </p>
-                                <p className="text-sm text-gray-500 mb-4">
-                                    Category: {product.category?.name || "--"}
-                                </p>
-                                <div className="flex gap-2">
-                                    <button
-                                        onClick={() => handleEdit(product)}
-                                        className="bg-blue-600 text-white px-4 py-2 rounded "
-                                    >
-                                        Edit
-                                    </button>
-                                    <button
-                                        onClick={() => handleDelete(product.id)}
-                                        className="bg-[#dc2626] text-white px-4 py-2 rounded "
-                                    >
-                                        Delete
-                                    </button>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-
-                    {showAddForm && (
-                        <AddProducts
-                            editingProducts={editingProducts}
-                            setShowForm={setShowAddForm}
-                            setEditingProducts={setEditingProducts}
-                            setReloadTrigger={setReloadTrigger}
-                            handleUpdate={handleUpdate}
-                        />
-                    )}
+    return (
+        <AdminWrapper>
+            <div className="container mx-auto py-4">
+                {/* Header */}
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+                    <h1 className="text-4xl font-bold tracking-widest text-stone-800 uppercase">
+                        Products
+                    </h1>
+                    <button
+                        onClick={() => {
+                            setEditingProducts(null);
+                            setShowAddForm(true);
+                        }}
+                        className="flex items-center gap-2 bg-[#dc2626] text-amber-50 px-6 py-2.5 rounded-lg text-sm font-medium tracking-widest uppercase transition-all duration-200 shadow-md hover:shadow-lg hover:-translate-y-0.5"
+                    >
+                        <Plus size={18} />
+                        Create
+                    </button>
                 </div>
-            </AdminWrapper>
-        </>
+
+                {/* Category Filter */}
+                <div className="flex items-center gap-3 mb-2">
+                    <div className="relative w-64">
+                        <select
+                            value={selectedCategory}
+                            onChange={(e) => setSelectedCategory(e.target.value)}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none appearance-none bg-white"
+                        >
+                            <option value="all">All Categories</option>
+                            {categories.map((c) => (
+                                <option key={c.id} value={c.slug}>
+                                    {c.name}
+                                </option>
+                            ))}
+                        </select>
+                        <ChevronDown className="absolute right-3 top-3 h-4 w-4 text-gray-400 pointer-events-none" />
+                    </div>
+                    <span className="text-sm text-gray-500">
+                        {filteredProducts.length} product{filteredProducts.length !== 1 ? "s" : ""}
+                    </span>
+                </div>
+
+                {/* Table */}
+                <MyTable
+                    columns={columns}
+                    data={paginatedData}
+                    pagination={{
+                        currentPage,
+                        lastPage,
+                        perPage,
+                        onPageChange: (page) => setCurrentPage(page),
+                        onPerPageChange: (size) => {
+                            setPerPage(size);
+                            setCurrentPage(1);
+                        },
+                    }}
+                />
+
+                {/* Empty state */}
+                {filteredProducts.length === 0 && (
+                    <div className="text-center py-16 text-gray-400">
+                        <p className="text-lg font-medium">No products found</p>
+                        <p className="text-sm mt-1">Try changing the category filter or add a new product.</p>
+                    </div>
+                )}
+
+                {/* Add / Edit Modal */}
+                {showAddForm && (
+                    <AddProducts
+                        editingProducts={editingProducts}
+                        setShowForm={setShowAddForm}
+                        setEditingProducts={setEditingProducts}
+                        setReloadTrigger={setReloadTrigger}
+                        handleUpdate={handleUpdate}
+                    />
+                )}
+            </div>
+        </AdminWrapper>
     );
 };
 

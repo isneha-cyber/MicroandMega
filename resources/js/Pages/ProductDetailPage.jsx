@@ -27,8 +27,23 @@ const iconMap = {
     "Grounding ERT": AlertTriangle,
     "Digital Lighting": Bell,
 };
+const imgurl = import.meta.env.VITE_IMAGE_PATH;
 
-// ─── Shared card used for both sub-categories and products ───────────────────
+function orderByOldestFirst(list) {
+    if (!Array.isArray(list)) return list;
+    return [...list].sort((a, b) => {
+        const aKey = a?.created_at ?? a?.createdAt ?? a?.id;
+        const bKey = b?.created_at ?? b?.createdAt ?? b?.id;
+
+        const aTime = aKey ? new Date(aKey).getTime() : NaN;
+        const bTime = bKey ? new Date(bKey).getTime() : NaN;
+
+        if (!Number.isNaN(aTime) && !Number.isNaN(bTime)) return aTime - bTime;
+        if (typeof aKey === "number" && typeof bKey === "number") return aKey - bKey;
+        return 0;
+    });
+}
+
 function ItemCard({ image, title, description, label, onClick }) {
     return (
         <div
@@ -40,7 +55,7 @@ function ItemCard({ image, title, description, label, onClick }) {
                     <img
                         src={image}
                         alt={title}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300"
                         onError={(e) => { e.target.onerror = null; e.target.src = "/images/placeholder.jpg"; }}
                     />
                 ) : (
@@ -64,40 +79,36 @@ function ItemCard({ image, title, description, label, onClick }) {
     );
 }
 
-// ─── Category/Product Detail Component (Reusable for both categories and sub-categories) ───
 function DetailView({ item, type, onImageClick, onProductSelect }) {
     const [activeImage, setActiveImage] = useState(null);
     const [additionalImages, setAdditionalImages] = useState([]);
 
     useEffect(() => {
-        // Set up images based on item type
         let images = [];
-        
+
         if (type === 'category') {
-            // Only add featured_image, NOT icon_image
             if (item.featured_image) {
-                images.push({ src: `/storage/${item.featured_image}`, type: 'featured' });
+                images.push({ src: `${imgurl}/${item.featured_image}`, type: 'featured' });
             }
-            // Add additional images from category (if available)
             if (item.additional_images && Array.isArray(item.additional_images)) {
                 item.additional_images.forEach(img => {
-                    if (img?.image_path) images.push({ src: `/storage/${img.image_path}`, type: 'additional' });
+                    if (img?.image_path) images.push({ src: `${imgurl}/${img.image_path}`, type: 'additional' });
                 });
             }
         } else if (type === 'product') {
-            if (item.featured_image) images.push({ src: `/storage/${item.featured_image}`, type: 'featured' });
+            if (item.featured_image) images.push({ src: `${imgurl}/${item.featured_image}`, type: 'featured' });
             if (item.images && Array.isArray(item.images)) {
                 item.images.forEach(img => {
-                    if (img?.image_path) images.push({ src: `/storage/${img.image_path}`, type: 'additional' });
+                    if (img?.image_path) images.push({ src: `${imgurl}/${img.image_path}`, type: 'additional' });
                 });
             }
         }
-        
+
         const featured = images.find(img => img.type === 'featured');
         const others = images.filter(img => img.type !== 'featured');
-        
+
         setActiveImage(featured?.src || (images[0]?.src || null));
-        setAdditionalImages(others.slice(0, 6)); // Up to 6 additional images for grid
+        setAdditionalImages(others.slice(0, 6));
     }, [item, type]);
 
     const handleThumbnailClick = (image) => {
@@ -107,50 +118,42 @@ function DetailView({ item, type, onImageClick, onProductSelect }) {
 
     return (
         <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
-            {/* Title Section */}
             <div className="px-5 pt-5 pb-3 border-b border-gray-100">
-                <h2 className="text-lg md:text-3xl font-bold text-gray-900">
-                    {item.title || item.name}
-                </h2>
+               
                 {type === 'product' && item.category?.name && (
-                    <p className="text-lg text-red-600 font-medium mt-0.5 uppercase tracking-wide">
+                    <h2 className="sm:text-3xl text-2xl text-red-600 font-bold mt-0.5 uppercase tracking-wide">
                         {item.category.name}
-                    </p>
+                    </h2>
                 )}
+                 <h3 className="text-xl md:text-xl font-bold text-gray-900">
+                    {item.title || item.name}
+                </h3>
             </div>
 
-            {/* Banner-shaped Featured Image - Only shows featured_image, not icon_image */}
             {activeImage && (
-                <div className="relative w-full bg-gradient-to-r from-gray-900 to-gray-800">
-                    <div className="relative h-[300px] sm:h-[400px] md:h-[500px] w-full overflow-hidden ">
+                <div className="relative w-full">
+                    <div className="relative h-[150px] sm:h-[400px] md:h-[250px] w-full overflow-hidden">
                         <img
                             src={activeImage}
                             alt={item.name || "Featured"}
-                            className="w-full h-full object-cover object-center"
-                            onError={(e) => { 
-                                e.target.onerror = null; 
+                            className="w-full h-full object-contain object-center"
+                            onError={(e) => {
+                                e.target.onerror = null;
                                 e.target.src = "/images/firealram.jpg";
                             }}
                         />
-                        {/* Overlay for better text readability if needed */}
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent pointer-events-none" />
                     </div>
                 </div>
             )}
 
-            {/* Additional Images Grid - 3 columns - Only shows additional images, not icon_image */}
             {additionalImages.length > 0 && (
                 <div className="p-4 border-b border-gray-100 bg-gray-50">
-                    <h3 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
-                        <Camera className="h-4 w-4 text-red-500" />
-                        Gallery
-                    </h3>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-3 gap-3">
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                         {additionalImages.map((img, idx) => (
                             <button
                                 key={idx}
                                 onClick={() => handleThumbnailClick(img.src)}
-                                className={`relative group rounded-lg overflow-hidden bg-white border-2 transition-all aspect-square ${
+                                className={`relative group rounded-lg overflow-hidden transition-all aspect-square ${
                                     activeImage === img.src
                                         ? "border-red-500 ring-2 ring-red-200 ring-offset-1"
                                         : "border-gray-200 hover:border-red-300 hover:shadow-md"
@@ -159,9 +162,9 @@ function DetailView({ item, type, onImageClick, onProductSelect }) {
                                 <img
                                     src={img.src}
                                     alt={`Gallery ${idx + 1}`}
-                                    className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                                    onError={(e) => { 
-                                        e.target.onerror = null; 
+                                    className="w-full h-[250px] object-cover transition-transform duration-300 group-hover:scale-105"
+                                    onError={(e) => {
+                                        e.target.onerror = null;
                                         e.target.src = "/images/firealram.jpg";
                                     }}
                                 />
@@ -174,7 +177,6 @@ function DetailView({ item, type, onImageClick, onProductSelect }) {
                 </div>
             )}
 
-            {/* Description and Content */}
             <div className="px-5 py-6">
                 {item.content ? (
                     <div className="prose prose-sm md:prose max-w-none">
@@ -190,7 +192,6 @@ function DetailView({ item, type, onImageClick, onProductSelect }) {
     );
 }
 
-// ─── Sidebar ─────────────────────────────────────────────────────────────────
 function SidebarItem({ item, isOpen, onToggle, onCategorySelect, onProductSelect }) {
     const Icon = iconMap[item.name] || Shield;
     const hasChildren = item.children?.length > 0;
@@ -206,7 +207,7 @@ function SidebarItem({ item, isOpen, onToggle, onCategorySelect, onProductSelect
                 >
                     {item.icon_image ? (
                         <img
-                            src={`/storage/${item.icon_image}`}
+                            src={`${imgurl}/${item.icon_image}`}
                             alt={item.name}
                             className="h-5 w-5 rounded object-cover flex-shrink-0"
                             onError={(e) => { e.target.onerror = null; e.target.src = "/images/placeholder.jpg"; }}
@@ -262,17 +263,20 @@ function Sidebar({ isMobileOpen, onClose, categories, onCategorySelect, onProduc
 
     return (
         <>
+            {/* Mobile backdrop */}
             {isMobileOpen && (
                 <div className="fixed inset-0 bg-black/50 z-40 lg:hidden" onClick={onClose} />
             )}
+
             <aside
                 className={`
-                    fixed lg:sticky top-0 lg:top-4 z-50 lg:z-auto
-                    w-72 lg:w-full
-                    h-screen lg:h-auto lg:max-h-[calc(100vh-2rem)]
-                    bg-white shadow-xl lg:shadow-none overflow-y-auto
+                    fixed inset-y-0 left-0 z-50 w-72
+                    bg-white shadow-xl overflow-y-auto
                     transition-transform duration-300
-                    ${isMobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
+                    ${isMobileOpen ? "translate-x-0" : "-translate-x-full"}
+                    lg:static lg:z-auto lg:w-full
+                    lg:translate-x-0 lg:shadow-none
+                    lg:max-h-[calc(100vh-3rem)] lg:overflow-y-auto
                 `}
             >
                 <div className="bg-gray-800 text-white py-3 px-4 flex items-center justify-between sticky top-0 z-10">
@@ -302,7 +306,6 @@ function Sidebar({ isMobileOpen, onClose, categories, onCategorySelect, onProduc
     );
 }
 
-// ─── Main page ────────────────────────────────────────────────────────────────
 export default function ProductDetailPage() {
     const { props } = usePage();
     const initKey = useRef(null);
@@ -311,6 +314,17 @@ export default function ProductDetailPage() {
     const productSlug  = props?.productSlug  || null;
 
     const [sidebarOpen,      setSidebarOpen]      = useState(false);
+
+    // FIX 1: Lock body scroll when mobile sidebar is open
+    useEffect(() => {
+        if (sidebarOpen) {
+            document.body.style.overflow = "hidden";
+        } else {
+            document.body.style.overflow = "";
+        }
+        return () => { document.body.style.overflow = ""; };
+    }, [sidebarOpen]);
+
     const [categories,       setCategories]       = useState([]);
     const [allProducts,      setAllProducts]      = useState([]);
     const [selectedProduct,  setSelectedProduct]  = useState(null);
@@ -318,16 +332,13 @@ export default function ProductDetailPage() {
     const [loading,          setLoading]          = useState(true);
     const [activeImage,      setActiveImage]      = useState(null);
 
-    // Products fetched on-demand when a category view is shown
     const [categoryProducts,        setCategoryProducts]        = useState([]);
     const [categoryProductsLoading, setCategoryProductsLoading] = useState(false);
 
-    // ── URL helper ────────────────────────────────────────────────────────────
     const updateUrl = (slug) => {
         if (slug) window.history?.replaceState(null, "", `/category/${slug}`);
     };
 
-    // ── Data fetchers ─────────────────────────────────────────────────────────
     const fetchCategories = async () => {
         try {
             const res = await axios.get("/ourproductcategories");
@@ -340,8 +351,9 @@ export default function ProductDetailPage() {
                 description:    cat.description    || "",
                 title:          cat.title          || "",
                 content:        cat.content        || "",
+                created_at:     cat.created_at     || null,
                 additional_images: cat.additional_images || [],
-                children: (cat.children ?? []).map((child) => ({
+                children: orderByOldestFirst((cat.children ?? []).map((child) => ({
                     id:             child.id,
                     name:           child.name,
                     slug:           child.slug,
@@ -350,11 +362,13 @@ export default function ProductDetailPage() {
                     description:    child.description    || "",
                     title:          child.title          || "",
                     content:        child.content        || "",
+                    created_at:     child.created_at     || null,
                     additional_images: child.additional_images || [],
-                })),
+                }))),
             }));
-            setCategories(transformed);
-            return transformed;
+            const ordered = orderByOldestFirst(transformed);
+            setCategories(ordered);
+            return ordered;
         } catch (err) {
             console.error("Error fetching categories:", err);
             return [];
@@ -365,18 +379,15 @@ export default function ProductDetailPage() {
         try {
             const res  = await axios.get("/ourproducts");
             const list = res.data?.data || res.data || [];
-            setAllProducts(list);
-            return list;
+            const ordered = orderByOldestFirst(list);
+            setAllProducts(ordered);
+            return ordered;
         } catch (err) {
             console.error("Error fetching products:", err);
             return [];
         }
     };
 
-    /**
-     * Find a category object purely from the already-loaded list.
-     * No API call — avoids the 404 on page refresh entirely.
-     */
     const resolveCategoryBySlug = (slug, cats) => {
         const source = cats ?? categories;
         return (
@@ -402,11 +413,10 @@ export default function ProductDetailPage() {
         }
     };
 
-    // ── Handlers ──────────────────────────────────────────────────────────────
     const handleCategorySelect = (category) => {
         if (!category?.slug) return;
-        setSelectedProduct(null);   // exit product view
-        setCategoryProducts([]);    // reset stale list
+        setSelectedProduct(null);
+        setCategoryProducts([]);
         setSelectedCategory(category);
         updateUrl(category.slug);
         setSidebarOpen(false);
@@ -419,10 +429,9 @@ export default function ProductDetailPage() {
         setSidebarOpen(false);
     };
 
-    // ── Initialise once per unique slug pair ──────────────────────────────────
     useEffect(() => {
         const key = `${categorySlug ?? ""}|${productSlug ?? ""}`;
-        if (initKey.current === key) return; // prevent double-fire from Inertia re-renders
+        if (initKey.current === key) return;
         initKey.current = key;
 
         const init = async () => {
@@ -430,10 +439,8 @@ export default function ProductDetailPage() {
             const [cats] = await Promise.all([fetchCategories(), fetchAllProducts()]);
 
             if (productSlug) {
-                // /category/{productSlug} — load the specific product
                 await fetchProductBySlug(productSlug);
             } else if (categorySlug) {
-                // /category/{categorySlug} — show category view, no products API call needed
                 const cat = resolveCategoryBySlug(categorySlug, cats);
                 setSelectedProduct(null);
                 setSelectedCategory(cat);
@@ -447,7 +454,6 @@ export default function ProductDetailPage() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [categorySlug, productSlug]);
 
-    // ── Lazily load products when a category is displayed ────────────────────
     useEffect(() => {
         if (!selectedCategory?.slug || selectedProduct) {
             setCategoryProducts([]);
@@ -459,9 +465,11 @@ export default function ProductDetailPage() {
             setCategoryProductsLoading(true);
             try {
                 const res = await axios.get(`/ourproducts/category/${selectedCategory.slug}`);
-                if (!cancelled) setCategoryProducts(res.data?.data || []);
+                if (!cancelled) {
+                    const list = res.data?.data || [];
+                    setCategoryProducts(orderByOldestFirst(list));
+                }
             } catch {
-                // 404 = no products yet — show empty grid, not an error
                 if (!cancelled) setCategoryProducts([]);
             } finally {
                 if (!cancelled) setCategoryProductsLoading(false);
@@ -472,7 +480,6 @@ export default function ProductDetailPage() {
         return () => { cancelled = true; };
     }, [selectedCategory?.slug, selectedProduct]);
 
-    // ── Sidebar data ──────────────────────────────────────────────────────────
     const categoriesWithProducts = useMemo(() => {
         if (!categories.length) return [];
 
@@ -486,16 +493,15 @@ export default function ProductDetailPage() {
 
         return categories.map((cat) => ({
             ...cat,
-            products: byCategorySlug[cat.slug] || [],
+            products: orderByOldestFirst(byCategorySlug[cat.slug] || []),
         }));
     }, [categories, allProducts]);
 
-    // ── Product images ─────────────────────────────────────────────────────────
     const productImages = useMemo(() => {
         const imgs = [];
-        if (selectedProduct?.featured_image) imgs.push(`/storage/${selectedProduct.featured_image}`);
+        if (selectedProduct?.featured_image) imgs.push(`${imgurl}/${selectedProduct.featured_image}`);
         (selectedProduct?.images ?? []).forEach((img) => {
-            if (img?.image_path) imgs.push(`/storage/${img.image_path}`);
+            if (img?.image_path) imgs.push(`${imgurl}/${img.image_path}`);
         });
         return [...new Set(imgs)];
     }, [selectedProduct]);
@@ -504,13 +510,11 @@ export default function ProductDetailPage() {
         setActiveImage(productImages[0] || null);
     }, [productImages]);
 
-    // ── Derived values ─────────────────────────────────────────────────────────
     const pageTitle =
         selectedProduct?.category?.name ||
         selectedCategory?.name ||
         "Products";
 
-    // ── Loading screen ─────────────────────────────────────────────────────────
     if (loading) {
         return (
             <div className="min-h-screen flex items-center justify-center">
@@ -522,7 +526,6 @@ export default function ProductDetailPage() {
         );
     }
 
-    // ── Render ─────────────────────────────────────────────────────────────────
     return (
         <>
             {/* Hero Banner */}
@@ -532,7 +535,7 @@ export default function ProductDetailPage() {
             >
                 <div className="absolute inset-0 bg-gray-900/70 pointer-events-none" />
                 <div className="relative z-20 flex flex-col items-center text-center gap-3">
-                    <h2 className="text-3xl font-extrabold uppercase text-white sm:text-5xl ">
+                    <h2 className="text-3xl font-extrabold uppercase text-white sm:text-5xl">
                         {pageTitle}
                     </h2>
                     <p className="text-sm font-medium text-gray-300 sm:text-base">
@@ -548,22 +551,11 @@ export default function ProductDetailPage() {
                 <div className="max-w-7xl mx-auto px-4 sm:px-0">
                     <div className="flex flex-col lg:flex-row gap-6 lg:gap-8 items-start">
 
-                        {/* Mobile sidebar overlay */}
-                        {sidebarOpen && (
+                        {/* Sidebar */}
+                        <div className="flex-shrink-0 w-80 lg:sticky lg:top-6 self-start">
                             <Sidebar
-                                isMobileOpen
+                                isMobileOpen={sidebarOpen}
                                 onClose={() => setSidebarOpen(false)}
-                                categories={categoriesWithProducts}
-                                onCategorySelect={handleCategorySelect}
-                                onProductSelect={handleProductSelect}
-                            />
-                        )}
-
-                        {/* Desktop sidebar */}
-                        <div className="hidden lg:block w-64 xl:w-72 flex-shrink-0">
-                            <Sidebar
-                                isMobileOpen={false}
-                                onClose={() => {}}
                                 categories={categoriesWithProducts}
                                 onCategorySelect={handleCategorySelect}
                                 onProductSelect={handleProductSelect}
@@ -573,7 +565,7 @@ export default function ProductDetailPage() {
                         {/* Main content */}
                         <main className="flex-1 min-w-0">
 
-                            {/* Heading + mobile categories button */}
+                            {/* Heading + mobile menu button */}
                             <div className="flex items-start justify-between gap-4 mb-5">
                                 <h1 className="text-xl md:text-2xl lg:text-4xl font-bold text-gray-900 leading-tight">
                                     {selectedProduct?.title  ||
@@ -586,30 +578,28 @@ export default function ProductDetailPage() {
                                     onClick={() => setSidebarOpen(true)}
                                     className="lg:hidden flex items-center gap-1.5 text-gray-700 text-md border border-gray-300 px-3 py-1.5 rounded hover:bg-gray-100 transition-colors flex-shrink-0"
                                 >
-                                    <Menu className="h-6 w-6" /> Categories
+                                    <Menu className="h-6 w-6" /> Menu
                                 </button>
                             </div>
 
-                            {/* ── PRODUCT VIEW ── */}
+                            {/* PRODUCT VIEW */}
                             {selectedProduct ? (
-                                <DetailView 
-                                    item={selectedProduct} 
+                                <DetailView
+                                    item={selectedProduct}
                                     type="product"
                                     onImageClick={setActiveImage}
                                 />
 
                             ) : selectedCategory ? (
-                                /* ── CATEGORY VIEW ── */
+                                /* CATEGORY VIEW */
                                 <>
-                                    {/* Category Detail View with consistent layout */}
-                                    <DetailView 
-                                        item={selectedCategory} 
+                                    <DetailView
+                                        item={selectedCategory}
                                         type="category"
                                         onImageClick={setActiveImage}
                                         onProductSelect={handleProductSelect}
                                     />
 
-                                    {/* Sub-category cards — same ItemCard as products */}
                                     {selectedCategory.children?.length > 0 && (
                                         <div className="mt-8">
                                             <h2 className="text-3xl font-bold text-gray-800 mb-5 pb-2 border-b-2 border-red-600 inline-block">
@@ -621,7 +611,7 @@ export default function ProductDetailPage() {
                                                         key={child.id || child.slug || child.name}
                                                         image={
                                                             (child.featured_image || child.icon_image)
-                                                                ? `/storage/${child.featured_image || child.icon_image}`
+                                                                ? `${imgurl}/${child.featured_image || child.icon_image}`
                                                                 : null
                                                         }
                                                         title={child.title || child.name}
@@ -634,7 +624,6 @@ export default function ProductDetailPage() {
                                         </div>
                                     )}
 
-                                    {/* Direct products under this category */}
                                     {categoryProductsLoading && (
                                         <div className="mt-8 flex items-center gap-2 text-sm text-gray-500">
                                             <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-red-600" />
@@ -642,6 +631,7 @@ export default function ProductDetailPage() {
                                         </div>
                                     )}
 
+                                    {/* FIX 2: Use imgurl instead of /storage/ for category products */}
                                     {!categoryProductsLoading && categoryProducts.length > 0 && (
                                         <div className="mt-8">
                                             <h2 className="text-lg font-bold text-gray-800 mb-5 pb-2 border-b-2 border-red-600 inline-block">
@@ -653,7 +643,7 @@ export default function ProductDetailPage() {
                                                         key={product.id || product.slug}
                                                         image={
                                                             product.featured_image
-                                                                ? `/storage/${product.featured_image}`
+                                                                ? `${imgurl}/${product.featured_image}`
                                                                 : null
                                                         }
                                                         title={product.title || product.name}

@@ -3,8 +3,34 @@ import axios from 'axios'
 import React, { useEffect, useState, useRef } from 'react'
 import { useForm } from 'react-hook-form'
 
-// ─── Icons ──────────────────────────────────────────────────────────────────
+// ─── Scroll To Top ────────────────────────────────────────────────────────────
+function ScrollToTop() {
+    const [visible, setVisible] = useState(false);
 
+    useEffect(() => {
+        const onScroll = () => setVisible(window.scrollY > 300);
+        window.addEventListener("scroll", onScroll, { passive: true });
+        return () => window.removeEventListener("scroll", onScroll);
+    }, []);
+
+    const scrollUp = () => window.scrollTo({ top: 0, behavior: "smooth" });
+
+    if (!visible) return null;
+
+    return (
+        <button
+            onClick={scrollUp}
+            aria-label="Scroll to top"
+            className="fixed bottom-6 right-6 z-[999] w-11 h-11 rounded-full bg-[#bb1403] hover:bg-[#9e1102] text-white shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center hover:-translate-y-1 active:translate-y-0"
+        >
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M5 15l7-7 7 7" />
+            </svg>
+        </button>
+    );
+}
+
+// ─── Icons ────────────────────────────────────────────────────────────────────
 const TicketIcon = () => (
   <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
     <path strokeLinecap="round" strokeLinejoin="round"
@@ -55,8 +81,7 @@ const XIcon = () => (
   </svg>
 )
 
-// ─── Field wrapper ───────────────────────────────────────────────────────────
-
+// ─── Field wrapper ────────────────────────────────────────────────────────────
 const Field = ({ label, required, error, children }) => (
   <div className="flex flex-col gap-1.5">
     <label className="text-md font-bold text-gray-700 flex items-center gap-1">
@@ -78,8 +103,17 @@ const inputCls = (err) =>
    placeholder:text-gray-400 focus:ring-2 focus:ring-[#bb1403]/20 focus:border-[#bb1403]
    ${err ? 'border-[#bb1403]/60 bg-red-50/30' : 'border-gray-200 hover:border-gray-300'}`
 
-// ─── Main Component ──────────────────────────────────────────────────────────
+// ─── Section heading helper ───────────────────────────────────────────────────
+function SectionHeading({ number, title }) {
+  return (
+    <div className="flex items-center gap-3 -mb-1">
+      <h3 className="text-xl font-bold text-gray-800 uppercase leading-relaxed tracking-wide">{title}</h3>
+      <div className="flex-1 h-px bg-gray-100" />
+    </div>
+  )
+}
 
+// ─── Main Component ───────────────────────────────────────────────────────────
 const generateTicketId = () =>
   '#TK-' + Math.floor(1000 + Math.random() * 9000)
 
@@ -91,7 +125,7 @@ export default function ServiceTicket() {
   const [submitted, setSubmitted] = useState(false)
   const [ticketId, setTicketId]   = useState('')
   const [isLoading, setIsLoading] = useState(false)
-  const [file, setFile]         = useState(null)
+  const [file, setFile]           = useState(null)
   const [supportFor, setSupportFor] = useState([])
   const [submitError, setSubmitError] = useState('')
   const fileInputRef = useRef(null)
@@ -103,11 +137,10 @@ export default function ServiceTicket() {
     formState: { errors },
   } = useForm({ mode: 'onBlur' })
 
-  // ── Support-For checkboxes ─────────────────────────────────────────────────
   const SUPPORT_OPTIONS = [
-    { value: 'amc_partner',       label: 'AMC Partner',            sub: 'Partner Code' },
-    { value: 'product_supplier',  label: 'Product Supply Partner', sub: 'Company Detail' },
-    { value: 'new_registration',  label: 'NEW',                    sub: 'All Details to register' },
+    { value: 'amc_partner',      label: 'AMC Partner',            sub: 'Partner Code' },
+    { value: 'product_supplier', label: 'Product Supply Partner', sub: 'Company Detail' },
+    { value: 'new_registration', label: 'NEW',                    sub: 'All Details to register' },
   ]
 
   const toggleSupport = (val) =>
@@ -115,7 +148,6 @@ export default function ServiceTicket() {
       prev.includes(val) ? prev.filter((v) => v !== val) : [...prev, val]
     )
 
-  // ── File handling ──────────────────────────────────────────────────────────
   const handleFileChange = (e) => {
     const selected = Array.from(e.target.files || [])
     const picked = selected[0] || null
@@ -136,14 +168,12 @@ export default function ServiceTicket() {
 
   const removeFile = () => setFile(null)
 
-  // ── Submit ─────────────────────────────────────────────────────────────────
   const onSubmit = async (data) => {
-    if (supportFor.length === 0) return // guard
+    if (supportFor.length === 0) return
     setIsLoading(true)
     setSubmitError('')
     const id = generateTicketId()
 
-    // Build FormData for real submission
     const formData = new FormData()
     formData.append('requesterName', data.requesterName)
     formData.append('email', data.email)
@@ -153,11 +183,9 @@ export default function ServiceTicket() {
     formData.append('subjectLine', data.subjectLine)
     formData.append('detailedDescription', data.detailedDescription)
     formData.append('requestSupportFor', JSON.stringify(supportFor))
-    if (file) {
-      formData.append('attachment', file)
-    }
+    if (file) formData.append('attachment', file)
 
-        try {
+    try {
       const response = await axios.post('/service-tickets', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       })
@@ -175,7 +203,7 @@ export default function ServiceTicket() {
     }
   }
 
-  // ── Success screen ─────────────────────────────────────────────────────────
+  // ── Success screen ──────────────────────────────────────────────────────────
   if (submitted) {
     return (
       <div
@@ -202,11 +230,12 @@ export default function ServiceTicket() {
             Submit Another Ticket
           </button>
         </div>
+        <ScrollToTop />
       </div>
     )
   }
 
-  // ── Form ───────────────────────────────────────────────────────────────────
+  // ── Form ────────────────────────────────────────────────────────────────────
   return (
     <>
       <link
@@ -214,295 +243,219 @@ export default function ServiceTicket() {
         rel="stylesheet"
       />
 
-    
-
-<div className="relative flex min-h-[420px] items-center justify-center bg-[url('/images/about-bg.jpg')] bg-cover bg-center bg-no-repeat px-6 py-12 sm:min-h-[420px] sm:py-20 lg:min-h-[550px] lg:bg-fixed">
-				<div className="absolute inset-0 bg-gray-900/70 pointer-events-none"/>
-				<div className="relative z-20 flex flex-col items-center text-center">
-					<h2 className="text-4xl font-extrabold uppercase text-white sm:text-5xl lg:text-6xl">Service Ticket</h2>
-					<h3 className="mt-2 text-sm font-semibold text-white sm:text-base lg:text-xl">
-<Link href="/" className="hover:text-red-500 transition-colors duration-300">Home</Link>
-						<span className="mx-2">/</span>
-						<span>Service Ticket</span>
-					</h3>
-
-				</div>
-
-
-			</div>
-        
-        {/* ── Page header ──────────────────────────────────────── */}
-        <div className="max-w-7xl mx-auto mb-8 text-center pt-12">
-        
-          <h1 className=" text-2xl sm:text-5xl font-bold text-gray-900 leading-relaxed mb-2">
-            Submit a Service Ticket
-          </h1>
-          <p className="text-gray-500  text-sm sm:text-md">
-            Fill in the details below and our team will respond as quickly as possible.
-          </p>
+      {/* Hero Banner */}
+      <div className="relative flex min-h-[420px] items-center justify-center bg-[url('/images/about-bg.jpg')] bg-cover bg-center bg-no-repeat px-6 py-12 sm:min-h-[420px] sm:py-20 lg:min-h-[550px] lg:bg-fixed">
+        <div className="absolute inset-0 bg-gray-900/70 pointer-events-none" />
+        <div className="relative z-20 flex flex-col items-center text-center">
+          <h2 className="text-4xl font-extrabold uppercase text-white sm:text-5xl lg:text-6xl">Service Ticket</h2>
+          <h3 className="mt-2 text-sm font-semibold text-white sm:text-base lg:text-xl">
+            <Link href="/" className="hover:text-red-500 transition-colors duration-300">Home</Link>
+            <span className="mx-2">/</span>
+            <span>Service Ticket</span>
+          </h3>
         </div>
+      </div>
 
-        {/* ── Card ─────────────────────────────────────────────── */}
-        <form
-          onSubmit={handleSubmit(onSubmit)}
-          className="max-w-2xl mx-auto bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden"
-        >
-          {/* Red top bar */}
-          <div className="h-1.5 bg-gradient-to-r from-[#bb1403] to-[#e84a35]" />
-
-          <div className="p-6 sm:p-8 flex flex-col gap-6">
-
-            {/* ─ Section 1: Identity ──────────────────────────── */}
-            <SectionHeading  title="Your Information" />
-
-            <div className="grid sm:grid-cols-2 gap-5">
-              {/* Requester Name */}
-              <Field label="Requester Name" required error={errors.requesterName?.message}>
-                <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2"><UserIcon /></span>
-                  <input
-                    {...register('requesterName', { required: 'Name is required' })}
-                    placeholder="John Doe"
-                    className={`${inputCls(errors.requesterName)} pl-9`}
-                  />
-                </div>
-              </Field>
-
-              {/* Email */}
-              <Field label="Email Address" required error={errors.email?.message}>
-                <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2"><MailIcon /></span>
-                  <input
-                    {...register('email', {
-                      required: 'Email is required',
-                      pattern: { value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, message: 'Invalid email' },
-                    })}
-                    type="email"
-                    placeholder="you@company.com"
-                    className={`${inputCls(errors.email)} pl-9`}
-                  />
-                </div>
-              </Field>
-            </div>
-
-            {/* ─ Section 2: Request Support For ──────────────── */}
-            <SectionHeading number="02" title="Request Support For" />
-
-            <div className="flex flex-col gap-3">
-              {SUPPORT_OPTIONS.map((opt) => {
-                const checked = supportFor.includes(opt.value)
-                return (
-                  <button
-                    type="button"
-                    key={opt.value}
-                    onClick={() => toggleSupport(opt.value)}
-                    className={`flex items-center gap-3 px-4 py-3.5 rounded-xl border-2 text-left transition-all duration-150 cursor-pointer w-full
-                      ${checked
-                        ? 'border-[#bb1403] bg-[#bb1403]/5'
-                        : 'border-gray-200 hover:border-gray-300 bg-white'
-                      }`}
-                  >
-                    <span
-                      className={`w-5 h-5 rounded-md border-2 flex items-center justify-center flex-shrink-0 transition-colors
-                        ${checked ? 'bg-[#bb1403] border-[#bb1403]' : 'border-gray-300'}`}
-                    >
-                      {checked && (
-                        <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                        </svg>
-                      )}
-                    </span>
-                    <div>
-                      <p className={`text-sm font-bold ${checked ? 'text-[#bb1403]' : 'text-gray-700'}`}>
-                        {opt.label}
-                      </p>
-                      <p className="text-xs text-gray-400 mt-0.5">{opt.sub}</p>
-                    </div>
-                  </button>
-                )
-              })}
-              {supportFor.length === 0 && (
-                <p className="text-xs text-[#bb1403] font-medium flex items-center gap-1">
-                  <span className="inline-block w-1 h-1 rounded-full bg-[#bb1403]" />
-                  Please select at least one option
-                </p>
-              )}
-            </div>
-
-            {/* ─ Section 3: Ticket Details ────────────────────── */}
-            <SectionHeading number="03" title="Ticket Details" />
-
-            <div className="grid sm:grid-cols-3 gap-5">
-              {/* Priority */}
-              <Field label="Priority Level" required error={errors.priorityLevel?.message}>
-                <div className="relative">
-                  <select
-                    {...register('priorityLevel', { required: 'Select a priority' })}
-                    className={`${inputCls(errors.priorityLevel)} appearance-none pr-9`}
-                    defaultValue=""
-                  >
-                    <option value="" disabled>Select…</option>
-                    {['Low', 'Medium', 'High', 'Urgent'].map((v) => (
-                      <option key={v} value={v}>{v}</option>
-                    ))}
-                  </select>
-                  <ChevronIcon />
-                </div>
-              </Field>
-
-              {/* Product / Service */}
-              <Field label="Product / Service" required error={errors.productService?.message}>
-                <div className="relative">
-                  <select
-                    {...register('productService', { required: 'Select a product' })}
-                    className={`${inputCls(errors.productService)} appearance-none pr-9`}
-                    defaultValue=""
-                  >
-                    <option value="" disabled>Select…</option>
-                    {['Fire Alarm', 'PAVA', 'IoT', 'Automation', 'Lighting', 'Other'].map((v) => (
-                      <option key={v} value={v}>{v}</option>
-                    ))}
-                  </select>
-                  <ChevronIcon />
-                </div>
-              </Field>
-
-              {/* Category */}
-              <Field label="Category / Department" required error={errors.categoryDepartment?.message}>
-                <div className="relative">
-                  <select
-                    {...register('categoryDepartment', { required: 'Select a category' })}
-                    className={`${inputCls(errors.categoryDepartment)} appearance-none pr-9`}
-                    defaultValue=""
-                  >
-                    <option value="" disabled>Select…</option>
-                    {['Billing', 'Tech Support', 'Account', 'HR'].map((v) => (
-                      <option key={v} value={v}>{v}</option>
-                    ))}
-                  </select>
-                  <ChevronIcon />
-                </div>
-              </Field>
-            </div>
-
-            {/* Subject */}
-            <Field label="Subject Line" required error={errors.subjectLine?.message}>
-              <input
-                {...register('subjectLine', {
-                  required: 'Subject is required',
-                  minLength: { value: 5, message: 'At least 5 characters' },
-                })}
-                placeholder="Brief summary of your issue…"
-                className={inputCls(errors.subjectLine)}
-              />
-            </Field>
-
-            {/* Description */}
-            <Field label="Detailed Description" required error={errors.detailedDescription?.message}>
-              <textarea
-                {...register('detailedDescription', {
-                  required: 'Please describe your issue',
-                  minLength: { value: 20, message: 'At least 20 characters' },
-                })}
-                rows={5}
-                placeholder="Describe the issue in detail, including steps to reproduce if applicable…"
-                className={`${inputCls(errors.detailedDescription)} resize-none`}
-              />
-            </Field>
-
-            {/* ─ Section 4: Attachments ──────────────────────── */}
-            <SectionHeading number="04" title="File Attachment" />
-
-            <div>
-              <div
-                onClick={() => fileInputRef.current?.click()}
-                className="border-2 border-dashed border-gray-200 hover:border-[#bb1403]/40 rounded-2xl p-6 flex flex-col items-center gap-2 cursor-pointer transition-colors group"
-              >
-                <span className="w-10 h-10 rounded-full bg-gray-100 group-hover:bg-red-50 flex items-center justify-center transition-colors text-gray-400 group-hover:text-[#bb1403]">
-                  <PaperclipIcon />
-                </span>
-                <p className="text-sm font-semibold text-gray-600 group-hover:text-[#bb1403] transition-colors">
-                  Click to attach files
-                </p>
-                <p className="text-xs text-gray-400">Supports .jpg, .png, .pdf — max 2 MB</p>
-              </div>
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept=".jpg,.jpeg,.png,.pdf"
-                onChange={handleFileChange}
-                className="hidden"
-              />
-
-              {file && (
-                <ul className="mt-3 flex flex-col gap-2">
-                  <li
-                    className="flex items-center gap-2.5 bg-gray-50 rounded-xl px-3.5 py-2.5 border border-gray-100"
-                  >
-                    <span className="text-[#bb1403]"><PaperclipIcon /></span>
-                    <span className="text-sm text-gray-700 flex-1 truncate font-medium">{file.name}</span>
-                    <span className="text-xs text-gray-400">{(file.size / 1024).toFixed(1)} KB</span>
-                    <button
-                      type="button"
-                      onClick={removeFile}
-                      className="w-5 h-5 rounded-full bg-gray-200 hover:bg-red-100 hover:text-[#bb1403] flex items-center justify-center transition-colors cursor-pointer"
-                    >
-                      <XIcon />
-                    </button>
-                  </li>
-                </ul>
-              )}
-            </div>
-
-            {/* ─ Divider + Submit ─────────────────────────────── */}
-            <div className="border-t border-gray-100 pt-4 flex flex-col sm:flex-row items-center justify-between gap-4">
-              <p className="text-xs text-gray-400 text-center sm:text-left">
-                Submission will be sent to <span className="font-semibold text-gray-600">admin@gmail.com</span>
-              </p>
-              <button
-                type="submit"
-                disabled={isLoading || supportFor.length === 0}
-                className="flex items-center justify-center gap-2 px-8 py-3 bg-[#bb1403] hover:bg-[#9e1102] disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-bold rounded-full transition-all text-sm shadow-md shadow-[#bb1403]/20 hover:shadow-lg hover:shadow-[#bb1403]/30 hover:-translate-y-0.5 active:translate-y-0 min-w-[160px]"
-              >
-                {isLoading ? (
-                  <>
-                    <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                    Submitting…
-                  </>
-                ) : (
-                  <>
-                    <SendIcon />
-                    Submit Ticket
-                  </>
-                )}
-              </button>
-            </div>
-            {submitError && (
-              <p className="text-sm text-red-600 font-semibold">{submitError}</p>
-            )}
-
-          </div>
-        </form>
-
-        {/* Bottom note */}
-        <p className="text-center text-xs text-gray-400 mt-6">
-          A unique Ticket ID will be generated upon submission for tracking purposes.
+      {/* Page header */}
+      <div className="max-w-7xl mx-auto mb-8 text-center pt-12 sm:px-0 px-4">
+        <h1 className="text-2xl sm:text-5xl font-bold text-gray-900 leading-relaxed mb-2">
+          Submit a Service Ticket
+        </h1>
+        <p className="text-gray-500 text-sm sm:text-md">
+          Fill in the details below and our team will respond as quickly as possible.
         </p>
-     
+      </div>
+
+      {/* Card / Form */}
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className="max-w-2xl mx-auto bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden mb-12"
+      >
+        <div className="h-1.5 bg-gradient-to-r from-[#bb1403] to-[#e84a35]" />
+
+        <div className="p-6 sm:p-8 flex flex-col gap-6">
+
+          {/* Section 1 */}
+          <SectionHeading title="Your Information" />
+          <div className="grid sm:grid-cols-2 gap-5">
+            <Field label="Requester Name" required error={errors.requesterName?.message}>
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2"><UserIcon /></span>
+                <input
+                  {...register('requesterName', { required: 'Name is required' })}
+                  placeholder="John Doe"
+                  className={`${inputCls(errors.requesterName)} pl-9`}
+                />
+              </div>
+            </Field>
+            <Field label="Email Address" required error={errors.email?.message}>
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2"><MailIcon /></span>
+                <input
+                  {...register('email', {
+                    required: 'Email is required',
+                    pattern: { value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, message: 'Invalid email' },
+                  })}
+                  type="email"
+                  placeholder="you@company.com"
+                  className={`${inputCls(errors.email)} pl-9`}
+                />
+              </div>
+            </Field>
+          </div>
+
+          {/* Section 2 */}
+          <SectionHeading number="02" title="Request Support For" />
+          <div className="flex flex-col gap-3">
+            {SUPPORT_OPTIONS.map((opt) => {
+              const checked = supportFor.includes(opt.value)
+              return (
+                <button
+                  type="button"
+                  key={opt.value}
+                  onClick={() => toggleSupport(opt.value)}
+                  className={`flex items-center gap-3 px-4 py-3.5 rounded-xl border-2 text-left transition-all duration-150 cursor-pointer w-full
+                    ${checked ? 'border-[#bb1403] bg-[#bb1403]/5' : 'border-gray-200 hover:border-gray-300 bg-white'}`}
+                >
+                  <span className={`w-5 h-5 rounded-md border-2 flex items-center justify-center flex-shrink-0 transition-colors
+                    ${checked ? 'bg-[#bb1403] border-[#bb1403]' : 'border-gray-300'}`}>
+                    {checked && (
+                      <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                      </svg>
+                    )}
+                  </span>
+                  <div>
+                    <p className={`text-sm font-bold ${checked ? 'text-[#bb1403]' : 'text-gray-700'}`}>{opt.label}</p>
+                    <p className="text-xs text-gray-400 mt-0.5">{opt.sub}</p>
+                  </div>
+                </button>
+              )
+            })}
+            {supportFor.length === 0 && (
+              <p className="text-xs text-[#bb1403] font-medium flex items-center gap-1">
+                <span className="inline-block w-1 h-1 rounded-full bg-[#bb1403]" />
+                Please select at least one option
+              </p>
+            )}
+          </div>
+
+          {/* Section 3 */}
+          <SectionHeading number="03" title="Ticket Details" />
+          <div className="grid sm:grid-cols-3 gap-5">
+            <Field label="Priority Level" required error={errors.priorityLevel?.message}>
+              <div className="relative">
+                <select {...register('priorityLevel', { required: 'Select a priority' })}
+                  className={`${inputCls(errors.priorityLevel)} appearance-none pr-9`} defaultValue="">
+                  <option value="" disabled>Select…</option>
+                  {['Low', 'Medium', 'High', 'Urgent'].map((v) => <option key={v} value={v}>{v}</option>)}
+                </select>
+                <ChevronIcon />
+              </div>
+            </Field>
+            <Field label="Product / Service" required error={errors.productService?.message}>
+              <div className="relative">
+                <select {...register('productService', { required: 'Select a product' })}
+                  className={`${inputCls(errors.productService)} appearance-none pr-9`} defaultValue="">
+                  <option value="" disabled>Select…</option>
+                  {['Fire Alarm', 'PAVA', 'IoT', 'Automation', 'Lighting', 'Other'].map((v) => <option key={v} value={v}>{v}</option>)}
+                </select>
+                <ChevronIcon />
+              </div>
+            </Field>
+            <Field label="Category / Department" required error={errors.categoryDepartment?.message}>
+              <div className="relative">
+                <select {...register('categoryDepartment', { required: 'Select a category' })}
+                  className={`${inputCls(errors.categoryDepartment)} appearance-none pr-9`} defaultValue="">
+                  <option value="" disabled>Select…</option>
+                  {['Billing', 'Tech Support', 'Account', 'HR'].map((v) => <option key={v} value={v}>{v}</option>)}
+                </select>
+                <ChevronIcon />
+              </div>
+            </Field>
+          </div>
+
+          <Field label="Subject Line" required error={errors.subjectLine?.message}>
+            <input
+              {...register('subjectLine', {
+                required: 'Subject is required',
+                minLength: { value: 5, message: 'At least 5 characters' },
+              })}
+              placeholder="Brief summary of your issue…"
+              className={inputCls(errors.subjectLine)}
+            />
+          </Field>
+
+          <Field label="Detailed Description" required error={errors.detailedDescription?.message}>
+            <textarea
+              {...register('detailedDescription', {
+                required: 'Please describe your issue',
+                minLength: { value: 20, message: 'At least 20 characters' },
+              })}
+              rows={5}
+              placeholder="Describe the issue in detail, including steps to reproduce if applicable…"
+              className={`${inputCls(errors.detailedDescription)} resize-none`}
+            />
+          </Field>
+
+          {/* Section 4 */}
+          <SectionHeading number="04" title="File Attachment" />
+          <div>
+            <div
+              onClick={() => fileInputRef.current?.click()}
+              className="border-2 border-dashed border-gray-200 hover:border-[#bb1403]/40 rounded-2xl p-6 flex flex-col items-center gap-2 cursor-pointer transition-colors group"
+            >
+              <span className="w-10 h-10 rounded-full bg-gray-100 group-hover:bg-red-50 flex items-center justify-center transition-colors text-gray-400 group-hover:text-[#bb1403]">
+                <PaperclipIcon />
+              </span>
+              <p className="text-sm font-semibold text-gray-600 group-hover:text-[#bb1403] transition-colors">Click to attach files</p>
+              <p className="text-xs text-gray-400">Supports .jpg, .png, .pdf — max 2 MB</p>
+            </div>
+            <input ref={fileInputRef} type="file" accept=".jpg,.jpeg,.png,.pdf" onChange={handleFileChange} className="hidden" />
+            {file && (
+              <ul className="mt-3 flex flex-col gap-2">
+                <li className="flex items-center gap-2.5 bg-gray-50 rounded-xl px-3.5 py-2.5 border border-gray-100">
+                  <span className="text-[#bb1403]"><PaperclipIcon /></span>
+                  <span className="text-sm text-gray-700 flex-1 truncate font-medium">{file.name}</span>
+                  <span className="text-xs text-gray-400">{(file.size / 1024).toFixed(1)} KB</span>
+                  <button type="button" onClick={removeFile}
+                    className="w-5 h-5 rounded-full bg-gray-200 hover:bg-red-100 hover:text-[#bb1403] flex items-center justify-center transition-colors cursor-pointer">
+                    <XIcon />
+                  </button>
+                </li>
+              </ul>
+            )}
+          </div>
+
+          {/* Submit */}
+          <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-4">
+            <button
+              type="submit"
+              disabled={isLoading || supportFor.length === 0}
+              className="flex items-center justify-center gap-2 px-8 py-3 bg-[#bb1403] hover:bg-[#9e1102] disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-bold rounded-full transition-all text-sm shadow-md shadow-[#bb1403]/20 hover:shadow-lg hover:shadow-[#bb1403]/30 hover:-translate-y-0.5 active:translate-y-0 min-w-[160px]"
+            >
+              {isLoading ? (
+                <>
+                  <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  Submitting…
+                </>
+              ) : (
+                <>
+                  <SendIcon />
+                  Submit Ticket
+                </>
+              )}
+            </button>
+          </div>
+          {submitError && (
+            <p className="text-sm text-red-600 font-semibold">{submitError}</p>
+          )}
+
+        </div>
+      </form>
+
+      {/* Scroll to top */}
+      <ScrollToTop />
     </>
-  )
-}
-
-// ─── Section heading helper ──────────────────────────────────────────────────
-
-function SectionHeading({ number, title }) {
-  return (
-    <div className="flex items-center gap-3 -mb-1">
-      {/* <span className="text-[10px] font-extrabold text-[#bb1403] bg-[#bb1403]/10 px-2 py-0.5 rounded-full tracking-widest">
-        {number}
-      </span> */}
-      <h3 className="text-xl font-bold text-gray-800 uppercase leading-relaxed  tracking-wide">{title}</h3>
-      <div className="flex-1 h-px bg-gray-100" />
-    </div>
   )
 }

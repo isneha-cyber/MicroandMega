@@ -497,7 +497,7 @@ export default function FAQ() {
 
       <section
         ref={sectionRef}
-        className="relative py-16 sm:py-20 lg:py-24 px-8 lg:px-0 overflow-hidden"
+        className="relative py-16 sm:py-20 lg:py-24 px-2 lg:px-0 overflow-hidden"
         style={{ fontFamily: "'Barlow', sans-serif" }}
       >
         {/* Background image with overlay */}

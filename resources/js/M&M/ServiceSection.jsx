@@ -7,7 +7,7 @@ gsap.registerPlugin(ScrollTrigger);
 // ── SVG Icons ────────────────────────────────────────────────────────────────
 
 const CCTVIcon = () => (
-  <svg viewBox="0 0 40 40" fill="none" className="w-24 h-24">
+  <svg viewBox="0 0 40 40" fill="none" className="w-14 h-14">
     <rect x="4" y="14" width="22" height="14" rx="3" stroke="white" strokeWidth="2" fill="none"/>
     <path d="M26 18l8-5v14l-8-5V18z" stroke="white" strokeWidth="2" fill="none" strokeLinejoin="round"/>
     <circle cx="12" cy="21" r="2.5" stroke="white" strokeWidth="2" fill="none"/>
@@ -15,7 +15,7 @@ const CCTVIcon = () => (
 );
 
 const MonitorIcon = () => (
-  <svg viewBox="0 0 40 40" fill="none" className="w-24 h-24">
+  <svg viewBox="0 0 40 40" fill="none" className="w-14 h-14">
     <rect x="4" y="6" width="32" height="22" rx="3" stroke="white" strokeWidth="2" fill="none"/>
     <path d="M14 34h12M20 28v6" stroke="white" strokeWidth="2" strokeLinecap="round"/>
     <circle cx="20" cy="17" r="5" stroke="white" strokeWidth="2" fill="none"/>
@@ -24,7 +24,7 @@ const MonitorIcon = () => (
 );
 
 const HomeSecIcon = () => (
-  <svg viewBox="0 0 40 40" fill="none" className="w-24 h-24">
+  <svg viewBox="0 0 40 40" fill="none" className="w-14 h-14">
     <path d="M6 18L20 6l14 12v16H6V18z" stroke="white" strokeWidth="2" fill="none" strokeLinejoin="round"/>
     <rect x="15" y="24" width="10" height="10" rx="1.5" stroke="white" strokeWidth="2" fill="none"/>
     <circle cx="20" cy="29" r="1.5" fill="white"/>
@@ -32,7 +32,7 @@ const HomeSecIcon = () => (
 );
 
 const AccessIcon = () => (
-  <svg viewBox="0 0 40 40" fill="none" className="w-24 h-24">
+  <svg viewBox="0 0 40 40" fill="none" className="w-14 h-14">
     <rect x="4" y="8" width="20" height="26" rx="3" stroke="white" strokeWidth="2" fill="none"/>
     <circle cx="14" cy="21" r="3" stroke="white" strokeWidth="2" fill="none"/>
     <path d="M14 24v4M28 14h6M28 21h6M28 28h6" stroke="white" strokeWidth="2" strokeLinecap="round"/>
@@ -41,7 +41,7 @@ const AccessIcon = () => (
 );
 
 const SmartHomeIcon = () => (
-  <svg viewBox="0 0 40 40" fill="none" className="w-24 h-24">
+  <svg viewBox="0 0 40 40" fill="none" className="w-14 h-14">
     <path d="M6 18L20 6l14 12v16H6V18z" stroke="white" strokeWidth="2" fill="none" strokeLinejoin="round"/>
     <circle cx="20" cy="22" r="5" stroke="white" strokeWidth="2" fill="none"/>
     <path d="M20 17v-3M20 30v-3M15 22H12M28 22h-3" stroke="white" strokeWidth="1.5" strokeLinecap="round"/>
@@ -50,7 +50,7 @@ const SmartHomeIcon = () => (
 );
 
 const AlarmIcon = () => (
-  <svg viewBox="0 0 40 40" fill="none" className="w-24 h-24">
+  <svg viewBox="0 0 40 40" fill="none" className="w-14 h-14">
     <circle cx="20" cy="22" r="12" stroke="white" strokeWidth="2" fill="none"/>
     <path d="M14 8c0 0 2-4 6-4s6 4 6 4" stroke="white" strokeWidth="2" strokeLinecap="round" fill="none"/>
     <path d="M20 14v8l5 3" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
@@ -151,10 +151,10 @@ function ServiceCard({ service, cardRef }) {
       </div>
 
       {/* ── Icon badge — lives OUTSIDE image div, so it's never clipped ── */}
-      <div className="relative flex justify-center" style={{ height: 12 }}>
+      <div className="relative flex justify-center" style={{ height: 16 }}>
         <div
           ref={iconWrapRef}
-          className="absolute -top-[26px] w-[62px] h-[62px] bg-[#c0201c] rounded-full flex items-center justify-center shadow-lg z-10"
+          className="absolute -top-[32px] w-[72px] h-[72px] bg-[#c0201c] rounded-full flex items-center justify-center shadow-lg z-10"
           style={{ willChange: 'transform' }}
         >
           <service.Icon />
@@ -162,7 +162,7 @@ function ServiceCard({ service, cardRef }) {
       </div>
 
       {/* ── Text block ── */}
-      <div className="flex flex-col items-center text-center p-6 pt-10 pb-8 rounded-b-3xl">
+      <div className="flex flex-col items-center text-center p-6 pt-12 pb-8 rounded-b-3xl">
         <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2 leading-snug">
           {service.title}
         </h3>
@@ -171,12 +171,12 @@ function ServiceCard({ service, cardRef }) {
         </p>
 
         {/* Discover More link */}
-        <div className="flex items-center gap-2 group/link mt-auto">
+        {/* <div className="flex items-center gap-2 group/link mt-auto">
           <span className="text-[#c0201c] text-sm font-semibold tracking-wide uppercase transition-all duration-300 group-hover/link:tracking-widest">
             Discover More
           </span>
           <ArrowIcon />
-        </div>
+        </div> */}
       </div>
     </div>
   );
@@ -262,3 +262,4 @@ export default function ServiceSection() {
     </section>
   );
 }
+

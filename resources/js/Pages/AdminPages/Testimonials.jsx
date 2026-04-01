@@ -4,6 +4,9 @@ import axios from "axios";
 import {Plus} from "lucide-react";
 import React, {useEffect, useState} from "react";
 
+
+const imgurl = import.meta.env.VITE_IMAGE_PATH;
+
 const Testimonials = () => {
 	const [allTestimonials, setAllTestimonials] = useState([]);
 	const [reloadTrigger, setReloadTrigger] = useState(false);
@@ -25,6 +28,9 @@ const Testimonials = () => {
 
 		fetchTestimonials();
 	}, [reloadTrigger]);
+
+
+	console.log("allTestimonials", allTestimonials);
 
 	// For delete the Testimonials
 	const handleDelete = async (id) => {
@@ -113,9 +119,7 @@ const handleUpdate = async (formData, id) => {
 									<div className="flex items-center gap-4 mb-4">
 										{
 										testimonial.photo_url ? (
-											<img src={
-													testimonial.photo_url
-												}
+											<img src={`${imgurl}/${testimonial.photo_url}`}
 												alt={
 													testimonial.client_name
 												}
@@ -194,8 +198,7 @@ const handleUpdate = async (formData, id) => {
 						)
 					} </div>
 				</div>
-
-				{
+{
 				showAddForm && (
 					<AddTestimonials editingTestimonials={editingTestimonials}
 						setShowForm={setShowAddForm}

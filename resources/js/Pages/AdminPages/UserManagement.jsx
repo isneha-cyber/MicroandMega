@@ -4,6 +4,9 @@ import axios from "axios";
 import AdminWrapper from "@/AdminDashboard/AdminWrapper";
 import AddUsers from "@/AddForm/AddUser";
 
+const imgurl = import.meta.env.VITE_IMAGE_PATH;
+
+
 const UserManagement = () => {
     const [allUsers, setAllUsers] = useState([]);
     const [reloadTrigger, setReloadTrigger] = useState(false);
@@ -16,6 +19,7 @@ const UserManagement = () => {
         const fetchUsers = async () => {
             try {
                 const response = await axios.get(route("ourusers.index"));
+                console.log(response.data)
                 setAllUsers(response.data);
             } catch (error) {
                 console.error("Fetching error", error);
@@ -152,7 +156,9 @@ const UserManagement = () => {
                                     <div className="relative mb-3">
                                         {user.image_url ? (
                                             <img 
-                                                src={user.image_url}
+                                               src={`${imgurl}/${user.image}`}
+                                            // src={user.image}
+
                                                 alt={user.name}
                                                 onError={handleImageError}
                                                 className="w-16 h-16 sm:w-20 sm:h-20 rounded-full object-cover border-4 border-white shadow"

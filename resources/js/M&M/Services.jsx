@@ -964,7 +964,7 @@ export default function Services() {
 				className="bg-[#cc1400] relative overflow-hidden py-16 sm:py-24"
 				style={{ backgroundImage: "radial-gradient(circle at 20% 50%, rgba(255,255,255,0.05) 0%, rgba(0,0,0,0) 50%)" }}
 			>
-				<div className="max-w-7xl mx-auto px-8 sm:px-0">
+				<div className="max-w-7xl mx-auto px-2 sm:px-0">
 					
 					{/* Header row: label + spinning badge */}
 					<div className="flex items-start justify-between gap-4 mb-4 sm:mb-10">
@@ -1054,7 +1054,7 @@ export default function Services() {
 				<div className="hidden sm:block border border-t border-white/20 max-w-7xl mx-auto mt-12"></div>
 				
 				<div ref={statsRef} className="w-full">
-					<div className="max-w-7xl mx-auto mt-12 px-8 sm:px-0">
+					<div className="max-w-7xl mx-auto mt-12 px-2 sm:px-0">
 						<div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-6 sm:gap-8">
 							{STATS.map((s) => (
 								<StatItem key={s.label} {...s} startCounting={startCounting} />

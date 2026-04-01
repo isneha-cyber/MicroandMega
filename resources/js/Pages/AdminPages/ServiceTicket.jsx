@@ -35,6 +35,7 @@ const ServiceTicket = () => {
 	const [priorityFilter, setPriorityFilter] = useState("All");
 	const [updatingStatus, setUpdatingStatus] = useState(false);
 	const [selectedStatus, setSelectedStatus] = useState("");
+	  const imgurl = import.meta.env.VITE_IMAGE_PATH;
 	
 	// Pagination state
 	const [currentPage, setCurrentPage] = useState(1);
@@ -183,7 +184,7 @@ const ServiceTicket = () => {
 
 	return (
 		<AdminWrapper>
-			<div className="container mx-auto py-4">
+			<div className="container mx-auto py-4 ">
 				<div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
 					<h1 className="text-3xl font-bold tracking-widest text-stone-800 uppercase">
 						Service Tickets
@@ -344,7 +345,7 @@ const ServiceTicket = () => {
 										<div className="flex flex-col gap-2">
 											{openTicket.attachments.map((a, i) => (
 												<a key={`${openTicket.id}-att-${i}`}
-													href={`/storage/${a}`}
+													href={`${imgurl}/${a}`}
 													target="_blank"
 													rel="noreferrer"
 													className="text-[#dc2626] hover:text-[#dc2626] underline text-sm flex items-center gap-2">

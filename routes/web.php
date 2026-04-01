@@ -73,6 +73,11 @@ Route::middleware('auth')->group(function () {
         Route::delete('/{id}/images/{imageId}', [ProductCategoryController::class, 'destroyImage'])
             ->name('ourproductcategories.images.destroy');
     });
+
+     Route::get('/ourproductcategories', [ProductCategoryController::class, 'index'])->name('ourproductcategories.index');       
+    Route::post('/ourproductcategories', [ProductCategoryController::class, 'store'])->name('ourproductcategories.store');      
+    Route::put('/ourproductcategories/{id}', [ProductCategoryController::class, 'update'])->name('ourproductcategories.update'); 
+    Route::delete('/ourproductcategories/{id}', [ProductCategoryController::class, 'destroy'])->name('ourproductcategories.destroy'); 
   
 
      // ── Testimonials ──────────────────────────────────────────────────────

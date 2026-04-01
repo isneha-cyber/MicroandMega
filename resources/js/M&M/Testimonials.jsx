@@ -296,6 +296,9 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import axios from "axios";
 
+	const imgurl = import.meta.env.VITE_IMAGE_PATH;
+
+
 const QuoteIcon = () => (
   <svg viewBox="0 0 40 32" fill="none" className="w-9 h-7 text-[#cc1400]" aria-hidden="true">
     <path
@@ -321,7 +324,7 @@ const TestimonialCard = ({ testimonial }) => (
     <div className="flex items-center justify-between">
       <div className="flex items-center gap-3">
         <img
-          src={testimonial.photo_url || "https://via.placeholder.com/200?text=User"}
+src={testimonial.photo_url ? `${imgurl}/${testimonial.photo_url}` : "https://via.placeholder.com/200?text=User"}
           alt={testimonial.client_name}
           className="w-14 h-14 sm:w-16 sm:h-16 rounded-full object-cover flex-shrink-0 border-2 border-gray-300"
         />
@@ -442,7 +445,7 @@ export default function Testimonials() {
 
   if (loading) {
     return (
-      <section className="bg-white py-16 lg:py-24 px-8 sm:px-0">
+      <section className="bg-white py-16 lg:py-24 px-2 sm:px-0">
         <div className="max-w-7xl mx-auto text-center">
           <p className="text-gray-500">Loading testimonials...</p>
         </div>
@@ -452,7 +455,7 @@ export default function Testimonials() {
 
   if (activeTestimonials.length === 0) {
     return (
-      <section className="bg-white py-16 lg:py-24 px-8 sm:px-0">
+      <section className="bg-white py-16 lg:py-24 px-2 sm:px-0">
         <div className="max-w-7xl mx-auto text-center">
           <h2 className="text-3xl font-bold text-gray-900">No testimonials available yet.</h2>
         </div>
@@ -469,7 +472,7 @@ export default function Testimonials() {
 
       <section
         ref={sectionRef}
-        className="bg-white py-16 lg:py-24 px-8 sm:px-0"
+        className="bg-white py-16 lg:py-24 px-2 sm:px-0"
         style={{ fontFamily: "'Barlow', sans-serif" }}
       >
         <div className="max-w-7xl mx-auto">

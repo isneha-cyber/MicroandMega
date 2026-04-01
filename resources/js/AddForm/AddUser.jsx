@@ -2,6 +2,7 @@ import axios from "axios";
 import { X, Eye, EyeOff } from "lucide-react";
 import React, { useEffect, useState } from "react";
 
+const imgurl = import.meta.env.VITE_IMAGE_PATH;
 const AddUsers = ({ editingUser, setEditingUser, setShowForm, setReloadTrigger, handleUpdate }) => {
     const [submitting, setSubmitting] = useState(false);
     const [imagePreview, setImagePreview] = useState(null);

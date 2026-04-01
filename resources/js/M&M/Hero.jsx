@@ -703,7 +703,7 @@ export default function Hero() {
           {/* Slide content */}
           <div 
             ref={contentRef}
-            className="relative z-10 h-full flex flex-col justify-center px-8 md:px-0 max-w-7xl mx-auto pt-52 pb-20 md:pt-0 md:pb-0 md:mt-14"
+            className="relative z-10 h-full flex flex-col justify-center px-2 md:px-0 max-w-7xl mx-auto pt-52 pb-20 md:pt-0 md:pb-0 md:mt-14"
           >
 
             {/* Tag */}

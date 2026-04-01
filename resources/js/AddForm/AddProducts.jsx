@@ -1,4 +1,4 @@
-// resources/js/AddForm/AddProducts.jsx
+﻿// resources/js/AddForm/AddProducts.jsx
 
 import axios from "axios";
 import { X, Trash2 } from "lucide-react";
@@ -6,6 +6,14 @@ import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import React, { useEffect, useState } from "react";
 import Select from "react-select";
+
+
+const imgurl = import.meta.env.VITE_IMAGE_PATH;
+const resolveImageUrl = (path) => {
+    if (!path) return "";
+    if (path.startsWith("http://") || path.startsWith("https://")) return path;
+    return `${imgurl}/${path}`;
+};
 
 const AddProducts = ({
     editingProducts,
@@ -19,6 +27,18 @@ const AddProducts = ({
     const [categoriesLoading, setCategoriesLoading] = useState(true);
     const [categoriesError, setCategoriesError] = useState("");
 
+    const coerceId = (value) => {
+        if (value === null || value === undefined || value === "") return "";
+        const num = Number(value);
+        return Number.isNaN(num) ? "" : num;
+    };
+
+    const getEditingCategoryId = (product) =>
+        product?.product_category_id ??
+        product?.category_id ??
+        product?.category?.id ??
+        "";
+
     const [productForm, setProductForm] = useState({
         name: "",
         description: "",
@@ -26,7 +46,7 @@ const AddProducts = ({
         content: "",
         featured_image: null,
         images: [],
-        product_category_id: "",   // ← was category_id
+        product_category_id: "",   // â† was category_id
     });
 
     // Lock background scroll when modal is open
@@ -52,7 +72,7 @@ const AddProducts = ({
                 content: editingProducts.content || "",
                 featured_image: null,
                 images: [],
-                product_category_id: editingProducts.product_category_id || "",  // ← was category_id
+                product_category_id: coerceId(getEditingCategoryId(editingProducts)),  // â† was category_id
             });
             setCategoriesError("");
         }
@@ -62,7 +82,7 @@ const AddProducts = ({
         try {
             setCategoriesLoading(true);
             setCategoriesError("");
-            // ← updated endpoint from ourcategories.dropdown to ourproductcategories/flat
+            // â† updated endpoint from ourcategories.dropdown to ourproductcategories/flat
             const response = await axios.get("/ourproductcategories/flat");
             const list = Array.isArray(response.data)
                 ? response.data
@@ -81,8 +101,8 @@ const AddProducts = ({
     // Each item has: { id, name, slug, parent_id, parent_name, ... }
     const buildSelectOptions = (flatList) => {
         return flatList.map((cat) => ({
-            value: cat.id,
-            label: cat.parent_name ? `└─ ${cat.name}` : cat.name,
+            value: coerceId(cat.id),
+            label: cat.parent_name ? `â””â”€ ${cat.name}` : cat.name,
             parentName: cat.parent_name || null,
         }));
     };
@@ -91,7 +111,7 @@ const AddProducts = ({
 
     // Find the currently selected option
     const selectedCategoryOption =
-        categoryOptions.find((o) => o.value === productForm.product_category_id) || null;  // ← was category_id
+        categoryOptions.find((o) => o.value === productForm.product_category_id) || null;  // â† was category_id
 
     const handleCreate = async (formData) => {
         try {
@@ -114,7 +134,7 @@ const AddProducts = ({
             return;
         }
 
-        // ← was category_id
+        // â† was category_id
         if (!productForm.product_category_id) {
             alert("Please select a category");
             return;
@@ -148,7 +168,7 @@ const AddProducts = ({
                 content: "",
                 featured_image: null,
                 images: [],
-                product_category_id: "",  // ← was category_id
+                product_category_id: "",  // â† was category_id
             });
             setShowForm(false);
             setEditingProducts(null);
@@ -267,7 +287,7 @@ const AddProducts = ({
                                 onChange={(selected) =>
                                     setProductForm((prev) => ({
                                         ...prev,
-                                        product_category_id: selected ? selected.value : "",  // ← was category_id
+                                        product_category_id: selected ? selected.value : "",  // â† was category_id
                                     }))
                                 }
                                 isLoading={categoriesLoading}
@@ -358,7 +378,7 @@ const AddProducts = ({
                             />
                         </div>
                         <p className="text-xs text-gray-500 mt-8">
-                            You can use HTML tags for formatting: h1–h6, p, ul, ol, li,
+                            You can use HTML tags for formatting: h1â€“h6, p, ul, ol, li,
                             strong, em, etc.
                         </p>
                     </div>
@@ -371,7 +391,7 @@ const AddProducts = ({
                         {editingProducts && editingProducts.featured_image && (
                             <div className="mb-2">
                                 <img
-                                    src={`/storage/${editingProducts.featured_image}`}
+                                    src={resolveImageUrl(editingProducts.featured_image)}
                                     alt="Current featured"
                                     className="h-32 w-32 object-cover rounded-md"
                                 />
@@ -427,7 +447,7 @@ const AddProducts = ({
                                         {editingProducts.images.map((image, idx) => (
                                             <img
                                                 key={idx}
-                                                src={`/storage/${image.image_path}`}
+                                                src={resolveImageUrl(image.image_path)}
                                                 alt="Current"
                                                 className="h-20 w-20 object-cover rounded-md"
                                             />

@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
-
+const imgurl = import.meta.env.VITE_IMAGE_PATH;
 function StarRating({ rating, size = 16 }) {
     return (
         <div className="flex items-center gap-0.5">
@@ -73,7 +73,21 @@ function ScrollToTopButton() {
     );
 }
 
-// ── Sidebar ───────────────────────────────────────────────────────────────────
+function orderByOldestFirst(list) {
+    if (!Array.isArray(list)) return list;
+    return [...list].sort((a, b) => {
+        const aKey = a?.created_at ?? a?.createdAt ?? a?.id;
+        const bKey = b?.created_at ?? b?.createdAt ?? b?.id;
+
+        const aTime = aKey ? new Date(aKey).getTime() : NaN;
+        const bTime = bKey ? new Date(bKey).getTime() : NaN;
+
+        if (!Number.isNaN(aTime) && !Number.isNaN(bTime)) return aTime - bTime;
+        if (typeof aKey === "number" && typeof bKey === "number") return aKey - bKey;
+        return 0;
+    });
+}
+// Sidebar
 
 function Sidebar({ project }) {
     const details = [
@@ -240,6 +254,8 @@ export default function ProjectDetailPage() {
     if (loading) return <LoadingState />;
     if (error || !project) return <ErrorState message={error} />;
 
+    const orderedProducts = orderByOldestFirst(project.products);
+
     return (
         <>
             <style>{`
@@ -321,7 +337,7 @@ export default function ProjectDetailPage() {
                                 <div className="p-4">
                                     <div className="rounded-xl overflow-hidden bg-gray-100">
                                         <img
-                                            src={project.image || "/placeholder-image.jpg"}
+src={project.image ? `${imgurl}/${project.image}` : "/placeholder-image.jpg"}
                                             alt={project.name}
                                             className="w-full h-64 sm:h-80 object-cover"
                                         />
@@ -329,11 +345,11 @@ export default function ProjectDetailPage() {
                                     {/* Extra gallery images if available */}
                                     {project.overviewImage && project.overviewImage !== project.image && (
                                         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-3">
-                                            {[project.overviewImage, project.solutionImage].filter(Boolean).map((img, i) => (
-                                                <div key={i} className="rounded-xl overflow-hidden bg-gray-100 aspect-video">
-                                                    <img src={img} alt="" className="w-full h-full object-cover" />
-                                                </div>
-                                            ))}
+                                         {[project.overviewImage, project.solutionImage].filter(Boolean).map((img, i) => (
+    <div key={i} className="rounded-xl overflow-hidden bg-gray-100 aspect-video">
+        <img src={`${imgurl}/${img}`} alt="" className="w-full h-full object-cover" />
+    </div>
+))}
                                         </div>
                                     )}
                                 </div>
@@ -379,17 +395,17 @@ export default function ProjectDetailPage() {
                             )}
 
                             {/* Products Used */}
-                            {project.products?.length > 0 && (
+                            {orderedProducts?.length > 0 && (
                                 <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
                                     <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
                                         <h2 className="text-sm font-black text-gray-900 uppercase tracking-wide">Products Used</h2>
                                         <span className="text-xs bg-red-50 text-red-600 font-bold px-2.5 py-1 rounded-full">
-                                            {project.products.length} items
+                                            {orderedProducts.length} items
                                         </span>
                                     </div>
                                     <div className="p-5">
                                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                            {project.products.map((prod, i) => (
+                                            {orderedProducts.map((prod, i) => (
                                                 <div key={i} className="flex items-center gap-3 bg-gray-50 border border-gray-100 rounded-xl p-4 hover:border-red-200 transition-colors">
                                                     <div className="w-10 h-10 rounded-xl bg-red-50 flex items-center justify-center flex-shrink-0">
                                                         <Package size={16} className="text-red-600" />
@@ -467,3 +483,5 @@ export default function ProjectDetailPage() {
         </>
     );
 }
+
+

@@ -2,6 +2,13 @@ import axios from "axios";
 import { X } from "lucide-react";
 import React, { useEffect, useState } from "react";
 
+const imgurl = import.meta.env.VITE_IMAGE_PATH;
+const resolveImageUrl = (path) => {
+    if (!path) return "";
+    if (path.startsWith("http://") || path.startsWith("https://")) return path;
+    return `${imgurl}/${path}`;
+};
+
 const AddTestimonials = ({ 
     editingTestimonials, 
     setEditingTestimonials, 
@@ -245,7 +252,7 @@ const AddTestimonials = ({
                             <div className="mt-2">
                                 <p className="text-sm text-gray-500">Current photo:</p>
                                 <img 
-                                    src={editingTestimonials.photo_url} 
+                                    src={resolveImageUrl(editingTestimonials.photo_url)} 
                                     alt="Current" 
                                     className="w-16 h-16 rounded-full object-cover mt-1"
                                 />

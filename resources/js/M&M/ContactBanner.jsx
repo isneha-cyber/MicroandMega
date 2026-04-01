@@ -244,7 +244,7 @@ export default function ContactBanner() {
         style={{ fontFamily: "'Barlow', sans-serif" }}
       >
         <section className="bg-[#cc1400] relative overflow-visible">
-          <div className="max-w-7xl mx-auto px-8 sm:px-0">
+          <div className="max-w-7xl mx-auto px-2 sm:px-0">
             <div className="flex flex-col lg:flex-row items-stretch justify-between">
               {/* LEFT: text + contact info */}
               <div

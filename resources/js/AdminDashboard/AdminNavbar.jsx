@@ -2,14 +2,31 @@ import React, { useState, useRef, useEffect } from "react";
 import { Menu, UserCircle, Settings, LogOut, ChevronDown } from "lucide-react";
 import { Link, usePage, router } from "@inertiajs/react";
 
+
+const imgurl = import.meta.env.VITE_IMAGE_PATH;
+
+
 const AdminNavBar = ({ onMenuToggle }) => {
     const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
     const userMenuRef = useRef(null);
     const { auth } = usePage().props;
     const user = auth?.user;
+    const [imageError, setImageError] = useState(false);
+
+    const isAbsoluteUrl = (value) => {
+        if (!value) return false;
+        return /^https?:\/\//i.test(value);
+    };
+
     const resolveUserImage = () => {
-        if (user?.image_url) return user.image_url;
-        if (user?.image) return `/storage/${user.image}`;
+        if (user?.image) {
+            return isAbsoluteUrl(user.image)
+                ? user.image
+                : `${imgurl}/${user.image}`;
+        }
+        if (user?.image) {
+            return isAbsoluteUrl(user.image) ? user.image : `${imgurl}/${user.image}`;
+        }
         return null;
     };
 
@@ -100,20 +117,15 @@ const AdminNavBar = ({ onMenuToggle }) => {
                                 aria-haspopup="true"
                             >
                                 <div className="flex items-center space-x-3">
-                                    <div className="w-8 h-8 rounded-full flex items-center justify-center overflow-hidden bg-gradient-to-br from-blue-500 to-blue-600">
-                                        {resolveUserImage() ? (
+                                    <div className="w-8 h-8 rounded-full flex items-center justify-center overflow-hidden">
+                                        {resolveUserImage() && !imageError ? (
                                             <img
                                                 src={resolveUserImage()}
                                                 alt={`${
                                                     user?.name || "User"
                                                 } profile`}
                                                 className="w-full h-full rounded-full object-cover"
-                                                onError={(e) => {
-                                                    e.target.style.display =
-                                                        "none";
-                                                    // Show initial when image fails to load
-                                                    e.target.parentElement.classList.add("flex", "items-center", "justify-center");
-                                                }}
+                                                onError={() => setImageError(true)}
                                             />
                                         ) : (
                                             // Show user initial when no image

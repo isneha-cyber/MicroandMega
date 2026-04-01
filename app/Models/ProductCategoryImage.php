@@ -20,8 +20,8 @@ class ProductCategoryImage extends Model
         'is_primary' => 'boolean',
     ];
 
-    public function productCategory()
-    {
-        return $this->belongsTo(ProductCategory::class, 'product_category_id');
-    }
+    // public function productCategory()
+    // {
+    //     return $this->belongsTo(ProductCategory::class, 'product_category_id');
+    // }
 }

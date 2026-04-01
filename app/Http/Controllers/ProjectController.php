@@ -31,8 +31,12 @@ class ProjectController extends Controller
             }
             
             if ($request->has('status') && !empty($request->status)) {
-                $query->where('status', $request->status);
+                // Allow "all" to return both active and inactive (used by admin page)
+                if ($request->status !== 'all') {
+                    $query->where('status', $request->status);
+                }
             } else {
+                // Default to active for public listings
                 $query->where('status', 'active');
             }
             
@@ -75,6 +79,7 @@ class ProjectController extends Controller
                 'name' => 'nullable|string|max:255',
                 'description' => 'nullable|string',
                 'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+                'client_name' => 'nullable|string|max:255',
                 'category' => 'nullable|string|max:255',
                 'status' => 'required|in:active,inactive',
                 'location' => 'nullable|string|max:255',
@@ -94,6 +99,7 @@ class ProjectController extends Controller
                 'name' => $request->name ?? $request->title,
                 'description' => $request->description,
                 'image' => $imagePath,
+                'client_name' => $request->client_name,
                 'category' => $request->category,
                 'status' => $request->status,
                 'location' => $request->location,
@@ -134,6 +140,7 @@ class ProjectController extends Controller
                 'name' => 'nullable|string|max:255',
                 'description' => 'nullable|string',
                 'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+                'client_name' => 'nullable|string|max:255',
                 'category' => 'nullable|string|max:255',
                 'status' => 'sometimes|in:active,inactive',
                 'location' => 'nullable|string|max:255',
@@ -144,7 +151,8 @@ class ProjectController extends Controller
 
             $updateData = $request->only([
                 'title', 'name', 'description', 'category', 
-                'status', 'location', 'rating', 'year', 'contract_type'
+                'status', 'location', 'rating', 'year', 'contract_type',
+                'client_name'
             ]);
 
             if ($request->has('title') && !$request->has('name')) {
@@ -222,6 +230,7 @@ class ProjectController extends Controller
             'description' => $project->description,
             'image' => $project->image_url,
             'image_url' => $project->image_url,
+            'client_name' => $project->client_name,
             'category' => $project->category,
             'status' => $project->status,
             'slug' => $project->slug,

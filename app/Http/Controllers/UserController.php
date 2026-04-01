@@ -12,32 +12,24 @@ use Illuminate\Support\Facades\Auth;
 class UserController extends Controller
 {
     /**
-     * Format user data with proper image URL
-     */
-    private function formatUserWithImageUrl($user)
-    {
-        if ($user->image) {
-            if (filter_var($user->image, FILTER_VALIDATE_URL)) {
-                $user->image_url = $user->image;
-            } else {
-                $user->image_url = asset('storage/' . $user->image);
-            }
-        } else {
-            $user->image_url = null;
-        }
-        
-        return $user;
-    }
-
-    /**
      * Display a listing of the users.
      */
     public function index()
     {
         $users = User::all();
         
+        // Add image_url to each user
         $users->transform(function ($user) {
-            return $this->formatUserWithImageUrl($user);
+            if ($user->image) {
+                if (filter_var($user->image, FILTER_VALIDATE_URL)) {
+                    $user->image_url = $user->image;
+                } else {
+                    $user->image_url = asset('storage/' . $user->image);
+                }
+            } else {
+                $user->image_url = null;
+            }
+            return $user;
         });
         
         return response()->json($users);
@@ -74,11 +66,21 @@ class UserController extends Controller
             'title'      => 'User Created: ' . $user->name,
         ]);
 
-        $user = $this->formatUserWithImageUrl($user);
+        // Add image_url to response
+        $userData = $user->toArray();
+        if ($user->image) {
+            if (filter_var($user->image, FILTER_VALIDATE_URL)) {
+                $userData['image_url'] = $user->image;
+            } else {
+                $userData['image_url'] = asset('storage/' . $user->image);
+            }
+        } else {
+            $userData['image_url'] = null;
+        }
 
         return response()->json([
             'message' => 'User created successfully',
-            'user'    => $user,
+            'user'    => $userData,
         ], 201);
     }
 
@@ -118,11 +120,21 @@ class UserController extends Controller
             'title'      => 'User Updated: ' . $user->name,
         ]);
 
-        $user = $this->formatUserWithImageUrl($user);
+        // Add image_url to response
+        $userData = $user->fresh()->toArray();
+        if ($user->image) {
+            if (filter_var($user->image, FILTER_VALIDATE_URL)) {
+                $userData['image_url'] = $user->image;
+            } else {
+                $userData['image_url'] = asset('storage/' . $user->image);
+            }
+        } else {
+            $userData['image_url'] = null;
+        }
 
         return response()->json([
             'message' => 'User updated successfully',
-            'user'    => $user,
+            'user'    => $userData,
         ]);
     }
 
@@ -160,7 +172,19 @@ class UserController extends Controller
     public function show($id)
     {
         $user = User::findOrFail($id);
-        $user = $this->formatUserWithImageUrl($user);
-        return response()->json($user);
+        
+        // Add image_url to response
+        $userData = $user->toArray();
+        if ($user->image) {
+            if (filter_var($user->image, FILTER_VALIDATE_URL)) {
+                $userData['image_url'] = $user->image;
+            } else {
+                $userData['image_url'] = asset('storage/' . $user->image);
+            }
+        } else {
+            $userData['image_url'] = null;
+        }
+        
+        return response()->json($userData);
     }
 }

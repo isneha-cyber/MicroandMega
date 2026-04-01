@@ -81,8 +81,8 @@ class ProductCategory extends Model
     }
 
     // A category has many gallery images
-    public function images()
-    {
-        return $this->hasMany(ProductCategoryImage::class, 'product_category_id');
-    }
+    // public function images()
+    // {
+    //     return $this->hasMany(ProductCategoryImage::class, 'product_category_id');
+    // }
 }

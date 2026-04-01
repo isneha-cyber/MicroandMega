@@ -17,6 +17,7 @@ class Project extends Model
         'name',
         'description',
         'image',
+        'client_name',
         'category',
         'status',
         'slug',
@@ -31,14 +32,18 @@ class Project extends Model
     ];
 
     // Add accessor for image URL
-    public function getImageUrlAttribute()
-    {
-        if ($this->image && Storage::disk('public')->exists($this->image)) {
-            return asset('storage/' . $this->image);
-        }
-        return null;
-    }
+    // public function getImageUrlAttribute()
+    // {
+    //     if ($this->image && Storage::disk('public')->exists($this->image)) {
+    //         return asset('storage/' . $this->image);
+    //     }
+    //     return null;
+    // }
 
+    public function getImageUrlAttribute(): ?string
+{
+    return $this->image ?? null;
+}
     // Set default values if not provided
     protected static function boot()
     {
