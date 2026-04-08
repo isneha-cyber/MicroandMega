@@ -11,6 +11,37 @@ use Illuminate\Support\Facades\Log as LaravelLog;
 class ProjectController extends Controller
 {
     // ✅ Get all projects with pagination and filtering
+
+// ✅ Inertia page render with SEO props
+public function showPage($slug)
+{
+    try {
+        $project = Project::where('slug', $slug)
+            ->where('status', 'active')
+            ->firstOrFail();
+
+        $formatted = $this->formatProjectData($project);
+
+        return \Inertia\Inertia::render('ProjectDetailPage', [
+            'slug'    => $slug,
+            'project' => $formatted,
+            'seo'     => [
+                'title'       => ($project->title ?: $project->name) . ' | Micro & Mega',
+                'description' => $project->description
+                                    ? \Illuminate\Support\Str::limit($project->description, 155)
+                                    : 'View project details for ' . $project->name . ' by Micro & Mega Nepal.',
+                'url'         => url("/project-details/{$slug}"),
+                'image'       => $project->image
+                                    ? env('VITE_IMAGE_PATH') . '/' . $project->image
+                                    : url('/images/og-image.jpg'),
+            ],
+        ]);
+    } catch (\Exception $e) {
+        abort(404);
+    }
+}
+
+
     public function index(Request $request)
     {
         try {

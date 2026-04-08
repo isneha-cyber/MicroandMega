@@ -8,10 +8,35 @@ use App\Models\ProductCategory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log as LaravelLog;
 use Illuminate\Support\Facades\Storage;
-
+use Inertia\Inertia;
 class ProductCategoryController extends Controller
 {
     // GET /ourproductcategories — all categories (nested tree)
+
+
+     public function showPage($slug)
+    {
+        try {
+            $category = ProductCategory::where('slug', $slug)
+                ->where('status', true)
+                ->firstOrFail();
+
+            return Inertia::render('ProductDetailPage', [
+                'categorySlug' => $slug,
+                'seo' => [
+                    'title'       => ($category->title ?: $category->name) . ' | Micro & Mega',
+                    'description' => $category->description
+                                        ?: 'Explore ' . $category->name . ' security products by Micro & Mega Nepal.',
+                    'url'         => url("/category/{$slug}"),
+                    'image'       => $category->featured_image
+                                        ? env('VITE_IMAGE_PATH') . '/' . $category->featured_image
+                                        : null,
+                ],
+            ]);
+        } catch (\Exception $e) {
+            abort(404);
+        }
+    }
     public function index()
     {
         try {

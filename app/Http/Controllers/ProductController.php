@@ -11,9 +11,35 @@ use App\Models\ProductCategory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log as LaravelLog;
 use Illuminate\Support\Facades\Storage;
+use Inertia\Inertia;
 
 class ProductController extends Controller
 {
+ public function showPage($slug)
+    {
+        try {
+            $product = Product::with('category', 'images')
+                ->where('slug', $slug)
+                ->firstOrFail();
+
+            return Inertia::render('ProductDetailPage', [
+                'productSlug' => $slug,
+                'seo' => [
+                    'title'       => ($product->title ?: $product->name) . ' | Micro & Mega',
+                    'description' => $product->description
+                                        ?: 'View details for ' . $product->name . ' by Micro & Mega Nepal.',
+                    'url'         => url("/category/{$slug}"),
+                    'image'       => $product->featured_image
+                                        ? env('VITE_IMAGE_PATH') . '/' . $product->featured_image
+                                        : null,
+                ],
+            ]);
+        } catch (\Exception $e) {
+            abort(404);
+        }
+    }
+
+
     // Get all products
     public function index()
     {

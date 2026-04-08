@@ -2,11 +2,27 @@ import ServiceSection from '@/M&M/ServiceSection'
 import Testimonials from '@/M&M/Testimonials'
 import WhyChooseUs from '@/M&M/WhyChooseUs'
 import { Link } from '@inertiajs/react'
+import { Head } from '@inertiajs/react'
 import React from 'react'
 
 const Service = () => {
 	return (
     <>
+    <Head>
+	<title>Security Services | CCTV & Surveillance Nepal</title>
+	<meta
+		name="description"
+		content="Explore our professional CCTV installation, surveillance, and security services in Nepal. Reliable protection for homes and businesses."
+	/>
+	<meta name="keywords" content="CCTV Services Nepal, Security Solutions Kathmandu, Surveillance Installation" />
+
+	<link rel="canonical" href="https://micronmega.saitsolution.com.np/services" />
+
+	<meta property="og:title" content="Security Services Nepal" />
+	<meta property="og:description" content="Professional CCTV and surveillance services in Nepal." />
+	<meta property="og:url" content="https://micronmega.saitsolution.com.np/services" />
+	<meta property="og:type" content="website" />
+</Head>
        <div
          className="relative flex min-h-[320px] items-center justify-center bg-[url('/images/about-bg.jpg')] bg-cover bg-center bg-no-repeat px-6 py-12 sm:min-h-[420px] sm:py-20 lg:min-h-[550px] lg:bg-fixed"
        >

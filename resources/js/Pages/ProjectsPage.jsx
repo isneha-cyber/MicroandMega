@@ -1,5 +1,6 @@
 import {useEffect, useRef, useState} from "react";
 import {Link} from "@inertiajs/react";
+import {Head} from "@inertiajs/react";
 import gsap from "gsap";
 import {ScrollTrigger} from "gsap/ScrollTrigger";
 import axios from "axios";
@@ -190,6 +191,23 @@ export default function ProjectsPage() {
 
     return (
         <>
+
+<Head>
+	<title>Our Projects | CCTV Installations Nepal</title>
+	<meta
+		name="description"
+		content="View our completed CCTV and security projects across Nepal. Trusted installations for homes, offices, and industries."
+	/>
+	<meta name="keywords" content="CCTV Projects Nepal, Security Installations Kathmandu, Surveillance Projects" />
+
+	<link rel="canonical" href="https://micronmega.saitsolution.com.np/projects" />
+
+	<meta property="og:title" content="CCTV Projects Nepal" />
+	<meta property="og:description" content="Explore our successful security installations." />
+	<meta property="og:url" content="https://micronmega.saitsolution.com.np/projects" />
+	<meta property="og:type" content="website" />
+</Head>
+
             <style>{`
                 @import url('https://fonts.googleapis.com/css2?family=Barlow:wght@400;600;700;800&display=swap');
                 * { font-family: 'Barlow', sans-serif; }

@@ -1,5 +1,6 @@
 import { Link } from "@inertiajs/react";
 import { useEffect, useState } from "react";
+import {Head} from "@inertiajs/react";
 
 // ─── Scroll To Top ────────────────────────────────────────────────────────────
 function ScrollToTop() {
@@ -126,6 +127,44 @@ const ContactUS = () => {
   const inputClass = "w-full border border-gray-200 rounded-lg px-4 py-4 sm:py-6 text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:border-red-400 focus:ring-1 focus:ring-red-400 transition";
 
   return (
+<>
+<Head>
+	<title>Contact Us | Micro & Mega Security Nepal</title>
+	<meta
+		name="description"
+		content="Contact Micro & Mega Security for CCTV installation, surveillance systems, and security solutions in Kathmandu, Nepal."
+	/>
+	<meta name="keywords" content="Contact CCTV Nepal, Security Company Kathmandu, CCTV installation Nepal" />
+
+	<link rel="canonical" href="https://micronmega.saitsolution.com.np/contact" />
+
+	<meta property="og:title" content="Contact Micro & Mega Security Nepal" />
+	<meta property="og:description" content="Get in touch for CCTV and security solutions." />
+	<meta property="og:url" content="https://micronmega.saitsolution.com.np/contact" />
+	<meta property="og:type" content="website" />
+</Head>
+<script
+	type="application/ld+json"
+	dangerouslySetInnerHTML={{
+		__html: JSON.stringify({
+			"@context": "https://schema.org",
+			"@type": "LocalBusiness",
+			"name": "Micro & Mega Security",
+			"image": "https://micronmega.saitsolution.com.np/logo.png",
+			"@id": "https://micronmega.saitsolution.com.np",
+			"url": "https://micronmega.saitsolution.com.np",
+			"telephone": "+977-01-4535104",
+			"address": {
+				"@type": "PostalAddress",
+				"streetAddress": "Ichhunadi Marg, Baluwatar",
+				"addressLocality": "Kathmandu",
+				"addressCountry": "NP"
+			}
+		})
+	}}
+/>
+
+    
     <div className="bg-white min-h-screen">
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Barlow:wght@400;600;700;800&display=swap');
@@ -263,6 +302,7 @@ const ContactUS = () => {
       {/* Scroll to top */}
       <ScrollToTop />
     </div>
+    </>
   );
 };
 

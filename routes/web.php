@@ -11,6 +11,11 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\LogController;
 use App\Http\Controllers\ProductCategoryController;
 use App\Http\Controllers\ServiceTicketController;
+use Illuminate\Support\Facades\Response;
+use Spatie\Sitemap\Sitemap;
+use Spatie\Sitemap\Tags\Url;
+use App\Models\Product;
+use App\Models\Project;
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [
@@ -133,13 +138,16 @@ Route::prefix('ourproductcategories')->group(function () {
     Route::get('/{slug}', [ProductCategoryController::class, 'show'])->name('ourproductcategories.show');
 });
 
-Route::get('/category/{categorySlug}', function ($categorySlug) {
-    return Inertia::render('ProductDetailPage', ['categorySlug' => $categorySlug]);
-})->name('products.category');
+// Route::get('/category/{categorySlug}', function ($categorySlug) {
+//     return Inertia::render('ProductDetailPage', ['categorySlug' => $categorySlug]);
+// })->name('products.category');
 
-Route::get('/products/{slug}', function ($slug) {
-    return Inertia::render('ProductDetailPage', ['productSlug' => $slug]);
-})->name('products.show');
+// Route::get('/products/{slug}', function ($slug) {
+//     return Inertia::render('ProductDetailPage', ['productSlug' => $slug]);
+// })->name('products.show');
+
+Route::get('/category/{categorySlug}', [ProductCategoryController::class, 'showPage'])->name('products.category');
+Route::get('/products/{slug}',         [ProductController::class, 'showPage'])->name('products.show');
 
 
 
@@ -164,9 +172,12 @@ Route::get('/ourtestimonials', [TestimonialController::class, 'index'])->name('o
     return Inertia::render('ProjectsPage');
 })->name('projects.page');
 
-Route::get('/project-details/{slug}', function ($slug) {
-    return Inertia::render('ProjectDetailPage', ['slug' => $slug]);
-})->name('project.details');
+// Route::get('/project-details/{slug}', function ($slug) {
+//     return Inertia::render('ProjectDetailPage', ['slug' => $slug]);
+// })->name('project.details');
+
+
+Route::get('/project-details/{slug}', [ProjectController::class, 'showPage'])->name('project.details');
 
 
 
@@ -195,6 +206,104 @@ Route::post('/service-tickets', [ServiceTicketController::class, 'store'])->name
 
 
 
+
+// robots.txt
+Route::get('/robots.txt', function () {
+
+    // Block everything in local environment
+    if (app()->environment('local')) {
+        return response("User-agent: *\nDisallow: /", 200)
+            ->header('Content-Type', 'text/plain');
+    }
+
+$content = "User-agent: *\n";
+$content .= "Allow: /\n\n";
+$content .= "Sitemap: " . url('/sitemap.xml') . "\n";
+
+    $content .= "Disallow: /admin\n";
+    $content .= "Disallow: /login\n";
+    $content .= "Disallow: /dashboard\n";
+    $content .= "Disallow: /storage\n";
+    $content .= "Disallow: /vendor\n\n";
+
+    $content .= "Sitemap: " . url('/sitemap.xml') . "\n";
+
+    return response($content, 200)
+        ->header('Content-Type', 'text/plain');
+});
+
+
+// llms.txt
+Route::get('/llms.txt', function () {
+
+    $content = "# LLMs.txt for Micro & Mega\n\n";
+
+    $content .= "User-agent: *\n";
+    $content .= "Allow: /\n\n";
+    
+
+    $content .= "Site-Name: Micro & Mega\n";
+    $content .= "Site-URL: " . url('/') . "\n";
+    $content .= "Description: Micro & Mega provides advanced security systems, industrial products, and technical services.\n\n";
+
+    $content .= "Focus: Security Systems, Industrial Products, Services, Projects\n\n";
+
+    $content .= "Preferred-Content:\n";
+    $content .= "- Product pages\n";
+    $content .= "- Service pages\n";
+    $content .= "- Project case studies\n\n";
+
+    $content .= "Avoid:\n";
+    $content .= "- Admin pages\n";
+    $content .= "- Login areas\n\n";
+
+    $content .= "Contact: " . url('/contact') . "\n";
+    $content .= "Sitemap: " . url('/sitemap.xml') . "\n";
+
+    return response($content, 200)
+        ->header('Content-Type', 'text/plain');
+});
+
+
+// Sitemap route
+Route::get('/sitemap.xml', function () {
+    $sitemap = Sitemap::create();
+
+    // Static Pages
+    $sitemap->add(
+        Url::create('/')
+            ->setPriority(1.0)
+            ->setChangeFrequency(Url::CHANGE_FREQUENCY_DAILY)
+    );
+
+    $sitemap->add('/about');
+    $sitemap->add('/service');
+    $sitemap->add('/contact');
+
+    // Dynamic Products
+    $products = Product::all();
+    foreach ($products as $product) {
+        $sitemap->add(
+            Url::create("/products/{$product->slug}")
+                ->setLastModificationDate($product->updated_at)
+                ->setPriority(0.9)
+        );
+    }
+
+    // Dynamic Projects
+    $projects = Project::all();
+    foreach ($projects as $project) {
+        $sitemap->add(
+            Url::create("/project-details/{$project->slug}")
+                ->setLastModificationDate($project->updated_at)
+                ->setPriority(0.8)
+        );
+    }
+
+    // Return response
+    return response($sitemap->render(), 200)
+        ->header('Content-Type', 'application/xml');
+})->name('sitemap');
 
 
 
