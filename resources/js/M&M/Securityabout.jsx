@@ -456,7 +456,7 @@ const SecurityAbout = () => {
             className="relative lg:absolute lg:top-0 lg:left-0 w-full lg:w-[420px] h-[260px] sm:h-[340px] lg:h-[450px] rounded-3xl overflow-hidden z-10 shadow-xl"
           >
             <img
-              src="/images/security2.jpg"
+              src="https://plus.unsplash.com/premium_photo-1682145887988-7a3712b88510?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NXx8Q09NUFJFSEVOU0lWRSUyMFNhZmV0eSUyMFNlY3VyaXR5JTIwJTI2JTIwQXV0b21hdGlvbnxlbnwwfHwwfHx8MA%3D%3D"
               alt="Technician installing CCTV camera"
               className="w-full h-full object-cover hover:scale-110 transition-transform duration-700"
             />
@@ -468,7 +468,7 @@ const SecurityAbout = () => {
             className="relative lg:absolute lg:-bottom-28 lg:-right-2 w-[220px] sm:w-[75%] lg:w-[382px] h-[230px] sm:h-[280px] lg:h-[380px] rounded-3xl overflow-hidden shadow-2xl z-10 -mt-10 sm:-mt-14 lg:mt-0 ml-auto lg:ml-0"
           >
             <img
-              src="/images/security1.jpg"
+              src="https://images.unsplash.com/photo-1748027869634-fc2e545cfb0c?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTJ8fENPTVBSRUhFTlNJVkUlMjBTYWZldHklMjBTZWN1cml0eSUyMCUyNiUyMEF1dG9tYXRpb258ZW58MHx8MHx8fDA%3D"
               alt="Security operator monitoring screens"
               className="w-full h-full object-cover hover:scale-110 transition-transform duration-700"
             />
@@ -522,7 +522,7 @@ const SecurityAbout = () => {
               className="text-sm lg:text-[13px] font-bold tracking-[0.2em] text-gray-400 uppercase"
               style={{ fontFamily: "'Barlow', sans-serif" }}
             >
-              About Us
+              About Us : Life Safety and Automation Solution
             </span>
           </div>
 
@@ -532,8 +532,8 @@ const SecurityAbout = () => {
             className="text-3xl sm:text-4xl lg:text-5xl font-semibold text-gray-900 leading-relaxed -mt-2 lg:-mt-4"
             style={{ fontFamily: "'Barlow Condensed', sans-serif" }}
           >
-            <span className="text-red-600">Protecting homes,</span>{" "}
-            businesses and peace of mind
+            <span className="text-red-600">COMPREHENSIVE  </span>{" "}
+Safety <br /> Security & Automation
           </h2>
 
           {/* Description — remove negative margin & auto mx on mobile */}
@@ -553,7 +553,7 @@ const SecurityAbout = () => {
             {/* Thumbnail — slightly smaller on mobile */}
             <div className="w-full h-[200px] sm:w-28 sm:h-24 lg:w-32 lg:h-28 rounded-2xl overflow-hidden flex-shrink-0 shadow-lg group">
               <img
-                src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=80"
+                src="https://images.unsplash.com/photo-1668515319620-199a4e17ee48?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
                 alt="CCTV technician"
                 className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
               />

@@ -343,9 +343,10 @@ if (typeof window !== 'undefined') {
 }
 
 const ITEMS = [
+ 
   {
-    label: "Fire Alarm",
-    icon: (
+    label: "Fire Detection Notification and Suppression",
+     icon: (
       <svg viewBox="0 0 24 24" fill="none" stroke="#e01c08" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" className="w-10 h-10 flex-shrink-0">
         <path d="M12 2c0 0-6 5-6 12a6 6 0 0012 0c0-7-6-12-6-12z"/>
         <path d="M10 16a2 2 0 004 0c0-2-2-3.5-2-3.5s-2 1.5-2 3.5z" fill="#e01c08" stroke="none"/>
@@ -353,13 +354,13 @@ const ITEMS = [
       </svg>
     ),
   },
-  {
-    label: "Fire Detection Notification and Suppression",
+    {
+    label: "Public Addressal Systems",
     icon: (
       <svg viewBox="0 0 24 24" fill="none" stroke="#e01c08" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" className="w-10 h-10 flex-shrink-0">
-        <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/>
-        <path d="M13.73 21a2 2 0 01-3.46 0"/>
-        <path d="M8 8c0-2.5 2-4 4-4"/>
+        <path d="M11 5L6 9H2v6h4l5 4V5z"/>
+        <path d="M19.07 4.93a10 10 0 010 14.14"/>
+        <path d="M15.54 8.46a5 5 0 010 7.07"/>
       </svg>
     ),
   },
@@ -372,17 +373,17 @@ const ITEMS = [
       </svg>
     ),
   },
-  {
-    label: "Modern Access Control Systems",
+   {
+    label: "Early Detection System",
     icon: (
       <svg viewBox="0 0 24 24" fill="none" stroke="#e01c08" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" className="w-10 h-10 flex-shrink-0">
-        <rect x="3" y="11" width="18" height="11" rx="2"/>
-        <path d="M7 11V7a5 5 0 0110 0v4"/>
-        <circle cx="12" cy="16" r="1.5" fill="#e01c08" stroke="none"/>
-        <path d="M12 17.5v1.5"/>
+        <circle cx="11" cy="11" r="7"/>
+        <path d="M21 21l-4.35-4.35"/>
+        <path d="M11 8v3l2 2"/>
       </svg>
     ),
   },
+
   {
     label: "Advanced Building Management System Integration",
     icon: (
@@ -393,16 +394,7 @@ const ITEMS = [
       </svg>
     ),
   },
-  {
-    label: "Public Addressal Systems",
-    icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="#e01c08" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" className="w-10 h-10 flex-shrink-0">
-        <path d="M11 5L6 9H2v6h4l5 4V5z"/>
-        <path d="M19.07 4.93a10 10 0 010 14.14"/>
-        <path d="M15.54 8.46a5 5 0 010 7.07"/>
-      </svg>
-    ),
-  },
+
   {
     label: "DATA Network",
     icon: (
@@ -412,6 +404,18 @@ const ITEMS = [
         <rect x="17" y="18" width="6" height="4" rx="1"/>
         <path d="M12 6v5M5 18v-3l7-2 7 2v3"/>
         <path d="M12 11l-7 4M12 11l7 4"/>
+      </svg>
+    ),
+  },
+
+   {
+    label: "Wireless Solution",
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="#e01c08" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" className="w-10 h-10 flex-shrink-0">
+        <path d="M5 12.55a11 11 0 0114.08 0"/>
+        <path d="M1.42 9a16 16 0 0121.16 0"/>
+        <path d="M8.53 16.11a6 6 0 016.95 0"/>
+        <circle cx="12" cy="20" r="1.5" fill="#e01c08" stroke="none"/>
       </svg>
     ),
   },
@@ -439,49 +443,8 @@ const ITEMS = [
       </svg>
     ),
   },
-  {
-    label: "Digital Lighting",
-    icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="#e01c08" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" className="w-10 h-10 flex-shrink-0">
-        <circle cx="12" cy="11" r="4"/>
-        <path d="M12 2v2M12 18v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M2 12h2M20 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
-        <path d="M9 17h6M10 20h4"/>
-      </svg>
-    ),
-  },
-  {
-    label: "Data Network",
-    icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="#e01c08" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" className="w-10 h-10 flex-shrink-0">
-        <path d="M5 12.55a11 11 0 0114.08 0"/>
-        <path d="M1.42 9a16 16 0 0121.16 0"/>
-        <path d="M8.53 16.11a6 6 0 016.95 0"/>
-        <circle cx="12" cy="20" r="1.5" fill="#e01c08" stroke="none"/>
-      </svg>
-    ),
-  },
-  {
-    label: "Grounding ERT",
-    icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="#e01c08" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" className="w-10 h-10 flex-shrink-0">
-        <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
-        <path d="M4 21h16" strokeWidth={1.4}/>
-        <path d="M6 23h12" strokeWidth={1.2}/>
-      </svg>
-    ),
-  },
-  {
-    label: "Early Detection System",
-    icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="#e01c08" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" className="w-10 h-10 flex-shrink-0">
-        <circle cx="11" cy="11" r="7"/>
-        <path d="M21 21l-4.35-4.35"/>
-        <path d="M11 8v3l2 2"/>
-      </svg>
-    ),
-  },
-  {
-    label: "Remote Notification and Monitoring",
+   {
+    label: "Remote Notification and Monitoring & Data Logger",
     icon: (
       <svg viewBox="0 0 24 24" fill="none" stroke="#e01c08" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" className="w-10 h-10 flex-shrink-0">
         <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 014.4 12.5 19.79 19.79 0 011.34 3.9 2 2 0 013.32 2h3a2 2 0 012 1.72c.13.96.36 1.9.7 2.81a2 2 0 01-.45 2.11L7.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0122 16.92z"/>
@@ -490,7 +453,7 @@ const ITEMS = [
       </svg>
     ),
   },
-  {
+   {
     label: "Customization on IoT RF, GSM, LORA, WIFI",
     icon: (
       <svg viewBox="0 0 24 24" fill="none" stroke="#e01c08" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" className="w-10 h-10 flex-shrink-0">
@@ -502,7 +465,31 @@ const ITEMS = [
     ),
   },
   {
-    label: "NVC Lighting",
+    label: "Digital Lighting & Dimming",
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="#e01c08" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" className="w-10 h-10 flex-shrink-0">
+        <circle cx="12" cy="11" r="4"/>
+        <path d="M12 2v2M12 18v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M2 12h2M20 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+        <path d="M9 17h6M10 20h4"/>
+      </svg>
+    ),
+  },
+ 
+  {
+    label: "Grounding ERT",
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="#e01c08" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" className="w-10 h-10 flex-shrink-0">
+        <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+        <path d="M4 21h16" strokeWidth={1.4}/>
+        <path d="M6 23h12" strokeWidth={1.2}/>
+      </svg>
+    ),
+  },
+ 
+ 
+ 
+  {
+    label: "Facade Lighting and Applications",
     icon: (
       <svg viewBox="0 0 24 24" fill="none" stroke="#e01c08" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" className="w-10 h-10 flex-shrink-0">
         <path d="M12 2a7 7 0 017 7c0 3-1.5 5-3.5 6.5V17a2 2 0 01-2 2h-3a2 2 0 01-2-2v-1.5C6.5 14 5 12 5 9a7 7 0 017-7z"/>

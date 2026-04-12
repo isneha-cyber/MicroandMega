@@ -334,18 +334,18 @@ const SLIDES = [
   {
     id: 1,
     bg: '/images/hero1.jpg',
-    tag: 'WELCOME SOLUTIONS',
+    tag: 'PAVA SOLUTIONS',
     title: 'Advanced Security\nSolutions For Every\nSpace',
-    desc: 'The best home security solution — combining AI-powered cameras, smart integration, and 24/7 monitoring for ultimate protection & convenience.',
+    desc: 'a.	Voice Alarm systems, are essential for communication and safety in various environments.',
     ctaLink: '/contact',
     video: true,
   },
   {
     id: 2,
     bg: '/images/hero2.jpg',
-    tag: 'FIRE DETECTION',
+    tag: 'Fire Detection, Notification, Suppression, Emergency Communication',
     title: 'Intelligent Fire\nDetection Systems\nFor Every Building',
-    desc: 'UL & EN listed fire alarm systems, suppression solutions, and integrated safety infrastructure for hospitals, banks and commercial spaces.',
+    desc: 'a.	UL & EN listed fire alarm systems, Notification, Communication and suppression solutions, and integrated safety infrastructure for SME; hospitals, banks and commercial spaces, Heritage and data centers.',
     ctaLink: '/products',
     video: false,
   },
@@ -362,8 +362,8 @@ const SLIDES = [
     id: 4,
     bg: '/images/hero4.jpg',
     tag: 'IOT AUTOMATION',
-    title: 'Smart IoT &\nLighting Automation\nSystems',
-    desc: 'DALI, 1-10V, TRIAC and IoT dimming solutions — intelligent building management and remote monitoring for modern spaces.',
+    title: 'Automation and IoT Solution',
+    desc: '	IoT to BacNet Automation and Control Network Solution Keep your system running without Breakdown.',
     ctaLink: '/iot-automation',
     video: false,
   },
@@ -371,76 +371,55 @@ const SLIDES = [
     id: 5,
     bg: '/images/hero5.jpg',
     tag: 'ACCESS CONTROL',
-    title: 'AI-Powered\nAccess & Attendance\nControl',
-    desc: 'From turnstile ACS to mass access systems for schools, offices and factories — precision access management with AI-based recognition.',
+    title: 'Surveillance, Security and Access control',
+    desc: 'a.	Home To Enterprise security solution. combining AI-powered cameras, smart integration, and 24/7 monitoring for ultimate protection & convenience.',
     ctaLink: '/products',
     video: false,
   },
 ]
 
 const FEATURES = [
-  {
-    icon: (
+ {
+  icon: (
+    <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
       <svg viewBox="0 0 48 48" fill="none" width="56" height="56">
         <rect x="3" y="10" width="32" height="22" rx="3" stroke="#bb1403" strokeWidth="2" />
         <circle cx="19" cy="21" r="6" stroke="#bb1403" strokeWidth="2" />
         <circle cx="19" cy="21" r="2.5" fill="#bb1403" />
         <path d="M35 13 L45 9 L45 33 L35 29" stroke="#bb1403" strokeWidth="2" strokeLinejoin="round" />
       </svg>
-    ),
-    iconSmall: (
+      <svg viewBox="0 0 48 48" fill="none" width="56" height="56">
+        <rect x="4" y="6" width="20" height="36" rx="4" stroke="#bb1403" strokeWidth="2" />
+        <circle cx="9" cy="13" r="2" fill="#bb1403" />
+        <circle cx="9" cy="21" r="1.5" fill="#bb1403" />
+        <circle cx="14" cy="21" r="1.5" fill="#bb1403" />
+        <circle cx="19" cy="21" r="1.5" fill="#bb1403" />
+        <circle cx="9" cy="27" r="1.5" fill="#bb1403" />
+        <circle cx="14" cy="27" r="1.5" fill="#bb1403" />
+        <circle cx="19" cy="27" r="1.5" fill="#bb1403" />
+        <circle cx="9" cy="33" r="1.5" fill="#bb1403" />
+        <circle cx="14" cy="33" r="1.5" fill="#bb1403" />
+        <circle cx="19" cy="33" r="1.5" fill="#bb1403" />
+        <rect x="28" y="24" width="16" height="14" rx="2" stroke="#bb1403" strokeWidth="2" />
+        <path d="M31 24 L31 18 Q36 13 41 18 L41 24" stroke="#bb1403" strokeWidth="2" strokeLinecap="round" />
+        <circle cx="36" cy="31" r="2" fill="#bb1403" />
+        <rect x="35" y="31" width="2" height="4" rx="1" fill="#bb1403" />
+      </svg>
+    </div>
+  ),
+  iconSmall: (
+    <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
       <svg viewBox="0 0 48 48" fill="none" width="44" height="44">
         <rect x="3" y="10" width="32" height="22" rx="3" stroke="#bb1403" strokeWidth="2" />
         <circle cx="19" cy="21" r="6" stroke="#bb1403" strokeWidth="2" />
         <circle cx="19" cy="21" r="2.5" fill="#bb1403" />
         <path d="M35 13 L45 9 L45 33 L35 29" stroke="#bb1403" strokeWidth="2" strokeLinejoin="round" />
       </svg>
-    ),
-    label: 'Integrated Security Systems',
+    </div>
+  ),
+  label: 'Integrated Surveillance, Control & Security Systems',
+},
   
-  },
-  {
-    icon: (
-      <svg viewBox="0 0 48 48" fill="none" width="56" height="56">
-        <rect x="4" y="6" width="20" height="36" rx="4" stroke="#bb1403" strokeWidth="2" />
-        <circle cx="9" cy="13" r="2" fill="#bb1403" />
-        <circle cx="9" cy="21" r="1.5" fill="#bb1403" />
-        <circle cx="14" cy="21" r="1.5" fill="#bb1403" />
-        <circle cx="19" cy="21" r="1.5" fill="#bb1403" />
-        <circle cx="9" cy="27" r="1.5" fill="#bb1403" />
-        <circle cx="14" cy="27" r="1.5" fill="#bb1403" />
-        <circle cx="19" cy="27" r="1.5" fill="#bb1403" />
-        <circle cx="9" cy="33" r="1.5" fill="#bb1403" />
-        <circle cx="14" cy="33" r="1.5" fill="#bb1403" />
-        <circle cx="19" cy="33" r="1.5" fill="#bb1403" />
-        <rect x="28" y="24" width="16" height="14" rx="2" stroke="#bb1403" strokeWidth="2" />
-        <path d="M31 24 L31 18 Q36 13 41 18 L41 24" stroke="#bb1403" strokeWidth="2" strokeLinecap="round" />
-        <circle cx="36" cy="31" r="2" fill="#bb1403" />
-        <rect x="35" y="31" width="2" height="4" rx="1" fill="#bb1403" />
-      </svg>
-    ),
-    iconSmall: (
-      <svg viewBox="0 0 48 48" fill="none" width="44" height="44">
-        <rect x="4" y="6" width="20" height="36" rx="4" stroke="#bb1403" strokeWidth="2" />
-        <circle cx="9" cy="13" r="2" fill="#bb1403" />
-        <circle cx="9" cy="21" r="1.5" fill="#bb1403" />
-        <circle cx="14" cy="21" r="1.5" fill="#bb1403" />
-        <circle cx="19" cy="21" r="1.5" fill="#bb1403" />
-        <circle cx="9" cy="27" r="1.5" fill="#bb1403" />
-        <circle cx="14" cy="27" r="1.5" fill="#bb1403" />
-        <circle cx="19" cy="27" r="1.5" fill="#bb1403" />
-        <circle cx="9" cy="33" r="1.5" fill="#bb1403" />
-        <circle cx="14" cy="33" r="1.5" fill="#bb1403" />
-        <circle cx="19" cy="33" r="1.5" fill="#bb1403" />
-        <rect x="28" y="24" width="16" height="14" rx="2" stroke="#bb1403" strokeWidth="2" />
-        <path d="M31 24 L31 18 Q36 13 41 18 L41 24" stroke="#bb1403" strokeWidth="2" strokeLinecap="round" />
-        <circle cx="36" cy="31" r="2" fill="#bb1403" />
-        <rect x="35" y="31" width="2" height="4" rx="1" fill="#bb1403" />
-      </svg>
-    ),
-    label: 'Access Control Systems',
-   
-  },
   {
     icon: (
       <svg viewBox="0 0 48 48" fill="none" width="56" height="56">
@@ -472,9 +451,36 @@ const FEATURES = [
         <path d="M45 25 Q50 32 45 39" stroke="#bb1403" strokeWidth="1.5" strokeLinecap="round" />
       </svg>
     ),
-    label: 'Fire Detection',
+    label: 'Fire Detection, Notification, Suppression',
 
   },
+  {
+  icon: (
+    <svg viewBox="0 0 48 48" fill="none" width="56" height="56">
+      {/* Light bulb icon for luxury lighting */}
+      <path d="M24 8C18 8 14 12.5 14 18C14 22 16 25 18 27V31C18 32.1 18.9 33 20 33H28C29.1 33 30 32.1 30 31V27C32 25 34 22 34 18C34 12.5 30 8 24 8Z" stroke="#bb1403" strokeWidth="2" fill="none"/>
+      <path d="M19 37H29" stroke="#bb1403" strokeWidth="2" strokeLinecap="round"/>
+      <path d="M21 41H27" stroke="#bb1403" strokeWidth="2" strokeLinecap="round"/>
+      <circle cx="24" cy="21" r="2" fill="#bb1403"/>
+      {/* Dimming indicator */}
+      <path d="M38 14L42 18M42 14L38 18" stroke="#bb1403" strokeWidth="2" strokeLinecap="round"/>
+      <path d="M6 14L10 18M10 14L6 18" stroke="#bb1403" strokeWidth="2" strokeLinecap="round"/>
+      {/* Dimmer arc */}
+      <path d="M8 30C8 30 12 36 24 36C36 36 40 30 40 30" stroke="#bb1403" strokeWidth="2" strokeLinecap="round" fill="none"/>
+    </svg>
+  ),
+  iconSmall: (
+    <svg viewBox="0 0 48 48" fill="none" width="44" height="44">
+      {/* Simplified light bulb for small icon */}
+      <path d="M24 10C18.5 10 15 14 15 19C15 22.5 17 25 18.5 27V31C18.5 32.1 19.4 33 20.5 33H27.5C28.6 33 29.5 32.1 29.5 31V27C31 25 33 22.5 33 19C33 14 29.5 10 24 10Z" stroke="#bb1403" strokeWidth="2" fill="none"/>
+      <path d="M20 37H28" stroke="#bb1403" strokeWidth="2" strokeLinecap="round"/>
+      <circle cx="24" cy="20" r="2" fill="#bb1403"/>
+      <path d="M36 16L39 19M39 16L36 19" stroke="#bb1403" strokeWidth="1.5" strokeLinecap="round"/>
+      <path d="M12 16L9 19M9 16L12 19" stroke="#bb1403" strokeWidth="1.5" strokeLinecap="round"/>
+    </svg>
+  ),
+  label: 'Luxury lighting & Dimming',
+},
 ]
 
 const DiscoverBtn = () => (

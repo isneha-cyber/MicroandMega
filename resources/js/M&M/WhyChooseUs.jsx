@@ -224,59 +224,66 @@ gsap.registerPlugin(ScrollTrigger);
 const FEATURES = [
   {
     side: "left",
-    title: "24/7 Support",
-    desc: "Round-the-clock monitoring and assistance for all your security systems, ensuring rapid response whenever you need it.",
+    title: "Fire Detection & Suppression",
+    desc: "UL & EN listed fire alarm systems, notification, communication, and suppression solutions for SMEs, hospitals, banks, commercial spaces, heritage sites, and data centers.",
     icon: (
-      // 24/7 clock-style icon
-      <svg viewBox="0 0 48 48" fill="none" className="sm:w-12 sm:h-12 w-8 h-8" stroke="white" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
-        <circle cx="24" cy="24" r="18" stroke="white" strokeWidth={2}/>
-        <path d="M24 14v10l6 4" strokeWidth={2.2}/>
-        <path d="M10 36l4-3M38 36l-4-3" strokeWidth={1.6}/>
-        <text x="50%" y="50%" dominantBaseline="middle" textAnchor="middle" fill="white" fontSize="10" fontWeight="bold" stroke="none" fontFamily="sans-serif">24/7</text>
+     <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" className="w-10 h-10 flex-shrink-0">
+        <path d="M12 2c0 0-6 5-6 12a6 6 0 0012 0c0-7-6-12-6-12z"/>
+        <path d="M10 16a2 2 0 004 0c0-2-2-3.5-2-3.5s-2 1.5-2 3.5z" fill="white" stroke="none"/>
+        <circle cx="12" cy="2.5" r="1" fill="white" stroke="none"/>
       </svg>
     ),
   },
   {
     side: "left",
-    title: "Customized Solutions",
-    desc: "Tailored security systems designed around your specific needs — from access control and fire detection to integrated surveillance.",
+    title: "Access Control & Surveillance",
+    desc: "Home to enterprise security solutions combining AI-powered cameras, smart integration, and 24/7 monitoring for ultimate protection and convenience.",
     icon: (
-      // DVR/monitor icon
-      <svg viewBox="0 0 48 48" fill="none" className="sm:w-12 sm:h-12 w-8 h-8" stroke="white" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-        <rect x="6" y="10" width="36" height="22" rx="3"/>
-        <path d="M16 38h16M24 32v6"/>
-        <rect x="10" y="15" width="12" height="8" rx="1"/>
-        <circle cx="33" cy="19" r="3"/>
-        <path d="M30 27h6"/>
+      <svg viewBox="0 0 48 48" fill="none" className="sm:w-12 sm:h-12 w-8 h-8 flex-shrink-0" stroke="white" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+        {/* Lock + camera / access control icon */}
+        <rect x="14" y="20" width="20" height="16" rx="3" stroke="white" fill="none"/>
+        <path d="M20 20v-4a4 4 0 0 1 8 0v4" stroke="white" fill="none"/>
+        <circle cx="24" cy="28" r="2" fill="white" stroke="none"/>
+        <rect x="32" y="8" width="8" height="6" rx="1" stroke="white" fill="none"/>
+        <circle cx="36" cy="11" r="1.5" fill="white" stroke="none"/>
       </svg>
     ),
   },
   {
     side: "right",
-    title: "Remote Access",
-    desc: "Monitor and manage your security infrastructure from anywhere in the world through our smart remote access platform.",
+    title: "Data Network & Structured Cabling",
+    desc: "Copper, fiber, and wireless solutions with structured cabling — keeping your enterprise always connected.",
     icon: (
-      // Monitor with gear/remote icon
-      <svg viewBox="0 0 48 48" fill="none" className="sm:w-12 sm:h-12 w-8 h-8" stroke="white" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-        <rect x="4" y="8" width="40" height="26" rx="3"/>
-        <path d="M16 40h16M24 34v6"/>
-        <circle cx="24" cy="21" r="6"/>
-        <path d="M24 15v2M24 25v2M18 21h2M28 21h2"/>
-        <circle cx="24" cy="21" r="2" fill="white" stroke="none"/>
+      <svg viewBox="0 0 48 48" fill="none" className="sm:w-12 sm:h-12 w-8 h-8 flex-shrink-0" stroke="white" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+        {/* Network/server with cable ports */}
+        <rect x="8" y="14" width="32" height="20" rx="2" stroke="white" fill="none"/>
+        <circle cx="18" cy="24" r="2" fill="white" stroke="none"/>
+        <circle cx="30" cy="24" r="2" fill="white" stroke="none"/>
+        <line x1="22" y1="24" x2="26" y2="24" stroke="white" strokeWidth={2}/>
+        <rect x="12" y="34" width="6" height="4" rx="1" stroke="white" fill="none"/>
+        <rect x="21" y="34" width="6" height="4" rx="1" stroke="white" fill="none"/>
+        <rect x="30" y="34" width="6" height="4" rx="1" stroke="white" fill="none"/>
+        <path d="M4 10h40" stroke="white" strokeWidth={1.5} strokeDasharray="3 2"/>
       </svg>
     ),
   },
   {
     side: "right",
-    title: "Proactive Maintenance",
-    desc: "Scheduled inspections and preventive servicing keep your CCTV, alarms, and access control systems running at peak performance.",
+    title: "IoT Automation & BacNet Control",
+    desc: "IoT to BacNet automation and control network solutions — keep your system running without breakdown.",
     icon: (
-      // Eye/camera surveillance icon
-      <svg viewBox="0 0 48 48" fill="none" className="sm:w-12 sm:h-12 w-8 h-8" stroke="white" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-        <path d="M6 24s6-10 18-10 18 10 18 10-6 10-18 10S6 24 6 24z"/>
-        <circle cx="24" cy="24" r="5"/>
-        <circle cx="24" cy="24" r="2" fill="white" stroke="none"/>
-        <path d="M34 14l4-4M38 18l3-3"/>
+      <svg viewBox="0 0 48 48" fill="none" className="sm:w-12 sm:h-12 w-8 h-8 flex-shrink-0" stroke="white" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+        {/* Connected nodes / IoT automation icon */}
+        <circle cx="12" cy="18" r="5" stroke="white" fill="none"/>
+        <circle cx="36" cy="18" r="5" stroke="white" fill="none"/>
+        <circle cx="24" cy="36" r="5" stroke="white" fill="none"/>
+        <circle cx="12" cy="18" r="2" fill="white" stroke="none"/>
+        <circle cx="36" cy="18" r="2" fill="white" stroke="none"/>
+        <circle cx="24" cy="36" r="2" fill="white" stroke="none"/>
+        <line x1="17" y1="20" x2="31" y2="20" stroke="white" strokeWidth={2}/>
+        <line x1="20" y1="22" x2="22" y2="32" stroke="white" strokeWidth={2}/>
+        <line x1="28" y1="22" x2="26" y2="32" stroke="white" strokeWidth={2}/>
+        <path d="M24 41v-3" stroke="white" strokeWidth={2}/>
       </svg>
     ),
   },
