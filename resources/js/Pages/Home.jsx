@@ -4,8 +4,8 @@ import Hero from '@/M&M/Hero'
 import Products from '@/M&M/Products'
 import Project from '@/M&M/Project'
 import SecurityAbout from '@/M&M/Securityabout'
-import Services from '@/M&M/Services'
-import Testimonials from '@/M&M/Testimonials'
+// import Services from '@/M&M/Services'
+// import Testimonials from '@/M&M/Testimonials'
 import WhyChooseUs from '@/M&M/WhyChooseUs'
 
 const Home = () => {
@@ -15,10 +15,10 @@ const Home = () => {
    <SecurityAbout/>
    <Products/>
    <WhyChooseUs/>
-   <Services/>
+   {/* <Services/> */}
     <Project/>
     <ContactBanner/>
-    <Testimonials/>
+    {/* <Testimonials/> */}
     <FAQ/>
    </>
   )

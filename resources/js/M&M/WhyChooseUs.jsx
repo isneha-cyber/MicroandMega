@@ -225,7 +225,7 @@ const FEATURES = [
   {
     side: "left",
     title: "Fire Detection & Suppression",
-    desc: "UL & EN listed fire alarm systems, notification, communication, and suppression solutions for SMEs, hospitals, banks, commercial spaces, heritage sites, and data centers.",
+    desc: "UL & EN listed fire alarm systems, notification, and suppression solutions for SMEs, hospitals, and data centers.",
     icon: (
      <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" className="w-10 h-10 flex-shrink-0">
         <path d="M12 2c0 0-6 5-6 12a6 6 0 0012 0c0-7-6-12-6-12z"/>
@@ -237,10 +237,9 @@ const FEATURES = [
   {
     side: "left",
     title: "Access Control & Surveillance",
-    desc: "Home to enterprise security solutions combining AI-powered cameras, smart integration, and 24/7 monitoring for ultimate protection and convenience.",
+    desc: "AI-powered cameras, smart integration, and 24/7 monitoring for enterprise security and ultimate protection.",
     icon: (
       <svg viewBox="0 0 48 48" fill="none" className="sm:w-12 sm:h-12 w-8 h-8 flex-shrink-0" stroke="white" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-        {/* Lock + camera / access control icon */}
         <rect x="14" y="20" width="20" height="16" rx="3" stroke="white" fill="none"/>
         <path d="M20 20v-4a4 4 0 0 1 8 0v4" stroke="white" fill="none"/>
         <circle cx="24" cy="28" r="2" fill="white" stroke="none"/>
@@ -252,10 +251,9 @@ const FEATURES = [
   {
     side: "right",
     title: "Data Network & Structured Cabling",
-    desc: "Copper, fiber, and wireless solutions with structured cabling — keeping your enterprise always connected.",
+    desc: "Copper, fiber, and wireless structured cabling solutions to keep your enterprise always connected.",
     icon: (
       <svg viewBox="0 0 48 48" fill="none" className="sm:w-12 sm:h-12 w-8 h-8 flex-shrink-0" stroke="white" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-        {/* Network/server with cable ports */}
         <rect x="8" y="14" width="32" height="20" rx="2" stroke="white" fill="none"/>
         <circle cx="18" cy="24" r="2" fill="white" stroke="none"/>
         <circle cx="30" cy="24" r="2" fill="white" stroke="none"/>
@@ -270,10 +268,9 @@ const FEATURES = [
   {
     side: "right",
     title: "IoT Automation & BacNet Control",
-    desc: "IoT to BacNet automation and control network solutions — keep your system running without breakdown.",
+    desc: "IoT to BacNet automation and control network solutions to prevent breakdowns and keep systems running.",
     icon: (
       <svg viewBox="0 0 48 48" fill="none" className="sm:w-12 sm:h-12 w-8 h-8 flex-shrink-0" stroke="white" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-        {/* Connected nodes / IoT automation icon */}
         <circle cx="12" cy="18" r="5" stroke="white" fill="none"/>
         <circle cx="36" cy="18" r="5" stroke="white" fill="none"/>
         <circle cx="24" cy="36" r="5" stroke="white" fill="none"/>

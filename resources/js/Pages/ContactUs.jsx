@@ -207,7 +207,7 @@ const ContactUS = () => {
             <p className="text-sm text-gray-500 leading-relaxed">
               Have questions or need a customized security solution? Our team is here to assist you. Get in touch with us today.
             </p>
-            <div className="flex items-center gap-3 mt-1">
+            {/* <div className="flex items-center gap-3 mt-1">
               {[
                 { icon: <InstagramIcon />, label: "Instagram" },
                 { icon: <TikTokIcon />, label: "Tiktok" },
@@ -219,14 +219,14 @@ const ContactUS = () => {
                   {icon}
                 </a>
               ))}
-            </div>
+            </div> */}
           </div>
 
           {/* Right: Cards */}
           <div className="w-full flex-1 flex flex-col gap-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <ContactInfoCard icon={<PhoneIcon />} label="Phone Number" value="+977 01-4535104" href="tel:+97701-4535104" />
-              <ContactInfoCard icon={<EmailIcon />} label="Email Address" value="info@mnm.com.np" href="mailto:info@mnm.com.np" />
+              <ContactInfoCard icon={<EmailIcon />} label="Email Address" value="tech@mnm.com.np" href="mailto:tech@mnm.com.np" />
             </div>
             <ContactInfoCard
               icon={<LocationIcon />}

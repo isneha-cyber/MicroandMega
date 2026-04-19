@@ -1,5 +1,5 @@
 import ServiceSection from '@/M&M/ServiceSection'
-import Testimonials from '@/M&M/Testimonials'
+// import Testimonials from '@/M&M/Testimonials'
 import WhyChooseUs from '@/M&M/WhyChooseUs'
 import { Link } from '@inertiajs/react'
 import { Head } from '@inertiajs/react'
@@ -37,7 +37,7 @@ const Service = () => {
 </div>
 <ServiceSection/>
 <WhyChooseUs/>
-<Testimonials/>
+{/* <Testimonials/> */}
     </>
 )
 }

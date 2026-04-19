@@ -324,7 +324,7 @@ export default function ContactBanner() {
               <div className="relative flex items-end justify-center lg:justify-end w-full lg:w-[44%] xl:w-[42%] mt-0 lg:mt-0">
                 {/* Mobile / tablet — inline image */}
                 <img
-                  src="/images/picture1.jpg"
+                  src="/images/Picture1.jpg"
                   alt="CCTV security technician"
                   className="block lg:hidden w-full object-cover object-top mb-5"
                   style={{ maxHeight: 340 }}
@@ -333,7 +333,7 @@ export default function ContactBanner() {
                 {/* Desktop — with animation */}
                 <img
                   ref={imageRef}
-                  src="/images/picture1.jpg"
+                  src="/images/Picture1.jpg"
                   alt="CCTV security technician"
                   className="hidden lg:block w-full object-cover object-top"
                   style={{

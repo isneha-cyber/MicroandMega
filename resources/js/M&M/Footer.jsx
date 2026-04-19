@@ -232,7 +232,7 @@ export default function Footer() {
 
             {/* Email */}
             <a
-              href="mailto:info@mnm.com.np"
+              href="mailto:tech@mnm.com.np"
               target="_blank"
               rel="noreferrer"
               className="contact-item flex items-center gap-4 no-underline group"
@@ -245,7 +245,7 @@ export default function Footer() {
               </div>
               <div>
                 <p className="text-gray-400 text-md font-medium">email address</p>
-                <p className="text-white font-bold text-lg group-hover:text-[#cc1400] transition-colors duration-150">info@mnm.com.np</p>
+                <p className="text-white font-bold text-lg group-hover:text-[#cc1400] transition-colors duration-150">tech@mnm.com.np</p>
               </div>
             </a>
 
