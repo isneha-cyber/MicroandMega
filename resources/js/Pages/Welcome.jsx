@@ -5,10 +5,10 @@ import Hero from '@/M&M/Hero';
 import SecurityAbout from '@/M&M/Securityabout';
 import Products from '@/M&M/Products';
 import WhyChooseUs from '@/M&M/WhyChooseUs';
-import Services from '@/M&M/Services';
+// import Services from '@/M&M/Services';
 import Project from '@/M&M/Project';
 import ContactBanner from '@/M&M/ContactBanner';
-import Testimonials from '@/M&M/Testimonials';
+// import Testimonials from '@/M&M/Testimonials';
 import FAQ from '@/M&M/FAQ';
 
 const SEO = {
@@ -53,10 +53,10 @@ export default function Welcome() {
       <SecurityAbout />
       <Products />
       <WhyChooseUs />
-      <Services />
+      {/* <Services /> */}
       <Project />
       <ContactBanner />
-      <Testimonials />
+      {/* <Testimonials /> */}
       <FAQ />
       <ScrollToTop />
     </>

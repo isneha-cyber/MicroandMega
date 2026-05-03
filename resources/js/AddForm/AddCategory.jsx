@@ -1,5 +1,3 @@
-
-
 import axios from "axios";
 import { X, Trash2 } from "lucide-react";
 import ReactQuill from "react-quill";
@@ -243,12 +241,12 @@ const AddCategory = ({
     return (
         <div
             className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
-            onClick={(e) => e.target === e.currentTarget && closeForm()}
+            // Removed the onClick handler that was closing the form when clicking the backdrop
         >
             <div className="relative w-full max-w-4xl max-h-[90vh] overflow-y-auto bg-white rounded-xl shadow-2xl flex flex-col">
 
                 {/* ── Sticky Header ── */}
-                <div className=" z-10 flex justify-between items-center px-8 py-5 bg-white border-b border-gray-200">
+                <div className="z-10 flex justify-between items-center px-8 py-5 bg-white border-b border-gray-200">
                     <h2 className="text-xl font-bold text-gray-800 tracking-wide">
                         {editingCategory ? "Edit Category" : "Add New Category"}
                     </h2>
@@ -521,7 +519,7 @@ const AddCategory = ({
                     </div>
 
                     {/* ── Sticky Footer Actions ── */}
-                    <div className=" flex justify-end gap-3 pt-4 pb-2 border-t border-gray-200 bg-white z-10 mt-2">
+                    <div className="flex justify-end gap-3 pt-4 pb-2 border-t border-gray-200 bg-white z-10 mt-2">
                         <button
                             type="button"
                             onClick={closeForm}

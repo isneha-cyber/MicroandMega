@@ -26,6 +26,14 @@ const AddTestimonials = ({
         photo: null,
     });
 
+    // Lock background scroll when modal is open
+    useEffect(() => {
+        document.body.style.overflow = "hidden";
+        return () => {
+            document.body.style.overflow = "";
+        };
+    }, []);
+
     // Use Effect for editing
     useEffect(() => {
         if (editingTestimonials) {
@@ -116,37 +124,13 @@ const AddTestimonials = ({
         setEditingTestimonials(null);
     };
 
-    // Handle backdrop click
-    const handleBackdropClick = (e) => {
-        // Only close if clicking on the backdrop itself, not the modal content
-        if (e.target === e.currentTarget) {
-            handleClose();
-        }
-    };
-
-    // Prevent body scroll when modal is open
-    useEffect(() => {
-        // Save original overflow style
-        const originalOverflow = document.body.style.overflow;
-        // Prevent scrolling on body
-        document.body.style.overflow = 'hidden';
-        
-        // Cleanup function to restore scroll when component unmounts
-        return () => {
-            document.body.style.overflow = originalOverflow;
-        };
-    }, []);
-
     return (
         <div 
             className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
-            onClick={handleBackdropClick}
+            // No onClick handler here - prevents closing when clicking backdrop
         >
-            <div 
-                className="relative px-6 py-6 rounded-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-white shadow-2xl"
-                onClick={(e) => e.stopPropagation()} // Prevent clicks inside modal from closing it
-            >
-                <div className="flex justify-between items-center mb-6 bg-white pb-4 border-b  z-10">
+            <div className="relative px-6 py-6 rounded-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-white shadow-2xl">
+                <div className="flex justify-between items-center mb-6 bg-white pb-4 border-b z-10">
                     <h2 className="text-2xl font-bold">
                         {editingTestimonials ? "Edit Testimonial" : "Add New Testimonial"}
                     </h2>

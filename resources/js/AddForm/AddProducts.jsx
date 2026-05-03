@@ -46,7 +46,7 @@ const AddProducts = ({
         content: "",
         featured_image: null,
         images: [],
-        product_category_id: "",   // â† was category_id
+        product_category_id: "",   // ← was category_id
     });
 
     // Lock background scroll when modal is open
@@ -72,7 +72,7 @@ const AddProducts = ({
                 content: editingProducts.content || "",
                 featured_image: null,
                 images: [],
-                product_category_id: coerceId(getEditingCategoryId(editingProducts)),  // â† was category_id
+                product_category_id: coerceId(getEditingCategoryId(editingProducts)),  // ← was category_id
             });
             setCategoriesError("");
         }
@@ -82,7 +82,7 @@ const AddProducts = ({
         try {
             setCategoriesLoading(true);
             setCategoriesError("");
-            // â† updated endpoint from ourcategories.dropdown to ourproductcategories/flat
+            // ← updated endpoint from ourcategories.dropdown to ourproductcategories/flat
             const response = await axios.get("/ourproductcategories/flat");
             const list = Array.isArray(response.data)
                 ? response.data
@@ -102,7 +102,7 @@ const AddProducts = ({
     const buildSelectOptions = (flatList) => {
         return flatList.map((cat) => ({
             value: coerceId(cat.id),
-            label: cat.parent_name ? `â””â”€ ${cat.name}` : cat.name,
+            label: cat.parent_name ? `└─ ${cat.name}` : cat.name,
             parentName: cat.parent_name || null,
         }));
     };
@@ -111,7 +111,7 @@ const AddProducts = ({
 
     // Find the currently selected option
     const selectedCategoryOption =
-        categoryOptions.find((o) => o.value === productForm.product_category_id) || null;  // â† was category_id
+        categoryOptions.find((o) => o.value === productForm.product_category_id) || null;  // ← was category_id
 
     const handleCreate = async (formData) => {
         try {
@@ -134,7 +134,7 @@ const AddProducts = ({
             return;
         }
 
-        // â† was category_id
+        // ← was category_id
         if (!productForm.product_category_id) {
             alert("Please select a category");
             return;
@@ -168,7 +168,7 @@ const AddProducts = ({
                 content: "",
                 featured_image: null,
                 images: [],
-                product_category_id: "",  // â† was category_id
+                product_category_id: "",  // ← was category_id
             });
             setShowForm(false);
             setEditingProducts(null);
@@ -254,7 +254,7 @@ const AddProducts = ({
     return (
         <div
             className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
-            onClick={(e) => e.target === e.currentTarget && closeForm()}
+            // Removed the onClick handler that was closing the form when clicking the backdrop
         >
             <div className="relative px-6 py-6 rounded-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto bg-white shadow-2xl">
                 {/* Header */}
@@ -287,7 +287,7 @@ const AddProducts = ({
                                 onChange={(selected) =>
                                     setProductForm((prev) => ({
                                         ...prev,
-                                        product_category_id: selected ? selected.value : "",  // â† was category_id
+                                        product_category_id: selected ? selected.value : "",  // ← was category_id
                                     }))
                                 }
                                 isLoading={categoriesLoading}
@@ -378,7 +378,7 @@ const AddProducts = ({
                             />
                         </div>
                         <p className="text-xs text-gray-500 mt-8">
-                            You can use HTML tags for formatting: h1â€“h6, p, ul, ol, li,
+                            You can use HTML tags for formatting: h1–h6, p, ul, ol, li,
                             strong, em, etc.
                         </p>
                     </div>
