@@ -409,7 +409,7 @@ const AddProjects = ({ editingProjects, setEditingProjects, setReloadTrigger, se
         category: "",
         status: "active",
         location: "",
-        order: 0,
+        order: "",
         year: new Date().getFullYear().toString(),
         contract_type: "Full Project",
     });
@@ -434,7 +434,7 @@ const AddProjects = ({ editingProjects, setEditingProjects, setReloadTrigger, se
                 category: editingProjects.category || "",
                 status: editingProjects.status || "active",
                 location: editingProjects.location || "",
-                order: editingProjects.order || 0,
+                order: editingProjects.order > 0 ? String(editingProjects.order) : "",
                 year: editingProjects.year || new Date().getFullYear().toString(),
                 contract_type: editingProjects.contractType || editingProjects.contract_type || "Full Project",
             });
@@ -449,7 +449,7 @@ const AddProjects = ({ editingProjects, setEditingProjects, setReloadTrigger, se
                 category: "",
                 status: "active",
                 location: "",
-                order: 0,
+                order: "",
                 year: new Date().getFullYear().toString(),
                 contract_type: "Full Project",
             });
@@ -538,7 +538,7 @@ const AddProjects = ({ editingProjects, setEditingProjects, setReloadTrigger, se
                 category: "",
                 status: "active",
                 location: "",
-                order: 0,
+                order: "",
                 year: new Date().getFullYear().toString(),
                 contract_type: "Full Project",
             });
@@ -649,12 +649,12 @@ const AddProjects = ({ editingProjects, setEditingProjects, setReloadTrigger, se
                                 name="order"
                                 value={projectsForm.order}
                                 onChange={handleChange}
-                                min="0"
+                                min="1"
                                 step="1"
                                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
                                 placeholder="e.g., 1, 2, 3..."
                             />
-                            <p className="text-xs text-gray-500 mt-1">Lower numbers appear first (1, 2, 3...)</p>
+                            <p className="text-xs text-gray-500 mt-1">Use 1 for first position, 2 for second, 3 for third.</p>
                         </div>
                     </div>
 

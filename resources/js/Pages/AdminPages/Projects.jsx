@@ -206,10 +206,36 @@ const imgurl = import.meta.env.VITE_IMAGE_PATH;
 const sortProjectsByOrder = (projects) => {
     if (!Array.isArray(projects)) return projects;
     return [...projects].sort((a, b) => {
-        const orderA = a.order !== undefined && a.order !== null ? a.order : 999999;
-        const orderB = b.order !== undefined && b.order !== null ? b.order : 999999;
-        return orderA - orderB;
+        const orderA = Number(a.order);
+        const orderB = Number(b.order);
+        const normalizedOrderA = Number.isFinite(orderA) && orderA > 0 ? orderA : 999999;
+        const normalizedOrderB = Number.isFinite(orderB) && orderB > 0 ? orderB : 999999;
+        return normalizedOrderA - normalizedOrderB;
     });
+};
+
+const formatOrderPosition = (order) => {
+    const value = Number(order);
+
+    if (!Number.isInteger(value) || value < 1) {
+        return null;
+    }
+
+    const remainder100 = value % 100;
+    if (remainder100 >= 11 && remainder100 <= 13) {
+        return `${value}th`;
+    }
+
+    switch (value % 10) {
+        case 1:
+            return `${value}st`;
+        case 2:
+            return `${value}nd`;
+        case 3:
+            return `${value}rd`;
+        default:
+            return `${value}th`;
+    }
 };
 
 const Projects = () => {
@@ -332,9 +358,9 @@ const Projects = () => {
                                     <div className="flex justify-between items-start mb-2">
                                         <div>
                                             <h3 className="text-xl font-semibold text-gray-800">{project.title}</h3>
-                                            {project.order !== undefined && project.order !== null && (
+                                            {formatOrderPosition(project.order) && (
                                                 <span className="text-xs text-gray-500 mt-1 block">
-                                                    Order: {project.order}
+                                                    Position: {formatOrderPosition(project.order)}
                                                 </span>
                                             )}
                                         </div>

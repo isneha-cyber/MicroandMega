@@ -70,9 +70,14 @@ public function showPage($slug)
                 // Default to active for public listings
                 $query->where('status', 'active');
             }
+
+            $query
+                ->orderByRaw('CASE WHEN `order` IS NULL OR `order` <= 0 THEN 1 ELSE 0 END')
+                ->orderBy('order')
+                ->latest();
             
             $perPage = $request->get('per_page', 10);
-            $projects = $query->latest()->paginate($perPage);
+            $projects = $query->paginate($perPage);
             
             $projects->getCollection()->transform(function ($project) {
                 return $this->formatProjectData($project);
@@ -114,7 +119,7 @@ public function showPage($slug)
                 'category' => 'nullable|string|max:255',
                 'status' => 'required|in:active,inactive',
                 'location' => 'nullable|string|max:255',
-                'rating' => 'nullable|integer|min:1|max:5',
+                'order' => 'nullable|integer|min:1',
                 'year' => 'nullable|string|max:4',
                 'contract_type' => 'nullable|string|max:255',
             ]);
@@ -134,7 +139,7 @@ public function showPage($slug)
                 'category' => $request->category,
                 'status' => $request->status,
                 'location' => $request->location,
-                'rating' => $request->rating ?? 4,
+                'order' => $this->resolveProjectOrder($request->input('order')),
                 'year' => $request->year,
                 'contract_type' => $request->contract_type,
             ]);
@@ -175,16 +180,20 @@ public function showPage($slug)
                 'category' => 'nullable|string|max:255',
                 'status' => 'sometimes|in:active,inactive',
                 'location' => 'nullable|string|max:255',
-                'rating' => 'nullable|integer|min:1|max:5',
+                'order' => 'nullable|integer|min:1',
                 'year' => 'nullable|string|max:4',
                 'contract_type' => 'nullable|string|max:255',
             ]);
 
             $updateData = $request->only([
                 'title', 'name', 'description', 'category', 
-                'status', 'location', 'rating', 'year', 'contract_type',
+                'status', 'location', 'order', 'year', 'contract_type',
                 'client_name'
             ]);
+
+            if ($request->filled('order')) {
+                $updateData['order'] = (int) $request->input('order');
+            }
 
             if ($request->has('title') && !$request->has('name')) {
                 $updateData['name'] = $request->title;
@@ -266,11 +275,22 @@ public function showPage($slug)
             'status' => $project->status,
             'slug' => $project->slug,
             'location' => $project->location ?? 'Various Locations',
-            'rating' => $project->rating ?? 4,
+            'order' => $project->order,
             'year' => $project->year ?? date('Y', strtotime($project->created_at)),
             'contractType' => $project->contract_type ?? 'Full Project',
             'created_at' => $project->created_at,
             'updated_at' => $project->updated_at,
         ];
+    }
+
+    private function resolveProjectOrder($order): int
+    {
+        if (filled($order)) {
+            return (int) $order;
+        }
+
+        $highestOrder = Project::whereNotNull('order')->max('order');
+
+        return max(1, ((int) $highestOrder) + 1);
     }
 }

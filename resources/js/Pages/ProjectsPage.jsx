@@ -276,11 +276,16 @@ const imgurl = import.meta.env.VITE_IMAGE_PATH;
 // Sort helper function
 const sortProjectsByOrder = (projects) => {
     if (!Array.isArray(projects)) return projects;
-    return [...projects].sort((a, b) => {
-        const orderA = a.order !== undefined && a.order !== null ? a.order : 999999;
-        const orderB = b.order !== undefined && b.order !== null ? b.order : 999999;
-        return orderA - orderB;
-    });
+
+    const getOrderValue = (item) => {
+        const parsed = Number(item?.order);
+        if (!Number.isFinite(parsed) || parsed < 1) {
+            return 999999;
+        }
+        return parsed;
+    };
+
+    return [...projects].sort((a, b) => getOrderValue(a) - getOrderValue(b));
 };
 
 // ─── Scroll To Top ────────────────────────────────────────────────────────────
