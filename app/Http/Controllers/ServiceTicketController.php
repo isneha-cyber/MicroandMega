@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\ServiceTicketCreatedAdminMail;
+use App\Mail\ServiceTicketCreatedCustomerMail;   // ← NEW
 use App\Models\ServiceTicket;
 use App\Models\Log;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Log as LaravelLog;
 use Illuminate\Support\Facades\Storage;
 
@@ -16,14 +19,14 @@ class ServiceTicketController extends Controller
             $tickets = ServiceTicket::latest()->get();
 
             return response()->json([
-                'status' => true,
-                'data' => $tickets,
+                'status'  => true,
+                'data'    => $tickets,
                 'message' => 'Service tickets fetched successfully',
             ]);
         } catch (\Exception $e) {
             LaravelLog::error('Error fetching service tickets: ' . $e->getMessage());
             return response()->json([
-                'status' => false,
+                'status'  => false,
                 'message' => 'Error fetching service tickets: ' . $e->getMessage(),
             ], 500);
         }
@@ -80,22 +83,62 @@ class ServiceTicketController extends Controller
 
             // Log ticket creation
             Log::create([
-'name' => $ticket->requester_name,  
+                'name'       => $ticket->requester_name,
                 'ip_address' => $request->ip(),
                 'title'      => 'Service Ticket Created: ' . $ticket->ticket_id . ' - ' . $ticket->subject_line,
             ]);
 
+            // Notify admin and send customer confirmation
+            $this->sendAdminNotification($ticket);
+            $this->sendCustomerConfirmation($ticket);   // ← NEW
+
             return response()->json([
-                'status' => true,
+                'status'  => true,
                 'message' => 'Service ticket created successfully',
-                'data' => $ticket,
+                'data'    => $ticket,
             ], 201);
         } catch (\Exception $e) {
             LaravelLog::error('Error creating service ticket: ' . $e->getMessage());
             return response()->json([
-                'status' => false,
+                'status'  => false,
                 'message' => 'Error creating service ticket: ' . $e->getMessage(),
             ], 500);
+        }
+    }
+
+    // ── NEW: customer confirmation ────────────────────────────────────────────
+    private function sendCustomerConfirmation(ServiceTicket $ticket): void
+    {
+        try {
+            Mail::to($ticket->email)->send(new ServiceTicketCreatedCustomerMail($ticket));
+        } catch (\Exception $e) {
+            // Log but don't bubble — the ticket is already saved successfully.
+            LaravelLog::error('Failed to send customer confirmation mail: ' . $e->getMessage(), [
+                'ticket_id'      => $ticket->ticket_id,
+                'customer_email' => $ticket->email,
+            ]);
+        }
+    }
+    // ─────────────────────────────────────────────────────────────────────────
+
+    private function sendAdminNotification(ServiceTicket $ticket): void
+    {
+        $adminEmail = config('mail.admin_notification_address');
+
+        if (blank($adminEmail)) {
+            LaravelLog::warning('Service ticket admin notification skipped: no admin email configured.', [
+                'ticket_id' => $ticket->ticket_id,
+            ]);
+            return;
+        }
+
+        try {
+            Mail::to($adminEmail)->send(new ServiceTicketCreatedAdminMail($ticket));
+        } catch (\Exception $e) {
+            LaravelLog::error('Failed to send service ticket admin notification: ' . $e->getMessage(), [
+                'ticket_id'   => $ticket->ticket_id,
+                'admin_email' => $adminEmail,
+            ]);
         }
     }
 
@@ -142,7 +185,7 @@ class ServiceTicketController extends Controller
             if ($request->hasFile('attachment')) {
                 $file = $request->file('attachment');
                 if ($file && $file->isValid()) {
-                    $existingAttachments = $ticket->attachments ?? [];
+                    $existingAttachments   = $ticket->attachments ?? [];
                     $existingAttachments[] = $file->store('service-tickets', 'public');
                     $updateData['attachments'] = $existingAttachments;
                 } else {
@@ -160,14 +203,14 @@ class ServiceTicketController extends Controller
             ]);
 
             return response()->json([
-                'status' => true,
+                'status'  => true,
                 'message' => 'Service ticket updated successfully',
-                'data' => $ticket->fresh(),
+                'data'    => $ticket->fresh(),
             ]);
         } catch (\Exception $e) {
             LaravelLog::error('Error updating service ticket: ' . $e->getMessage());
             return response()->json([
-                'status' => false,
+                'status'  => false,
                 'message' => 'Error updating service ticket: ' . $e->getMessage(),
             ], 500);
         }
@@ -178,12 +221,10 @@ class ServiceTicketController extends Controller
         try {
             $ticket = ServiceTicket::findOrFail($id);
 
-            // Capture details before deletion for the log
             $ticketId      = $ticket->ticket_id;
             $subjectLine   = $ticket->subject_line;
             $requesterName = $ticket->requester_name;
 
-            // Delete stored attachments from storage
             if (!empty($ticket->attachments)) {
                 foreach ($ticket->attachments as $attachment) {
                     if (Storage::disk('public')->exists($attachment)) {
@@ -194,7 +235,6 @@ class ServiceTicketController extends Controller
 
             $ticket->delete();
 
-            // Log ticket deletion
             Log::create([
                 'name'       => auth()->user()?->name ?? $requesterName,
                 'ip_address' => $request->ip(),
@@ -202,13 +242,13 @@ class ServiceTicketController extends Controller
             ]);
 
             return response()->json([
-                'status' => true,
+                'status'  => true,
                 'message' => 'Service ticket deleted successfully',
             ]);
         } catch (\Exception $e) {
             LaravelLog::error('Error deleting service ticket: ' . $e->getMessage());
             return response()->json([
-                'status' => false,
+                'status'  => false,
                 'message' => 'Error deleting service ticket: ' . $e->getMessage(),
             ], 500);
         }

@@ -683,11 +683,13 @@ export default function Hero() {
 
         <div className="relative w-full min-h-[700px] md:min-h-[940px] h-auto md:h-screen overflow-hidden">
 
-          {/* Background image */}
-          <div
-            className="hero-bg-image absolute inset-0 bg-cover bg-center bg-scroll md:bg-fixed transition-all duration-700"
-            style={{ backgroundImage: `url(${slide.bg})` }}
+        <div
+            className="absolute inset-0 bg-center bg-cover md:bg-cover bg-no-repeat transition-all duration-700 scale-100"
+            style={{
+              backgroundImage: `url(${slide.bg})`,
+            }}
           />
+
 
           {/* Dark overlay with gradient animation */}
           <div className="absolute inset-0 bg-gradient-to-r from-[rgba(5,10,20,0.90)] via-[rgba(5,10,20,0.60)] to-[rgba(5,10,20,0.30)]" />
